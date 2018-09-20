@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -N JOBNAME
+#PBS -M abcd28s@gmail.com
+#PBS -m abe
+#PBS -l nodes=1:ppn=16
+#PBS -l walltime=7:00:00:00
+export OMP_NUM_THREADS=1
+cd $PBS_O_WORKDIR
+source activate mypython3
+python  get_ra_dec.py             1>stdout-get  2>stderr-get
+python  density-estimation.py     1>stdout-den  2>stderr-den
