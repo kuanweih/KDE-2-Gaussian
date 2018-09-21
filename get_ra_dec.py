@@ -4,7 +4,7 @@ import sqlutilpy
 
 # files names
 PERSONAL_TXT = 'kw-wsdb.txt'    # text file of input personal info
-PARAMETER_TXT = 'parameters.txt'    # text file for parameters of database
+PARAMETER_TXT = 'param-get.txt'    # text file for parameters of database
 FILENAME = 'stars-coord-fornax'    # output file name
 INFOFILE = 'stars-coord-attr'    # info of the map
 
