@@ -1,13 +1,19 @@
 import numpy as np
 
 
+# files names
 COORDFILE = 'stars-coord-fornax.npy'    # input stars coords
 INFOFILE = 'stars-coord-attr.npy'    # input center info
 SIGNI_FILE = 'significance'    # output significance file
 MESHFILE = 'meshgrids'    # output mesh grids
-NUM_GRID = 50    # number of meshgrids
-SIGMA1 = 0.05    # searching scale (smaller) in degree
-SIGMA2 = 1.    # background scale (larger) in degree
+PARAMETER_TXT = 'param-get.txt'    # parma file txt
+
+
+# NUM_GRID, SIGMA1, SIGMA2 from parameter file
+with open(PARAMETER_TXT, 'r') as param_file:
+    exec(param_file.readline())
+    exec(param_file.readline())
+    exec(param_file.readline())
 
 
 def gaussian(x, y, s):
