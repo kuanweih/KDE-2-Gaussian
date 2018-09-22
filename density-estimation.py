@@ -2,7 +2,7 @@ import numpy as np
 
 
 # files names
-COORDFILE = 'stars-coord-fornax.npy'    # input stars coords
+COORDFILE = 'stars-coord.npy'    # input stars coords
 INFOFILE = 'stars-coord-attr.npy'    # input center info
 SIGNI_FILE = 'significance'    # output significance file
 MESHFILE = 'meshgrids'    # output mesh grids
