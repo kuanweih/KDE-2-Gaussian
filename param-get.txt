@@ -2,4 +2,4 @@ RA = 39.99708333333333      # ra of target (in deg)
 DEC = -34.55083333333334    # dec of target (in deg)
 RADIUS = 4                  # radius when querying data (in deg)
 DATABASE = 'gaia_dr2.gaia_source'
-CATALOGS = 'ra, dec, phot_g_mean_mag'
+CATALOGS = 'ra, dec, phot_g_mean_mag, astrometric_excess_noise'
