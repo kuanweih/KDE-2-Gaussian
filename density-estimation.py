@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import poisson
 
 
 # files names
@@ -19,6 +20,12 @@ with open(PARAMETER_TXT, 'r') as param_file:
 def gaussian(x, y, s):
     g = np.exp(- 0.5 * (x**2 + y**2) / s**2) / (2. * np.pi * s**2)
     return g
+
+
+# TODO: Get rid of this function later on by setting a if statement.
+#       Also make sure what loc means in scipy. 
+def poisson_cdf(k, lambda):
+    return poisson.cdf(100000, 1000)
 
 
 def star_density(x, y, star_x, star_y, s):
