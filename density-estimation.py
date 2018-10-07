@@ -11,7 +11,6 @@ PARAMETER_TXT = 'param-den.txt'    # parma file txt
 
 # NUM_GRID, SIGMA1, SIGMA2... from parameter file
 with open(PARAMETER_TXT, 'r') as file:
-    exec(param_file.readline())
     for line in file:
         exec(line)
 
