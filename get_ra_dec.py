@@ -22,13 +22,17 @@ with open(PARAMETER_TXT, 'r') as param_file:
 
 
 if ASTRO_EX_NOISE_G_MAG_CUT == 1:
-    """ simplify eq 1 in Koposov et al 2017 (MNRAS 470) into exponential form """
+    """
+    simplify eq 1 in Koposov et al 2017 (MNRAS 470) into exponential form
+    """
     def con_arr_astro_ex_noise_g_mag(astro_ex_noise, g_mag):
         return astro_ex_noise - 10.**(0.15 * (g_mag - 15.) + 0.25)
 
 
 def cut_datas(datas, con_arr, min_val, max_val):
-    """ apply condition to the queried data"""
+    """
+    apply condition to the queried data
+    """
     if min_val != None:
         if max_val != None:
             mask = (min_val < con_arr) & (con_arr < max_val)
