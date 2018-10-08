@@ -51,10 +51,19 @@ def od_poisson(x, y, star_x, star_y, s1, r, s2):
     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
                                for i in range(len(star_x))]), axis=0)
 
+    # TODO: test middle r value
+    r = np.sqrt(s2**2 - 10.*s1**2)
+
     n_outer = np.sum(np.array([(r**2 < distance2(x, y, star_x[i], star_y[i])) *
                                (distance2(x, y, star_x[i], star_y[i]) < s2**2)
                                for i in range(len(star_x))]), axis=0)
     od = poisson.cdf(n_inner, n_outer)
+
+    print('N_0:')
+    print(n_inner)
+    print('N:')
+    print(n_outer)
+
     return od
 
 
