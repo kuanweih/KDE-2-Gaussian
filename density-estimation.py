@@ -53,7 +53,7 @@ def od_poisson(x, y, star_x, star_y, s1, s2, r12):
 
     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
                                for i in range(len(star_x))]), axis=0)
-                               
+
     n_outer = np.sum(np.array([(r**2 < distance2(x, y, star_x[i], star_y[i])) *
                                (distance2(x, y, star_x[i], star_y[i]) < s2**2)
                                for i in range(len(star_x))]), axis=0)
@@ -122,7 +122,7 @@ xx, yy = np.meshgrid(x, y, sparse=True)  # TODO: what does sparse mean?
 
 # sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
 sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1],
-                   kernel_bg=KERNEL_BG, poisson_r=RATIO_AREA_TG_BG)
+                   kernel_bg=KERNEL_BG, r12=RATIO_AREA_TG_BG)
 print(sig)
 np.save(SIGNI_FILE, sig)
 np.save(MESHFILE, np.array([x, y]))
