@@ -51,17 +51,18 @@ def od_poisson(x, y, star_x, star_y, s1, r, s2):
     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
                                for i in range(len(star_x))]), axis=0)
 
-    # TODO: test middle r value
-    r = np.sqrt(s2**2 - 10.*s1**2)
+    # TODO: debugging: test middle r value
+    r = np.sqrt(s2**2 - 10. * s1**2)
 
     n_outer = np.sum(np.array([(r**2 < distance2(x, y, star_x[i], star_y[i])) *
                                (distance2(x, y, star_x[i], star_y[i]) < s2**2)
                                for i in range(len(star_x))]), axis=0)
     od = poisson.cdf(n_inner, n_outer)
 
-    print('N_0:')
+    # TODO: debugging
+    print('\nN_0:')
     print(n_inner)
-    print('N:')
+    print('\nN:')
     print(n_outer)
 
     return od
@@ -87,8 +88,18 @@ def significance(x, y, s1, s2, star_x, star_y,
     od_1: overdensity of target region + background
     od_2: background overdensity
     """
-    sig = (od_1 - od_2) / np.sqrt(od_2)
-    sig *= np.sqrt(4. * np.pi) * s1
+    sigma = od_gaussian(x, y, star_x, star_y, s2) / (4. * np.pi * s1**2)
+    sigma = np.sqrt(sigma)
+    sig = (od_1 - od_2) / sigma
+
+    # TODO: debugging
+    print('\nod_1:')
+    print(od_1)
+    print('\nod_2:')
+    print(od_2)
+    print('\nsig:')
+    print(sig)
+
     return sig
 
 
