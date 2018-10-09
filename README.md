@@ -1,6 +1,11 @@
 # KDE-2-Gaussian
-Two Gaussian KDE for 2D observational data
+Two Gaussians kernel density estimation for 2D observational data, based on [Koposov et al 2008](http://cdsads.u-strasbg.fr/abs/2008ApJ...686..279K) and plus another estimation for background overdensity with Poisson distribution. 
 
 
-### First run get_ra_dec.py to get numpy array by querying data from database
-### Then run density-estimation.py to calculate overdensity and significance 
+# How to use it: 
+
+1. setup paramters in param_get.txt and param_den.txt
+2. run get_ra_dec.py to get numpy array by querying data from database
+3. run density-estimation.py to calculate overdensity and significance 
+
+P.S. If running on clusters, a pbs script is provided also. 
