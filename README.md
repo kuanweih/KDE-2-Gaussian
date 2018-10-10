@@ -4,8 +4,8 @@ Two Gaussians kernel density estimation for 2D observational data, based on [Kop
 
 # How to use it: 
 
-1. setup paramters in param_get.txt and param_den.txt
+1. setup paramters in param_get.py and param_den.py
 2. run get_ra_dec.py to get numpy array by querying data from database
-3. run density-estimation.py to calculate overdensity and significance 
+3. run density_estimation.py to calculate overdensity and significance 
 
 P.S. If running on clusters, a pbs script is provided also. 
