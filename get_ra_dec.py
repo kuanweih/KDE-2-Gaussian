@@ -27,23 +27,10 @@ def cut_datas(datas, con_arr, min_val, max_val):
     return [data[mask] for data in datas]
 
 
-def exec_txt(txtfile):
-    with open(txtfile, 'r') as file:
-        for line in file:
-            exec(line)
-
-
-
 def main():
     # files names
-    PERSONAL_FILE = 'kw-wsdb.txt'    # text file of input personal info
-    # PARAMETER_FILE = 'param-get.txt'    # text file for parameters of database
-    PARAMETER_FILE = 'param_get.py'    # text file for parameters of database
     FILENAME = 'stars-coord'    # output file name
     INFOFILE = 'stars-coord-attr'    # info of the map
-
-
-
 
     # query data from DATABASE
     query_str = 'select {} from {} where q3c_radial_query(ra, dec, {}, {}, {})'.format(
@@ -65,7 +52,7 @@ def main():
     np.save(FILENAME, np.array([ra, dec]))
     np.save(INFOFILE, np.array([RA, DEC, RADIUS, len(ra)]))
 
-    print('Yeah! Done!')
+    print('Yeah! Done with getting ra and dec!')
 
 
 if __name__ == '__main__':
