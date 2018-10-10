@@ -1,18 +1,5 @@
 import numpy as np
-
-
-# files names
-COORDFILE = 'stars-coord.npy'    # input stars coords
-INFOFILE = 'stars-coord-attr.npy'    # input center info
-SIGNI_FILE = 'significance'    # output significance file
-MESHFILE = 'meshgrids'    # output mesh grids
-PARAMETER_TXT = 'param-den.txt'    # parma file txt
-
-
-# NUM_GRID, SIGMA1, SIGMA2... from parameter file
-with open(PARAMETER_TXT, 'r') as file:
-    for line in file:
-        exec(line)
+from param_den import *
 
 
 def gaussian(x, y, s):
@@ -35,7 +22,7 @@ def od_gaussian(x, y, star_x, star_y, s):
 
 def distance2(x_arr, y_arr, x_cen, y_cen):
     """
-    2d distance
+    2d distance square
     """
     d2 = (x_arr - x_cen)**2 + (y_arr - y_cen)**2
     return d2
@@ -103,29 +90,41 @@ def significance(x, y, s1, s2, star_x, star_y, kernel_bg='gaussian', r12=0):
     return sig
 
 
-# load ra and dec
-coords = np.load(COORDFILE)
-infos = np.load(INFOFILE)
+def main():
+    # files names
+    COORDFILE = 'stars-coord.npy'    # input stars coords
+    INFOFILE = 'stars-coord-attr.npy'    # input center info
+    SIGNI_FILE = 'significance'    # output significance file
+    MESHFILE = 'meshgrids'    # output mesh grids
 
-ra_center = infos[0]
-dec_center = infos[1]
-width_mesh = infos[2]
+    # load ra and dec
+    coords = np.load(COORDFILE)
+    infos = np.load(INFOFILE)
+
+    ra_center = infos[0]
+    dec_center = infos[1]
+    width_mesh = infos[2]
+
+    # create mesh
+    x = np.linspace(ra_center - 0.5 * width_mesh,
+                    ra_center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
+    y = np.linspace(dec_center - 0.5 * width_mesh,
+                    dec_center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
+    xx, yy = np.meshgrid(x, y, sparse=True)  # TODO: what does sparse mean?
+
+    # TODO use kernel tag to shorten this into one line
+    # sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
+    sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1],
+                       kernel_bg=KERNEL_BG, r12=RATIO_AREA_TG_BG)
+
+    # TODO debugging
+    print(sig)
+
+    np.save(SIGNI_FILE, sig)
+    np.save(MESHFILE, np.array([x, y]))
+
+    print('Yeah! Done with density estimation!')
 
 
-# create mesh
-x = np.linspace(ra_center - 0.5 * width_mesh,
-                ra_center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
-y = np.linspace(dec_center - 0.5 * width_mesh,
-                dec_center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
-xx, yy = np.meshgrid(x, y, sparse=True)  # TODO: what does sparse mean?
-
-
-# sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
-sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1],
-                   kernel_bg=KERNEL_BG, r12=RATIO_AREA_TG_BG)
-print(sig)
-np.save(SIGNI_FILE, sig)
-np.save(MESHFILE, np.array([x, y]))
-
-
-# end of code
+if __name__ == '__main__':
+    main()
