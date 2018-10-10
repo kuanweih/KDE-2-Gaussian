@@ -1,5 +1,7 @@
 import numpy as np
 import sqlutilpy
+from param_get import *
+from kw_wsdb import *
 
 
 def con_arr_astro_ex_noise_g_mag(astro_ex_noise, g_mag):
@@ -25,23 +27,23 @@ def cut_datas(datas, con_arr, min_val, max_val):
     return [data[mask] for data in datas]
 
 
+def exec_txt(txtfile):
+    with open(txtfile, 'r') as file:
+        for line in file:
+            exec(line)
+
+
+
 def main():
     # files names
     PERSONAL_FILE = 'kw-wsdb.txt'    # text file of input personal info
-    # PARAMETER_TXT = 'param-get.txt'    # text file for parameters of database
-    PARAMETER_FILE = 'param-get.py'    # text file for parameters of database
+    # PARAMETER_FILE = 'param-get.txt'    # text file for parameters of database
+    PARAMETER_FILE = 'param_get.py'    # text file for parameters of database
     FILENAME = 'stars-coord'    # output file name
     INFOFILE = 'stars-coord-attr'    # info of the map
 
-    # HOST, USER, PASSWORD from personal txt file
-    with open(PERSONAL_FILE, 'r') as info_file:
-        for line in info_file:
-            exec(line)
 
-    # RA, DEC, RADIUS, DATABASE, CATALOGS etc... from parameter file
-    with open(PARAMETER_FILE, 'r') as param_file:
-        for line in param_file:
-            exec(line)
+
 
     # query data from DATABASE
     query_str = 'select {} from {} where q3c_radial_query(ra, dec, {}, {}, {})'.format(
