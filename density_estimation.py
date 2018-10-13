@@ -46,11 +46,12 @@ def od_poisson(x, y, star_x, star_y, s1, s2, r12):
                                for i in range(len(star_x))]), axis=0)
     od = poisson.cdf(n_inner, n_outer)
 
-    # TODO: debugging
-    print('\nN_0:')
-    print(n_inner)
-    print('\nN:')
-    print(n_outer)
+
+    if DEBUGGING:    # TODO: debugging
+        print('\nN_0:')
+        print(n_inner)
+        print('\nN:')
+        print(n_outer)
 
     return od
 
@@ -79,15 +80,32 @@ def significance(x, y, s1, s2, star_x, star_y, kernel_bg='gaussian', r12=0):
     sigma = np.sqrt(sigma)
     sig = (od_1 - od_2) / sigma
 
-    # TODO: debugging
-    print('\nod_1:')
-    print(od_1)
-    print('\nod_2:')
-    print(od_2)
-    print('\nsig:')
-    print(sig)
+    if DEBUGGING:    # TODO: debugging
+        print('\nod_1:')
+        print(od_1)
+        print('\nod_2:')
+        print(od_2)
+        print('\nsig:')
+        print(sig)
 
     return sig
+
+def get_grid_coord(center, width_mesh):
+    """
+    get grid coordinates according to the center position and width of the mesh
+    """
+    coord = np.linspace(center - 0.5 * width_mesh,
+                        center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
+    return coord
+
+
+def create_mesh(ra_center, dec_center, width_mesh):
+    """
+    create meshgrid according to grid coordinates by np.meshgrid
+    """
+    x = get_grid_coord(ra_center, width_mesh)
+    y = get_grid_coord(dec_center, width_mesh)
+    return np.meshgrid(x, y, sparse=True)  # TODO: what does sparse mean?
 
 
 def main():
@@ -106,19 +124,19 @@ def main():
     width_mesh = infos[2]
 
     # create mesh
-    x = np.linspace(ra_center - 0.5 * width_mesh,
-                    ra_center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
-    y = np.linspace(dec_center - 0.5 * width_mesh,
-                    dec_center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
-    xx, yy = np.meshgrid(x, y, sparse=True)  # TODO: what does sparse mean?
+    xx, yy = create_mesh(ra_center, dec_center, width_mesh)
 
-    # TODO use kernel tag to shorten this into one line
-    # sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
-    sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1],
-                       kernel_bg=KERNEL_BG, r12=RATIO_AREA_TG_BG)
+    # get significance
+    if KERNEL_BG == 'gaussian':
+        sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
+    elif KERNEL_BG == 'poisson':
+        sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1],
+                           kernel_bg=KERNEL_BG, r12=RATIO_AREA_TG_BG)
+    else:
+        print('wrong kernel :(')
 
-    # TODO debugging
-    print(sig)
+    if DEBUGGING:    # TODO debugging
+        print(sig)
 
     np.save(SIGNI_FILE, sig)
     np.save(MESHFILE, np.array([x, y]))
