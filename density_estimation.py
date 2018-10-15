@@ -102,6 +102,7 @@ def get_grid_coord(center, width_mesh):
 def create_mesh(ra_center, dec_center, width_mesh):
     """
     create meshgrid according to grid coordinates by np.meshgrid
+    also np.save mesh coordinates
     """
     x = get_grid_coord(ra_center, width_mesh)
     y = get_grid_coord(dec_center, width_mesh)
@@ -139,7 +140,8 @@ def main():
         print(sig)
 
     np.save(SIGNI_FILE, sig)
-    np.save(MESHFILE, np.array([x, y]))
+    np.save(MESHFILE, np.array([get_grid_coord(ra_center, width_mesh),
+                                get_grid_coord(dec_center, width_mesh)]))
 
     print('Yeah! Done with density estimation!')
 
