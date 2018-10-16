@@ -1,6 +1,6 @@
-NUM_GRID = 20    # number of meshgrids
+NUM_GRID = 100    # number of meshgrids
 SIGMA1 = 0.01    # searching scale (smaller) in degree
-SIGMA2 = 1.    # background scale (larger) in degree
+SIGMA2 = 0.1    # background scale (larger) in degree
 
 
 KERNEL_BG = 'poisson'    # background distribution: default 'gaussian'

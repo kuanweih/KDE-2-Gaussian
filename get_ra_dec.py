@@ -11,24 +11,7 @@ def con_arr_astro_ex_noise_g_mag(astro_ex_noise, g_mag):
     return astro_ex_noise - 10.**(0.15 * (g_mag - 15.) + 0.25)
 
 
-# TODO to be replaced by returning mask_cut
-def cut_datas(datas, con_arr, min_val, max_val):
-    """
-    apply condition to the queried data
-    """
-    if min_val != None:
-        if max_val != None:
-            mask = (min_val < con_arr) & (con_arr < max_val)
-        else:
-            mask = (min_val < con_arr)
-    elif max_val != None:
-        mask = (con_arr < max_val)
-    else:
-        print('Oops, no input minimum or maximum value here.')
-    return [data[mask] for data in datas]
-
-
-def mask_cut(datas, con_arr, min_val, max_val):
+def mask_cut(con_arr, min_val, max_val):
     """
     apply condition to the queried data
     """
@@ -53,34 +36,53 @@ def sql_get(catalog):
     return sqlutilpy.get(query_str, host=HOST, user=USER, password=PASSWORD)
 
 
+def g_mag_cut(datas, mask):
+    g_mag = sql_get('phot_g_mean_mag')[0]
+    datas = np.concatenate((datas, [g_mag]), axis=0)
+    mask = mask & mask_cut(g_mag, G_MAG_MIN, G_MAG_MAX)
+    return datas, mask
+
+
+def astro_ex_noise_gmag_cut(datas, mask):
+    g_mag, am_noise = sql_get('phot_g_mean_mag, astrometric_excess_noise')
+    am_ex_no_g_mag = con_arr_astro_ex_noise_g_mag(am_noise, g_mag)
+    datas = np.concatenate((datas, [am_ex_no_g_mag]), axis=0)
+    mask = mask & mask_cut(am_ex_no_g_mag, ASTRO_EX_NOISE_G_MAG_MIN,
+                           ASTRO_EX_NOISE_G_MAG_MAX)
+    return datas, mask
+
+
+def remove_pm_nan(datas, mask):
+    pmra, pmdec = sql_get('pmra, pmdec')
+    datas = np.concatenate((datas, [pmra]), axis=0)
+    datas = np.concatenate((datas, [pmdec]), axis=0)
+    mask = mask & (~np.isnan(pmra)) & (~np.isnan(pmdec))
+    return datas, mask
+
+
 def main():
     # files names
     FILENAME = 'stars-coord'    # output file name
     INFOFILE = 'stars-coord-attr'    # info of the map
 
-    # query data from DATABASE
+    # query position data from DATABASE
     ra, dec = sql_get('ra, dec')
     datas = np.array([ra, dec])
     mask = [True] * len(ra)
 
+    # apply selections
     if G_MAG_CUT:
-        g_mag = sql_get('phot_g_mean_mag')
-        datas = np.concatenate((datas, [g_mag]), axis=0)
-        mask = mask & mask_cut(datas, g_mag, G_MAG_MIN, G_MAG_MAX)
-
+        datas, mask = g_mag_cut(datas, mask)
     if ASTRO_EX_NOISE_G_MAG_CUT:
-        am_ex_noise = sql_get('astrometric_excess_noise')
-        am_ex_no_g_mag = con_arr_astro_ex_noise_g_mag(am_ex_noise, g_mag)
-        datas = np.concatenate((datas, [am_ex_noise]), axis=0)
-        datas = mask & mask_cut(datas, am_ex_no_g_mag,
-                                ASTRO_EX_NOISE_G_MAG_MIN,
-                                ASTRO_EX_NOISE_G_MAG_MAX)
+        datas, mask = astro_ex_noise_gmag_cut(datas, mask)
+    if REMOVE_PM_NAN:
+        datas, mask = remove_pm_nan(datas, mask)
 
     datas = [data[mask] for data in datas]
 
     # output
-    np.save(FILENAME, np.array([ra, dec]))
-    np.save(INFOFILE, np.array([RA, DEC, RADIUS, len(ra)]))
+    np.save(FILENAME, np.array([datas[0], datas[1]]))    # ra and dec
+    np.save(INFOFILE, np.array([RA, DEC, RADIUS, len(datas[0])]))
 
     print('Yeah! Done with getting ra and dec!')
 
