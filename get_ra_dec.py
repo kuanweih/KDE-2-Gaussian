@@ -60,6 +60,23 @@ def remove_pm_nan(datas, mask):
     return datas, mask
 
 
+def pm_cut(datas, mask):
+    pmra, pmdec = sql_get('pmra, pmdec')
+    datas = np.concatenate((datas, [pmra]), axis=0)
+    datas = np.concatenate((datas, [pmdec]), axis=0)
+
+    pmra_mean = np.mean(pmra[~np.isnan(pmra)])
+    pmra_std = np.std(pmra[~np.isnan(pmra)])
+    pmdec_mean = np.mean(pmdec[~np.isnan(pmdec)])
+    pmdec_std = np.std(pmdec[~np.isnan(pmdec)])
+
+    mask = mask & mask_cut(pmra, pmra_mean - PM_CUT_STD * pmra_std,
+                           pmra_mean + PM_CUT_STD * pmra_std) &
+                  mask_cut(pmdec, pmdec_mean - PM_CUT_STD * pmdec_std,
+                           pmdec_mean + PM_CUT_STD * pmdec_std)
+    return datas, mask
+
+
 def main():
     # files names
     FILENAME = 'stars-coord'    # output file name
@@ -77,6 +94,8 @@ def main():
         datas, mask = astro_ex_noise_gmag_cut(datas, mask)
     if REMOVE_PM_NAN:
         datas, mask = remove_pm_nan(datas, mask)
+    if PM_CUT:
+        datas, mask = pm_cut(datas, mask)
 
     datas = [data[mask] for data in datas]
 

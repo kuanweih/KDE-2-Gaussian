@@ -8,6 +8,12 @@ DATABASE = 'gaia_dr2.gaia_source'
 REMOVE_PM_NAN = True    # True:on, Flase:off
 
 
+""" proper motion cut for pmra and pmdec """
+PM_CUT = True
+if PM_CUT:
+    PM_CUT_STD = 1
+
+
 """ g-band cut"""
 G_MAG_CUT = False    # True:on, Flase:off
 if G_MAG_CUT:
