@@ -9,9 +9,9 @@ REMOVE_PM_NAN = True    # True:on, Flase:off
 
 
 """ proper motion cut for pmra and pmdec """
-PM_CUT = True
+PM_CUT = True    # True:on, Flase:off
 if PM_CUT:
-    PM_CUT_STD = 1
+    PM_CUT_STD = 1.
 
 
 """ g-band cut"""

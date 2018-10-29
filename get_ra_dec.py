@@ -70,11 +70,13 @@ def pm_cut(datas, mask):
     pmdec_mean = np.mean(pmdec[~np.isnan(pmdec)])
     pmdec_std = np.std(pmdec[~np.isnan(pmdec)])
 
-    mask = mask & mask_cut(pmra,
-           pmra_mean - PM_CUT_STD * pmra_std,
-           pmra_mean + PM_CUT_STD * pmra_std) & mask_cut(pmdec,
-           pmdec_mean - PM_CUT_STD * pmdec_std,
-           pmdec_mean + PM_CUT_STD * pmdec_std)
+    pmra_min = pmra_mean - PM_CUT_STD * pmra_std
+    pmra_max = pmra_mean + PM_CUT_STD * pmra_std
+    pmdec_min = pmdec_mean - PM_CUT_STD * pmdec_std
+    pmdec_max = pmdec_mean + PM_CUT_STD * pmdec_std
+
+    mask = mask & mask_cut(pmra, pmra_min,
+                           pmra_max) & mask_cut(pmdec, mdec_min, pmdec_max)
     return datas, mask
 
 
