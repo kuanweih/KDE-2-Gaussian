@@ -122,7 +122,7 @@ def main():
 
     ra_center = infos[0]
     dec_center = infos[1]
-    width_mesh = infos[2]
+    width_mesh = infos[2]  # This is actually the radius when querying
 
     # create mesh
     xx, yy = create_mesh(ra_center, dec_center, width_mesh)
