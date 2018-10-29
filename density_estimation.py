@@ -90,22 +90,22 @@ def significance(x, y, s1, s2, star_x, star_y, kernel_bg='gaussian', r12=0):
 
     return sig
 
-def get_grid_coord(center, half_width):
+def get_grid_coord(center, width_mesh):
     """
     get grid coordinates according to the center position and width of the mesh
     """
-    coord = np.linspace(center - half_width,
-                        center + half_width, num=NUM_GRID, endpoint=True)
+    coord = np.linspace(center - 0.5 * width_mesh,
+                        center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
     return coord
 
 
-def create_mesh(ra_center, dec_center, half_width):
+def create_mesh(ra_center, dec_center, width_mesh):
     """
     create meshgrid according to grid coordinates by np.meshgrid
     also np.save mesh coordinates
     """
-    x = get_grid_coord(ra_center, half_width)
-    y = get_grid_coord(dec_center, half_width)
+    x = get_grid_coord(ra_center, width_mesh)
+    y = get_grid_coord(dec_center, width_mesh)
     return np.meshgrid(x, y, sparse=True)  # TODO: what does sparse mean?
 
 
@@ -122,10 +122,10 @@ def main():
 
     ra_center = infos[0]
     dec_center = infos[1]
-    half_width = infos[2]  # This is actually the radius when querying
+    width_mesh = infos[2]  # This is actually the radius when querying
 
     # create mesh
-    xx, yy = create_mesh(ra_center, dec_center, half_width)
+    xx, yy = create_mesh(ra_center, dec_center, width_mesh)
 
     # get significance
     if KERNEL_BG == 'gaussian':
@@ -140,8 +140,8 @@ def main():
         print(sig)
 
     np.save(SIGNI_FILE, sig)
-    np.save(MESHFILE, np.array([get_grid_coord(ra_center, half_width),
-                                get_grid_coord(dec_center, half_width)]))
+    np.save(MESHFILE, np.array([get_grid_coord(ra_center, width_mesh),
+                                get_grid_coord(dec_center, width_mesh)]))
 
     print('Yeah! Done with density estimation!')
 
