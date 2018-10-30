@@ -76,7 +76,7 @@ def pm_cut(datas, mask):
     pmdec_max = pmdec_mean + PM_CUT_STD * pmdec_std
 
     mask = mask & mask_cut(pmra, pmra_min,
-                           pmra_max) & mask_cut(pmdec, mdec_min, pmdec_max)
+                           pmra_max) & mask_cut(pmdec, pmdec_min, pmdec_max)
     return datas, mask
 
 
