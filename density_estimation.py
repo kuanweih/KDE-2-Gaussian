@@ -51,6 +51,8 @@ def poisson_cdf(x, y, star_x, star_y, s1, s2, r12):
         print(n_inner)
         print('\nN:')
         print(n_outer)
+        print('\nCDF:')
+        print(poisson.cdf(n_inner, n_outer))
 
     return poisson.cdf(n_inner, n_outer)
 
