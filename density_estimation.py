@@ -28,9 +28,10 @@ def distance2(x_arr, y_arr, x_cen, y_cen):
     return d2
 
 
-def od_poisson(x, y, star_x, star_y, s1, s2, r12):
+def poisson_cdf(x, y, star_x, star_y, s1, s2, r12):
     """
-    overdensity on a mesh with a Poisson CDF
+    Calculate Poisson CDF on each grid to represent the probability of
+    background stars.
     x, y: mesh arrays. star_x, star_y: position of stars
     s1, s2: inner and outer scales
     r12: ratio of area between target and background
@@ -44,8 +45,6 @@ def od_poisson(x, y, star_x, star_y, s1, s2, r12):
     n_outer = np.sum(np.array([(r**2 < distance2(x, y, star_x[i], star_y[i])) *
                                (distance2(x, y, star_x[i], star_y[i]) < s2**2)
                                for i in range(len(star_x))]), axis=0)
-    od = poisson.cdf(n_inner, n_outer)
-
 
     if DEBUGGING:    # TODO: debugging
         print('\nN_0:')
@@ -53,7 +52,7 @@ def od_poisson(x, y, star_x, star_y, s1, s2, r12):
         print('\nN:')
         print(n_outer)
 
-    return od
+    return poisson.cdf(n_inner, n_outer)
 
 
 def significance(x, y, s1, s2, star_x, star_y, kernel_bg='gaussian', r12=0):
@@ -68,7 +67,7 @@ def significance(x, y, s1, s2, star_x, star_y, kernel_bg='gaussian', r12=0):
         od_2 = od_gaussian(x, y, star_x, star_y, s2)
     elif kernel_bg == 'poisson':
         od_1 = od_gaussian(x, y, star_x, star_y, s1)
-        od_2 = od_poisson(x, y, star_x, star_y, s1, s2, r12)
+        od_2 = od_1 * poisson_cdf(x, y, star_x, star_y, s1, s2, r12)
     else:
         print('wrong kernel :(')
     """
