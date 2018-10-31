@@ -67,11 +67,9 @@ def significance(x, y, s1, s2, star_x, star_y, kernel_bg='gaussian', r12=0):
     if kernel_bg == 'gaussian':    # default case
         od_1 = od_gaussian(x, y, star_x, star_y, s1)
         od_2 = od_gaussian(x, y, star_x, star_y, s2)
-        print('Kernels: Gaussain and Gaussian.')
     elif kernel_bg == 'poisson':
         od_1 = od_gaussian(x, y, star_x, star_y, s1)
         od_2 = od_1 * poisson_cdf(x, y, star_x, star_y, s1, s2, r12)
-        print('Kernels: Gaussain and Poission.')
     else:
         print('wrong kernel :(')
     """
@@ -88,7 +86,7 @@ def significance(x, y, s1, s2, star_x, star_y, kernel_bg='gaussian', r12=0):
         print(od_1)
         print('\nod_2:')
         print(od_2)
-        print('\nsig:')
+        print('\nsig: max = %0.2e' %np.max(sig))
         print(sig)
 
     return sig
@@ -139,8 +137,6 @@ def main():
     else:
         print('wrong kernel :(')
 
-    if DEBUGGING:    # TODO debugging
-        print(sig)
 
     np.save(SIGNI_FILE, sig)
     np.save(MESHFILE, np.array([get_grid_coord(ra_center, width_mesh),
@@ -150,4 +146,6 @@ def main():
 
 
 if __name__ == '__main__':
+    # if DEBUGGING:    # TODO debugging
+    #     np.set_printoptions(precision=1)
     main()
