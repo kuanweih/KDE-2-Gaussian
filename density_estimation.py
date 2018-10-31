@@ -65,9 +65,11 @@ def significance(x, y, s1, s2, star_x, star_y, kernel_bg='gaussian', r12=0):
     if kernel_bg == 'gaussian':    # default case
         od_1 = od_gaussian(x, y, star_x, star_y, s1)
         od_2 = od_gaussian(x, y, star_x, star_y, s2)
+        print('Kernels: Gaussain and Gaussian.')
     elif kernel_bg == 'poisson':
         od_1 = od_gaussian(x, y, star_x, star_y, s1)
         od_2 = od_1 * poisson_cdf(x, y, star_x, star_y, s1, s2, r12)
+        print('Kernels: Gaussain and Poission.')
     else:
         print('wrong kernel :(')
     """
