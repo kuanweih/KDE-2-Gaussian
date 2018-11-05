@@ -93,12 +93,16 @@ def main():
     # apply selections
     if G_MAG_CUT:
         datas, mask = g_mag_cut(datas, mask)
+        print('Selected data by g_mag cut.')
     if ASTRO_EX_NOISE_G_MAG_CUT:
         datas, mask = astro_ex_noise_gmag_cut(datas, mask)
+        print('Selected data by astro_ex_noise and g_mag cut.')
     if REMOVE_PM_NAN:
         datas, mask = remove_pm_nan(datas, mask)
+        print('Selected data by removing nan pm.')
     if PM_CUT:
         datas, mask = pm_cut(datas, mask)
+        print('Selected data by pmra and pmdec cut.')
 
     datas = [data[mask] for data in datas]
 
