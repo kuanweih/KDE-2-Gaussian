@@ -28,15 +28,15 @@ def distance2(x_arr, y_arr, x_cen, y_cen):
     return d2
 
 
-def poisson_cdf(x, y, star_x, star_y, s1, s2, r12):
+def sig_poisson(x, y, s1, s2, star_x, star_y, r12):
     """
-    Calculate Poisson CDF on each grid to represent the probability of
-    background stars.
+    get z-score as significance using inverse survival function of Poisson.
     x, y: mesh arrays. star_x, star_y: position of stars
     s1, s2: inner and outer scales
     r12: ratio of area between target and background
     """
     from scipy.stats import poisson
+    from scipy import stats
     r = np.sqrt(s2**2 - r12 * s1**2)    # middle radius
 
     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
@@ -46,50 +46,22 @@ def poisson_cdf(x, y, star_x, star_y, s1, s2, r12):
                                (distance2(x, y, star_x[i], star_y[i]) < s2**2)
                                for i in range(len(star_x))]), axis=0)
 
-    if DEBUGGING:    # TODO: debugging
-        print('\nN_0:')
-        print(n_inner)
-        print('\nN:')
-        print(n_outer)
-        print('\nCDF:')
-        print(poisson.cdf(n_inner, n_outer))
-
-    return poisson.cdf(n_inner, n_outer)
+    # TODO: this is just the percentile but not the z-score yet
+    sig = stats.zscore(poisson.isf(n_inner, n_outer / r12))
+    return sig
 
 
-def significance(x, y, s1, s2, star_x, star_y, kernel_bg='gaussian', r12=0):
+def sig_2_gaussian(x, y, s1, s2, star_x, star_y):
     """
-    get significance on a mesh with a Poisson CDF
+    get significance using 2 Gaussian kernels.
     x, y: mesh arrays, star_x, star_y: position of stars
     s1, s2: target and background scales
-    kernel_bg: background kernel: 'gaussian' or 'poisson'
     """
-    if kernel_bg == 'gaussian':    # default case
-        od_1 = od_gaussian(x, y, star_x, star_y, s1)
-        od_2 = od_gaussian(x, y, star_x, star_y, s2)
-    elif kernel_bg == 'poisson':
-        od_1 = od_gaussian(x, y, star_x, star_y, s1)
-        od_2 = od_1 * poisson_cdf(x, y, star_x, star_y, s1, s2, r12)
-    else:
-        print('wrong kernel :(')
-    """
-    od_1: overdensity of target region + background
-    od_2: background overdensity
-    sigma: sigma for od_1
-    """
-    sigma = od_gaussian(x, y, star_x, star_y, s2) / (4. * np.pi * s1**2)
-    sigma = np.sqrt(sigma)
-    sig = (od_1 - od_2) / sigma
-
-    if DEBUGGING:    # TODO: debugging
-        print('\nod_1:')
-        print(od_1)
-        print('\nod_2:')
-        print(od_2)
-        print('\nsig: max = %0.2e' %np.max(sig))
-        print(sig)
-
+    od_1 = od_gaussian(x, y, star_x, star_y, s1)
+    od_2 = od_gaussian(x, y, star_x, star_y, s2)
+    sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
     return sig
+
 
 def get_grid_coord(center, width_mesh):
     """
@@ -103,11 +75,10 @@ def get_grid_coord(center, width_mesh):
 def create_mesh(ra_center, dec_center, width_mesh):
     """
     create meshgrid according to grid coordinates by np.meshgrid
-    also np.save mesh coordinates
     """
     x = get_grid_coord(ra_center, width_mesh)
     y = get_grid_coord(dec_center, width_mesh)
-    return np.meshgrid(x, y, sparse=True)  # TODO: what does sparse mean?
+    return np.meshgrid(x, y, sparse=True)
 
 
 def main():
@@ -130,13 +101,14 @@ def main():
 
     # get significance
     if KERNEL_BG == 'gaussian':
-        sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
+        print('We are using 2-Gaussian kernels to estimate the density!')
+        sig = sig_2_gaussian(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
     elif KERNEL_BG == 'poisson':
-        sig = significance(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1],
-                           kernel_bg=KERNEL_BG, r12=RATIO_AREA_TG_BG)
+        print('We are using Poisson statistics to estimate the density!')
+        sig = sig_poisson(xx, yy, SIGMA1, SIGMA2,
+                          coords[0], coords[1], RATIO_AREA_TG_BG)
     else:
         print('wrong kernel :(')
-
 
     np.save(SIGNI_FILE, sig)
     np.save(MESHFILE, np.array([get_grid_coord(ra_center, width_mesh),
