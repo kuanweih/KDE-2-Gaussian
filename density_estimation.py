@@ -46,8 +46,7 @@ def sig_poisson(x, y, s1, s2, star_x, star_y, r12):
                                (distance2(x, y, star_x[i], star_y[i]) < s2**2)
                                for i in range(len(star_x))]), axis=0)
 
-    # TODO: this is just the percentile but not the z-score yet
-    sig = stats.zscore(poisson.isf(n_inner, n_outer / r12))
+    sig = stats.zscore(poisson.sf(n_inner, n_outer / r12))
     return sig
 
 
