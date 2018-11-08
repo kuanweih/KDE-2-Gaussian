@@ -37,7 +37,7 @@ def sig_poisson(x, y, s1, s2, star_x, star_y, r12):
     """
     from scipy.stats import poisson
     from scipy import stats
-    r = np.sqrt(s2**2 + r12 * s1**2)    # middle radius
+    r = np.sqrt(s2**2 + r12 * s1**2)    # outer radius
 
     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
                                for i in range(len(star_x))]), axis=0)
@@ -81,6 +81,9 @@ def create_mesh(ra_center, dec_center, width_mesh):
 
 
 def main():
+    """
+    calculate kernel density estimation
+    """
     # files names
     COORDFILE = 'stars-coord.npy'    # input stars coords
     INFOFILE = 'stars-coord-attr.npy'    # input center info
@@ -97,13 +100,17 @@ def main():
 
     # create mesh
     xx, yy = create_mesh(ra_center, dec_center, width_mesh)
+    print('There %d grids on a side.' % NUM_GRID)
+    print('Dectection scale is %0.4f degree' % SIGMA1)
+    print('Background scale is %0.4f degree' % SIGMA2)
 
     # get significance
     if KERNEL_BG == 'gaussian':
-        print('We are using 2-Gaussian kernels to estimate the density!')
+        print('We are using 2-Gaussian kernels to estimate the density.')
         sig = sig_2_gaussian(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
     elif KERNEL_BG == 'poisson':
-        print('We are using Poisson statistics to estimate the density!')
+        print('We are using Poisson statistics to estimate the density.')
+        print('Background area = %0.1f detection area.' % RATIO_AREA_TG_BG)
         sig = sig_poisson(xx, yy, SIGMA1, SIGMA2,
                           coords[0], coords[1], RATIO_AREA_TG_BG)
     else:
@@ -113,10 +120,8 @@ def main():
     np.save(MESHFILE, np.array([get_grid_coord(ra_center, width_mesh),
                                 get_grid_coord(dec_center, width_mesh)]))
 
-    print('Yeah! Done with density estimation!')
+    print('Yeah! Done with density estimation! :)')
 
 
 if __name__ == '__main__':
-    # if DEBUGGING:    # TODO debugging
-    #     np.set_printoptions(precision=1)
     main()

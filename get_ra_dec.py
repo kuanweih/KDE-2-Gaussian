@@ -81,6 +81,9 @@ def pm_cut(datas, mask):
 
 
 def main():
+    """
+    query data from database 
+    """
     # files names
     FILENAME = 'stars-coord'    # output file name
     INFOFILE = 'stars-coord-attr'    # info of the map
@@ -89,6 +92,8 @@ def main():
     ra, dec = sql_get('ra, dec')
     datas = np.array([ra, dec])
     mask = [True] * len(ra)
+    print('We are querying data from {}'.format(DATABASE))
+    print('Centered at (%0.3f, %0.3f) within %0.2f degree' % (RA, DEC, RADIUS))
 
     # apply selections
     if G_MAG_CUT:
