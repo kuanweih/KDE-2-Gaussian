@@ -37,7 +37,7 @@ def sig_poisson(x, y, s1, s2, star_x, star_y, r12):
     """
     from scipy.stats import poisson
     from scipy import stats
-    r = np.sqrt(s2**2 - r12 * s1**2)    # middle radius
+    r = np.sqrt(s2**2 + r12 * s1**2)    # middle radius
 
     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
                                for i in range(len(star_x))]), axis=0)
