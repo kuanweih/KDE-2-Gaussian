@@ -35,18 +35,14 @@ def sig_poisson(x, y, s1, s2, star_x, star_y, r12):
     s1, s2: inner and outer scales
     r12: ratio of area between target and background
     """
-    from scipy.stats import poisson
-    from scipy import stats
     r = np.sqrt(s2**2 + r12 * s1**2)    # outer radius
-
     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
                                for i in range(len(star_x))]), axis=0)
-
     n_outer = np.sum(np.array([(s2**2 < distance2(x, y, star_x[i], star_y[i])) *
                                (distance2(x, y, star_x[i], star_y[i]) < r**2)
                                for i in range(len(star_x))]), axis=0)
-    lambda_poisson = n_outer / r12
-    sig = (n_inner - lambda_poisson) / np.sqrt(lambda_poisson)
+    lambda_poisson = n_outer / r12    # estimated background count
+    sig = (n_inner - lambda_poisson) / np.sqrt(lambda_poisson)    # z score
     return sig
 
 
