@@ -45,13 +45,8 @@ def sig_poisson(x, y, s1, s2, star_x, star_y, r12):
     n_outer = np.sum(np.array([(s2**2 < distance2(x, y, star_x[i], star_y[i])) *
                                (distance2(x, y, star_x[i], star_y[i]) < r**2)
                                for i in range(len(star_x))]), axis=0)
-
-    """
-    TODO: Need to find out what scale to use...
-          What we have here may generate inf z score (cdf = 1)...
-    """
     lambda_poisson = n_outer / r12
-    sig = poisson.ppf(poisson.cdf(n_inner, lambda_poisson), lambda_poisson)
+    sig = (n_inner - lambda_poisson) / np.sqrt(lambda_poisson)
     return sig
 
 
