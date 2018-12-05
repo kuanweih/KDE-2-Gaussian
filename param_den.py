@@ -1,4 +1,4 @@
-NUM_GRID = 100    # number of meshgrids
+NUM_GRID = 200    # number of meshgrids
 SIGMA1 = 0.01    # searching scale (smaller) in degree
 SIGMA2 = 0.05    # background scale (larger) in degree
 
