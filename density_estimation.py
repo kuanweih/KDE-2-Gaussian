@@ -2,24 +2,6 @@ import numpy as np
 from param_den import *
 
 
-# def gaussian(x, y, s):
-#     """
-#     2d Gaussian with a width of s
-#     """
-#     g = np.exp(- 0.5 * (x**2 + y**2) / s**2) / (2. * np.pi * s**2)
-#     return g
-
-
-# def od_gaussian(x, y, star_x, star_y, s):
-#     """
-#     overdensity on a mesh with a 2d Gaussian filter
-#     x, y: mesh arrays. star_x, star_y: position of stars
-#     """
-#     od = np.sum(np.array([gaussian(x - star_x[i], y - star_y[i], s)
-#                           for i in range(len(star_x))]), axis=0)
-#     return od
-
-
 def distance2(x_arr, y_arr, x_cen, y_cen):
     """
     2d distance square
@@ -54,11 +36,9 @@ def sig_2_gaussian(x, y, s1, s2, star_x, star_y):
     s1, s2: target and background scales
     """
     from scipy.ndimage import gaussian_filter
-    hist2d, x, y = np.histogram2d(star_x, star_y, bins=(x, y))
+    hist2d, x, y = np.histogram2d(star_y, star_x, bins=(y, x))
     od_1 = gaussian_filter(hist2d, sigma=s1)
     od_2 = gaussian_filter(hist2d, sigma=s2)
-    # od_1 = od_gaussian(x, y, star_x, star_y, s1)
-    # od_2 = od_gaussian(x, y, star_x, star_y, s2)
     sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
     return sig
 
@@ -70,15 +50,6 @@ def get_grid_coord(center, width_mesh):
     coord = np.linspace(center - 0.5 * width_mesh,
                         center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
     return coord
-
-
-# def create_mesh(ra_center, dec_center, width_mesh):
-#     """
-#     create meshgrid according to grid coordinates by np.meshgrid
-#     """
-#     x = get_grid_coord(ra_center, width_mesh)
-#     y = get_grid_coord(dec_center, width_mesh)
-#     return np.meshgrid(x, y, sparse=True)
 
 
 def main():
@@ -100,7 +71,6 @@ def main():
     width_mesh = infos[2]  # This is actually the radius when querying
 
     # create mesh
-    # xx, yy = create_mesh(ra_center, dec_center, width_mesh) #TODO del when done
     xx = get_grid_coord(ra_center, width_mesh)
     yy = get_grid_coord(dec_center, width_mesh)
     print('There %d grids on a side.' % NUM_GRID)
@@ -114,8 +84,7 @@ def main():
     elif KERNEL_BG == 'poisson':
         print('We are using Poisson statistics to estimate the density.')
         print('Background area = %0.1f detection area.' % RATIO_AREA_TG_BG)
-        meshgrid = np.meshgrid(xx, yy, sparse=True)  # TODO check after done
-        # xx, yy = create_mesh(ra_center, dec_center, width_mesh)
+        meshgrid = np.meshgrid(xx, yy, sparse=True)
         sig = sig_poisson(meshgrid[0], meshgrid[1], SIGMA1, SIGMA2,
                           coords[0], coords[1], RATIO_AREA_TG_BG)
     else:
