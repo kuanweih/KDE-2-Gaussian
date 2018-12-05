@@ -23,6 +23,7 @@ def sig_poisson(x, y, s1, s2, star_x, star_y, dr_s2):
     n_outer = np.sum(np.array([(s2**2 < distance2(x, y, star_x[i], star_y[i])) *
                                (distance2(x, y, star_x[i], star_y[i]) < r**2)
                                for i in range(len(star_x))]), axis=0)
+    r12 = s1**2 / (r**2 + s2**2)    # area ratio = inner / outer
     lambda_poisson = n_outer / r12    # estimated background count
     sig = (n_inner - lambda_poisson) / np.sqrt(lambda_poisson)    # z score
     return sig
