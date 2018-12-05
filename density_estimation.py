@@ -2,22 +2,22 @@ import numpy as np
 from param_den import *
 
 
-def gaussian(x, y, s):
-    """
-    2d Gaussian with a width of s
-    """
-    g = np.exp(- 0.5 * (x**2 + y**2) / s**2) / (2. * np.pi * s**2)
-    return g
+# def gaussian(x, y, s):
+#     """
+#     2d Gaussian with a width of s
+#     """
+#     g = np.exp(- 0.5 * (x**2 + y**2) / s**2) / (2. * np.pi * s**2)
+#     return g
 
 
-def od_gaussian(x, y, star_x, star_y, s):
-    """
-    overdensity on a mesh with a 2d Gaussian filter
-    x, y: mesh arrays. star_x, star_y: position of stars
-    """
-    od = np.sum(np.array([gaussian(x - star_x[i], y - star_y[i], s)
-                          for i in range(len(star_x))]), axis=0)
-    return od
+# def od_gaussian(x, y, star_x, star_y, s):
+#     """
+#     overdensity on a mesh with a 2d Gaussian filter
+#     x, y: mesh arrays. star_x, star_y: position of stars
+#     """
+#     od = np.sum(np.array([gaussian(x - star_x[i], y - star_y[i], s)
+#                           for i in range(len(star_x))]), axis=0)
+#     return od
 
 
 def distance2(x_arr, y_arr, x_cen, y_cen):
@@ -49,11 +49,16 @@ def sig_poisson(x, y, s1, s2, star_x, star_y, r12):
 def sig_2_gaussian(x, y, s1, s2, star_x, star_y):
     """
     get significance using 2 Gaussian kernels.
-    x, y: mesh arrays, star_x, star_y: position of stars
+    x, y: mesh arrays
+    star_x, star_y: position of stars
     s1, s2: target and background scales
     """
-    od_1 = od_gaussian(x, y, star_x, star_y, s1)
-    od_2 = od_gaussian(x, y, star_x, star_y, s2)
+    from scipy.ndimage import gaussian_filter
+    hist2d, x, y = np.histogram2d(star_x, star_y, bins=(x, y))
+    od_1 = gaussian_filter(hist2d, sigma=s1)
+    od_2 = gaussian_filter(hist2d, sigma=s2)
+    # od_1 = od_gaussian(x, y, star_x, star_y, s1)
+    # od_2 = od_gaussian(x, y, star_x, star_y, s2)
     sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
     return sig
 
@@ -67,13 +72,13 @@ def get_grid_coord(center, width_mesh):
     return coord
 
 
-def create_mesh(ra_center, dec_center, width_mesh):
-    """
-    create meshgrid according to grid coordinates by np.meshgrid
-    """
-    x = get_grid_coord(ra_center, width_mesh)
-    y = get_grid_coord(dec_center, width_mesh)
-    return np.meshgrid(x, y, sparse=True)
+# def create_mesh(ra_center, dec_center, width_mesh):
+#     """
+#     create meshgrid according to grid coordinates by np.meshgrid
+#     """
+#     x = get_grid_coord(ra_center, width_mesh)
+#     y = get_grid_coord(dec_center, width_mesh)
+#     return np.meshgrid(x, y, sparse=True)
 
 
 def main():
@@ -95,7 +100,9 @@ def main():
     width_mesh = infos[2]  # This is actually the radius when querying
 
     # create mesh
-    xx, yy = create_mesh(ra_center, dec_center, width_mesh)
+    # xx, yy = create_mesh(ra_center, dec_center, width_mesh) #TODO del when done
+    xx = get_grid_coord(ra_center, width_mesh)
+    yy = get_grid_coord(dec_center, width_mesh)
     print('There %d grids on a side.' % NUM_GRID)
     print('Dectection scale is %0.4f degree' % SIGMA1)
     print('Background scale is %0.4f degree' % SIGMA2)
@@ -107,14 +114,15 @@ def main():
     elif KERNEL_BG == 'poisson':
         print('We are using Poisson statistics to estimate the density.')
         print('Background area = %0.1f detection area.' % RATIO_AREA_TG_BG)
-        sig = sig_poisson(xx, yy, SIGMA1, SIGMA2,
+        meshgrid = np.meshgrid(xx, yy, sparse=True)  # TODO check after done
+        # xx, yy = create_mesh(ra_center, dec_center, width_mesh)
+        sig = sig_poisson(meshgrid[0], meshgrid[1], SIGMA1, SIGMA2,
                           coords[0], coords[1], RATIO_AREA_TG_BG)
     else:
         print('wrong kernel :(')
 
     np.save(SIGNI_FILE, sig)
-    np.save(MESHFILE, np.array([get_grid_coord(ra_center, width_mesh),
-                                get_grid_coord(dec_center, width_mesh)]))
+    np.save(MESHFILE, np.array([xx, yy]))
 
     print('Yeah! Done with density estimation! :)')
 
