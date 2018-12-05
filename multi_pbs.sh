@@ -57,7 +57,7 @@ for pmcut in $pmcuts;  do
   sed  "s/SIGMA1 = .*/SIGMA1 = $s_one    # searching scale in deg/g"  param_den.py > tmp.py  &&  mv  tmp.py  param_den.py
   sed  "s/SIGMA2 = .*/SIGMA2 = $s_two    # background scale in deg/g"  param_den.py > tmp.py  &&  mv  tmp.py  param_den.py
   sed  "s/KERNEL_BG = .*/KERNEL_BG = '$kernel'    # kernel/g"  param_den.py > tmp.py  &&  mv  tmp.py  param_den.py
-  sed  "s/RATIO_AREA_TG_BG = .*/RATIO_AREA_TG_BG = $r_area    # ratio of area/g"  param_den.py > tmp.py  &&  mv  tmp.py  param_den.py
+  sed  "s/DR_FROM_S2 = .*/DR_FROM_S2 = $r_area    # delta distance in deg/g"  param_den.py > tmp.py  &&  mv  tmp.py  param_den.py
 
   sed  "s/RA = .*/RA = $ra    # ra of target deg/g"  param_get.py > tmp.py  &&  mv  tmp.py  param_get.py
   sed  "s/DEC = .*/DEC = $dec    # dec of target in deg/g"  param_get.py > tmp.py  &&  mv  tmp.py  param_get.py
