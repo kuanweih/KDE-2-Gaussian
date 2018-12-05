@@ -2,7 +2,7 @@
 
 
 job_path="/Users/kwhuang/bash-multi-pbs/Fornax"
-source_path="/Users/kwhuang/bash-multi-pbs/KDE-Detecor"
+source_path="/Users/kwhuang/bash-multi-pbs/KDE-Detector"
 
 ra='39.99708'
 dec='-34.55083'
