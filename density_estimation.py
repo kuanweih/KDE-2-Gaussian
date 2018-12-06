@@ -13,9 +13,10 @@ def distance2(x_arr, y_arr, x_cen, y_cen):
 def sig_poisson(x, y, s1, s2, star_x, star_y, dr_s2):
     """
     get z-score as significance using inverse survival function of Poisson.
-    x, y: mesh arrays. star_x, star_y: position of stars
+    x, y: mesh arrays
+    star_x, star_y: position of stars
     s1, s2: inner and outer scales
-    r12: ratio of area between target and background
+    dr_s2: r_out = s2 + dr_s2
     """
     r = s2 + dr_s2    # outer radius
     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
@@ -24,7 +25,7 @@ def sig_poisson(x, y, s1, s2, star_x, star_y, dr_s2):
                                (distance2(x, y, star_x[i], star_y[i]) < r**2)
                                for i in range(len(star_x))]), axis=0)
     r12 = s1**2 / (r**2 - s2**2)    # area ratio = inner / outer
-    lambda_poisson = n_outer / r12    # estimated background count
+    lambda_poisson = n_outer * r12    # estimated background count
     sig = (n_inner - lambda_poisson) / np.sqrt(lambda_poisson)    # z score
     return sig
 
