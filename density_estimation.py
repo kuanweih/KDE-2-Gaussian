@@ -39,8 +39,8 @@ def sig_2_gaussian(x, y, s1, s2, star_x, star_y):
     """
     from scipy.ndimage import gaussian_filter
     hist2d, x, y = np.histogram2d(star_y, star_x, bins=(y, x))
-    od_1 = gaussian_filter(hist2d, sigma=s1)
-    od_2 = gaussian_filter(hist2d, sigma=s2)
+    od_1 = gaussian_filter(hist2d, s1)
+    od_2 = gaussian_filter(hist2d, s2)
     sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
     return sig
 
@@ -82,7 +82,8 @@ def main():
     # get significance
     if KERNEL_BG == 'gaussian':
         print('We are using 2-Gaussian kernels to estimate the density.')
-        sig = sig_2_gaussian(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
+        sig = sig_2_gaussian(xx, yy, SIGMA1 * NUM_GRID, SIGMA2 * NUM_GRID,
+                             coords[0], coords[1])
     elif KERNEL_BG == 'poisson':
         print('We are using Poisson statistics to estimate the density.')
         print('Background area = %0.1f detection area.' % DR_FROM_S2)
