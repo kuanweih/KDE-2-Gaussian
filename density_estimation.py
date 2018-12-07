@@ -82,8 +82,9 @@ def main():
     # get significance
     if KERNEL_BG == 'gaussian':
         print('We are using 2-Gaussian kernels to estimate the density.')
-        sig = sig_2_gaussian(xx, yy, SIGMA1 * NUM_GRID, SIGMA2 * NUM_GRID,
-                             coords[0], coords[1])
+        s1_grid = SIGMA1 * NUM_GRID / width_mesh
+        s2_grid = SIGMA2 * NUM_GRID / width_mesh
+        sig = sig_2_gaussian(xx, yy, s1_grid, s2_grid, coords[0], coords[1])
     elif KERNEL_BG == 'poisson':
         print('We are using Poisson statistics to estimate the density.')
         print('Background area = %0.1f detection area.' % DR_FROM_S2)
