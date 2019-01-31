@@ -45,10 +45,10 @@ def sig_2_gaussian(x, y, s1, s2, star_x, star_y):
     return sig
 
 
-def get_grid_coord(center, width_mesh):
+def get_grid_coord(center, width_mesh, num_grid):
     """
     get grid coordinates according to the center position and width of the mesh
     """
     coord = np.linspace(center - 0.5 * width_mesh,
-                        center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
+                        center + 0.5 * width_mesh, num=num_grid, endpoint=True)
     return coord

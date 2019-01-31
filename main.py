@@ -61,8 +61,8 @@ if __name__ == '__main__':
     # create mesh
     width_mesh = 2. * RADIUS
     num_grid = round(width_mesh / PIXEL_SIZE)
-    x_mesh = get_grid_coord(RA, width_mesh)
-    y_mesh = get_grid_coord(DEC, width_mesh)
+    x_mesh = get_grid_coord(RA, width_mesh, num_grid)
+    y_mesh = get_grid_coord(DEC, width_mesh, num_grid)
     print('Create a mesh with width = %0.2f deg' % width_mesh)
     print('There %d grids on a side.' % num_grid)
     print('Pixel size of each grid = %0.5f deg' % PIXEL_SIZE)
