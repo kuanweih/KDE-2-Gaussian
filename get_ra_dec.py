@@ -1,6 +1,6 @@
 import numpy as np
 import sqlutilpy
-from param_get import *
+from param import *
 from kw_wsdb import *
 
 
@@ -8,7 +8,8 @@ def con_arr_astro_ex_noise_g_mag(astro_ex_noise, g_mag):
     """
     simplify eq 1 in Koposov et al 2017 (MNRAS 470) into exponential form
     """
-    return astro_ex_noise - 10.**(0.15 * (g_mag - 15.) + 0.25)
+    # return astro_ex_noise - 10.**(0.15 * (g_mag - 15.) + 0.25)
+    return astro_ex_noise - np.exp(1.5 + 0.3 * (g_mag - 18.))
 
 
 def mask_cut(con_arr, min_val, max_val):
@@ -31,39 +32,31 @@ def sql_get(catalog):
     """
     query 'catalog' from database using sqlutilpy.get()
     """
-    query_str = 'select {} from {} where q3c_radial_query(ra, dec, {}, {}, {})'.format(
-                catalog, DATABASE, RA, DEC, RADIUS)
+    query_str = """
+                select {} from {}
+                where q3c_radial_query(ra, dec, {}, {}, {})
+                      and {} < phot_g_mean_mag and phot_g_mean_mag < {}
+                """.format(catalog, DATABASE,
+                           RA, DEC, RADIUS,
+                           G_MAG_MIN, G_MAG_MAX)
     return sqlutilpy.get(query_str, host=HOST, user=USER, password=PASSWORD)
 
 
-def g_mag_cut(datas, mask):
-    g_mag = sql_get('phot_g_mean_mag')[0]
-    datas = np.concatenate((datas, [g_mag]), axis=0)
-    mask = mask & mask_cut(g_mag, G_MAG_MIN, G_MAG_MAX)
-    return datas, mask
-
-
 def astro_ex_noise_gmag_cut(datas, mask):
-    g_mag, am_noise = sql_get('phot_g_mean_mag, astrometric_excess_noise')
+    g_mag, am_noise = datas[5], datas[6]
     am_ex_no_g_mag = con_arr_astro_ex_noise_g_mag(am_noise, g_mag)
-    datas = np.concatenate((datas, [am_ex_no_g_mag]), axis=0)
-    mask = mask & mask_cut(am_ex_no_g_mag, ASTRO_EX_NOISE_G_MAG_MIN,
+    return mask & mask_cut(am_ex_no_g_mag,
+                           ASTRO_EX_NOISE_G_MAG_MIN,
                            ASTRO_EX_NOISE_G_MAG_MAX)
-    return datas, mask
 
 
 def remove_pm_nan(datas, mask):
-    pmra, pmdec = sql_get('pmra, pmdec')
-    datas = np.concatenate((datas, [pmra]), axis=0)
-    datas = np.concatenate((datas, [pmdec]), axis=0)
-    mask = mask & (~np.isnan(pmra)) & (~np.isnan(pmdec))
-    return datas, mask
+    pmra, pmdec = datas[3], datas[4]
+    return mask & (~np.isnan(pmra)) & (~np.isnan(pmdec))
 
 
 def pm_cut(datas, mask):
-    pmra, pmdec = sql_get('pmra, pmdec')
-    datas = np.concatenate((datas, [pmra]), axis=0)
-    datas = np.concatenate((datas, [pmdec]), axis=0)
+    pmra, pmdec = datas[3], datas[4]
 
     pmra_mean = np.mean(pmra[~np.isnan(pmra)])
     pmra_std = np.std(pmra[~np.isnan(pmra)])
@@ -75,48 +68,22 @@ def pm_cut(datas, mask):
     pmdec_min = pmdec_mean - PM_CUT_STD * pmdec_std
     pmdec_max = pmdec_mean + PM_CUT_STD * pmdec_std
 
-    mask = mask & mask_cut(pmra, pmra_min,
+    return mask & mask_cut(pmra, pmra_min,
                            pmra_max) & mask_cut(pmdec, pmdec_min, pmdec_max)
-    return datas, mask
 
 
-def main():
-    """
-    query data from database 
-    """
-    # files names
-    FILENAME = 'stars-coord'    # output file name
-    INFOFILE = 'stars-coord-attr'    # info of the map
-
-    # query position data from DATABASE
-    ra, dec = sql_get('ra, dec')
-    datas = np.array([ra, dec])
-    mask = [True] * len(ra)
-    print('We are querying data from {}'.format(DATABASE))
-    print('Centered at (%0.3f, %0.3f) within %0.2f degree' % (RA, DEC, RADIUS))
-
-    # apply selections
-    if G_MAG_CUT:
-        datas, mask = g_mag_cut(datas, mask)
-        print('Selected data by g_mag cut.')
-    if ASTRO_EX_NOISE_G_MAG_CUT:
-        datas, mask = astro_ex_noise_gmag_cut(datas, mask)
-        print('Selected data by astro_ex_noise and g_mag cut.')
-    if REMOVE_PM_NAN:
-        datas, mask = remove_pm_nan(datas, mask)
-        print('Selected data by removing nan pm.')
-    if PM_CUT:
-        datas, mask = pm_cut(datas, mask)
-        print('Selected data by pmra and pmdec cut.')
-
-    datas = [data[mask] for data in datas]
-
-    # output
-    np.save(FILENAME, np.array([datas[0], datas[1]]))    # ra and dec
-    np.save(INFOFILE, np.array([RA, DEC, RADIUS, len(datas[0])]))
-
-    print('Yeah! Done with getting ra and dec!')
+def remove_parallax_nan(datas, mask):
+    parallax = datas[2]
+    return mask & (~np.isnan(parallax))
 
 
-if __name__ == '__main__':
-    main()
+def parallax_cut(datas, mask):
+    plx = datas[2]    # parallax
+
+    plx_mean = np.mean(plx[~np.isnan(plx)])
+    plx_std = np.std(plx[~np.isnan(plx)])
+
+    plx_min = plx_mean - PM_CUT_STD * plx_std
+    plx_max = plx_mean + PM_CUT_STD * plx_std
+
+    return mask & mask_cut(plx, plx_min, plx_max)

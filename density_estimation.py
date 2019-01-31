@@ -1,5 +1,5 @@
 import numpy as np
-from param_den import *
+from param import *
 
 
 def distance2(x_arr, y_arr, x_cen, y_cen):
@@ -52,51 +52,3 @@ def get_grid_coord(center, width_mesh):
     coord = np.linspace(center - 0.5 * width_mesh,
                         center + 0.5 * width_mesh, num=NUM_GRID, endpoint=True)
     return coord
-
-
-def main():
-    """
-    calculate kernel density estimation
-    """
-    # files names
-    COORDFILE = 'stars-coord.npy'    # input stars coords
-    INFOFILE = 'stars-coord-attr.npy'    # input center info
-    SIGNI_FILE = 'significance'    # output significance file
-    MESHFILE = 'meshgrids'    # output mesh grids
-
-    # load ra and dec
-    coords = np.load(COORDFILE)
-    infos = np.load(INFOFILE)
-
-    ra_center = infos[0]
-    dec_center = infos[1]
-    width_mesh = infos[2]  # This is actually the radius when querying
-
-    # create mesh
-    xx = get_grid_coord(ra_center, width_mesh)
-    yy = get_grid_coord(dec_center, width_mesh)
-    print('There %d grids on a side.' % NUM_GRID)
-    print('Dectection scale is %0.4f degree' % SIGMA1)
-    print('Background scale is %0.4f degree' % SIGMA2)
-
-    # get significance
-    if KERNEL_BG == 'gaussian':
-        print('We are using 2-Gaussian kernels to estimate the density.')
-        sig = sig_2_gaussian(xx, yy, SIGMA1, SIGMA2, coords[0], coords[1])
-    elif KERNEL_BG == 'poisson':
-        print('We are using Poisson statistics to estimate the density.')
-        print('Background area = %0.1f detection area.' % DR_FROM_S2)
-        meshgrid = np.meshgrid(xx, yy, sparse=True)
-        sig = sig_poisson(meshgrid[0], meshgrid[1], SIGMA1, SIGMA2,
-                          coords[0], coords[1], DR_FROM_S2)
-    else:
-        print('wrong kernel :(')
-
-    np.save(SIGNI_FILE, sig)
-    np.save(MESHFILE, np.array([xx, yy]))
-
-    print('Yeah! Done with density estimation! :)')
-
-
-if __name__ == '__main__':
-    main()
