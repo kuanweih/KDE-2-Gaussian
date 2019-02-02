@@ -83,7 +83,7 @@ def parallax_cut(datas, mask):
     plx_mean = np.mean(plx[~np.isnan(plx)])
     plx_std = np.std(plx[~np.isnan(plx)])
 
-    plx_min = plx_mean - PM_CUT_STD * plx_std
-    plx_max = plx_mean + PM_CUT_STD * plx_std
+    plx_min = plx_mean - PARALLAX_CUT_STD * plx_std
+    plx_max = plx_mean + PARALLAX_CUT_STD * plx_std
 
     return mask & mask_cut(plx, plx_min, plx_max)
