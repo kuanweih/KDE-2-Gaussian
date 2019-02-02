@@ -59,7 +59,7 @@ if __name__ == '__main__':
     ra, dec = datas[0], datas[1]
 
     # create mesh
-    width_mesh = 2. * RADIUS
+    width_mesh = RADIUS
     num_grid = round(width_mesh / PIXEL_SIZE)
     x_mesh = get_grid_coord(RA, width_mesh, num_grid)
     y_mesh = get_grid_coord(DEC, width_mesh, num_grid)
@@ -73,7 +73,9 @@ if __name__ == '__main__':
     # get significance
     if KERNEL_BG == 'gaussian':
         print('We are using 2-Gaussian kernels to estimate the density...')
-        sig = sig_2_gaussian(x_mesh, y_mesh, SIGMA1, SIGMA2, ra, dec)
+        s1_grid = SIGMA1 / PIXEL_SIZE
+        s2_grid = SIGMA2 / PIXEL_SIZE
+        sig = sig_2_gaussian(x_mesh, y_mesh, s1_grid, s2_grid, ra, dec)
     elif KERNEL_BG == 'poisson':
         print('We are using Poisson statistics to estimate the density...')
         print('Background area = %0.1f detection area.' % DR_FROM_S2)
