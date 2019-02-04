@@ -39,8 +39,8 @@ def sig_2_gaussian(x, y, s1, s2, star_x, star_y):
     """
     from scipy.ndimage import gaussian_filter
     hist2d, x, y = np.histogram2d(star_y, star_x, bins=(y, x))
-    od_1 = gaussian_filter(hist2d, sigma=s1)
-    od_2 = gaussian_filter(hist2d, sigma=s2)
+    od_1 = gaussian_filter(hist2d, s1)
+    od_2 = gaussian_filter(hist2d, s2)
     sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
     return sig
 
@@ -52,3 +52,4 @@ def get_grid_coord(center, width_mesh, num_grid):
     coord = np.linspace(center - 0.5 * width_mesh,
                         center + 0.5 * width_mesh, num=num_grid, endpoint=True)
     return coord
+
