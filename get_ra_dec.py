@@ -4,6 +4,55 @@ from param import *
 from kw_wsdb import *
 
 
+class MWSatellite(object):
+    def __init__(self, name_sat, ra_sat, dec_sat, width,
+                 database, catalog_str):
+        """
+        Milky Way (MW) Satellite object:
+        name_sat: name of the satellite, e.g. Fornax
+        ra_sat: ra of the satellite in deg
+        dec_sat: dec of the satellite in deg
+        width: width of the square area when querying data in deg
+        database: database to be queried
+        catalog_str: a string of catalogs for querying
+        """
+        self.name_sat = name_sat
+        self.ra_sat = ra_sat
+        self.dec_sat = dec_sat
+        self.width = width
+        self.database = database
+        self.catalog_str = catalog_str
+
+    def __str__(self):
+        str1 = "This is a MW Satellite object:"
+        str2 = "    name = {}\n".format(self.name_sat)
+        str3 = "    ra = {}\n    dec = {}\n".format(self.ra_sat, self.dec_sat)
+        str4 = "    width of the queried map = {}\n".format(self.width)
+        str5 = "    database = {}\n".formate(self.database)
+        str = "{}{}{}{}{}".format(str1, str2, str3, str4, str5)
+        return str
+
+    def sql_get(self):
+        """
+        query 'catalog_str' from 'database' using sqlutilpy.get()
+        """
+        ra_min = self.ra_sat - 0.5 * self.width
+        ra_max = self.ra_sat + 0.5 * self.width
+        dec_min = self.dec_sat - 0.5 * self.width
+        dec_max = self.dec_sat + 0.5 * self.width
+        query_str = """
+                    select {} from {}
+                    where {}<ra and ra<{} and {}<dec and dec<{}
+                          and {} < phot_g_mean_mag and phot_g_mean_mag < {}
+                    """.format(self.catalog_str, self.database,
+                               ra_min, ra_max, dec_min, dec_max,
+                               self.ra_sat, self.dec_sat, 0.5 * self.width,
+                               G_MAG_MIN, G_MAG_MAX)
+        return sqlutilpy.get(query_str, host=HOST, user=USER, password=PASSWORD)
+
+
+
+
 def con_arr_astro_ex_noise_g_mag(astro_ex_noise, g_mag):
     """
     simplify eq 1 in Koposov et al 2017 (MNRAS 470) into exponential form
@@ -28,18 +77,7 @@ def mask_cut(con_arr, min_val, max_val):
     return mask
 
 
-def sql_get(catalog):
-    """
-    query 'catalog' from database using sqlutilpy.get()
-    """
-    query_str = """
-                select {} from {}
-                where q3c_radial_query(ra, dec, {}, {}, {})
-                      and {} < phot_g_mean_mag and phot_g_mean_mag < {}
-                """.format(catalog, DATABASE,
-                           RA, DEC, RADIUS,
-                           G_MAG_MIN, G_MAG_MAX)
-    return sqlutilpy.get(query_str, host=HOST, user=USER, password=PASSWORD)
+
 
 
 def astro_ex_noise_gmag_cut(datas, mask):
