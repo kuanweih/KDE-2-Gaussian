@@ -22,17 +22,19 @@ class MWSatellite(object):
         self.width = width
         self.database = database
         self.catalog_str = catalog_str
+        self.catalog_list = self.catalog_str.replace("\n", "").replace(" ", "").split(",")
+        self.datas = {}
 
     def __str__(self):
-        str1 = "This is a MW Satellite object:"
+        str1 = "This is a MW Satellite object:\n"
         str2 = "    name = {}\n".format(self.name_sat)
         str3 = "    ra = {}\n    dec = {}\n".format(self.ra_sat, self.dec_sat)
-        str4 = "    width of the queried map = {}\n".format(self.width)
-        str5 = "    database = {}\n".formate(self.database)
+        str4 = "    map width = {} deg\n".format(self.width)
+        str5 = "    database = {}\n".format(self.database)
         str = "{}{}{}{}{}".format(str1, str2, str3, str4, str5)
         return str
 
-    def sql_get(self):
+    def sql_get(self, host, user, password):
         """
         query 'catalog_str' from 'database' using sqlutilpy.get()
         """
@@ -40,15 +42,34 @@ class MWSatellite(object):
         ra_max = self.ra_sat + 0.5 * self.width
         dec_min = self.dec_sat - 0.5 * self.width
         dec_max = self.dec_sat + 0.5 * self.width
+
         query_str = """
                     select {} from {}
-                    where {}<ra and ra<{} and {}<dec and dec<{}
-                          and {} < phot_g_mean_mag and phot_g_mean_mag < {}
+                    where {} < ra and ra < {} and {} < dec and dec < {}
                     """.format(self.catalog_str, self.database,
-                               ra_min, ra_max, dec_min, dec_max,
-                               self.ra_sat, self.dec_sat, 0.5 * self.width,
-                               G_MAG_MIN, G_MAG_MAX)
-        return sqlutilpy.get(query_str, host=HOST, user=USER, password=PASSWORD)
+                               ra_min, ra_max, dec_min, dec_max)
+
+        """ use sqlutilpy.get() to query data """
+        datas = sqlutilpy.get(query_str,
+                              host=host, user=user, password=password)
+
+        """ create 'datas' dic to store queried data """
+        for i, catalog in enumerate(self.catalog_list):
+            self.datas[catalog] = datas[i]
+
+
+
+
+
+""" test code """
+catalog_str = """
+              ra, dec, parallax, pmra, pmdec,
+              phot_g_mean_mag, astrometric_excess_noise
+              """
+#TODO: CHANGE RADIUS INTO WIDTH
+Fornax = MWSatellite('Fornax', RA, DEC, RADIUS, DATABASE, catalog_str)
+print(Fornax)
+print(Fornax.datas["astrometric_excess_noise"].shape)
 
 
 
@@ -75,9 +96,6 @@ def mask_cut(con_arr, min_val, max_val):
     else:
         print('Oops, no input minimum or maximum value here.')
     return mask
-
-
-
 
 
 def astro_ex_noise_gmag_cut(datas, mask):
