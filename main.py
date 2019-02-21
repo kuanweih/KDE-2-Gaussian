@@ -1,19 +1,20 @@
 import numpy as np
-from get_ra_dec import *
-from density_estimation import *
+from classMWSatellite import *
+from classKDE_MWSatellite import *
 from param import *
 from kw_wsdb import *
-
 
 
 if __name__ == '__main__':
     print('Begin part 1: querying data \n')
     # Satellite = MWSatellite(NAME, RA, DEC, WIDTH, DATABASE, CATALOG_STR)
     Satellite = KDE_MWSatellite(NAME, RA, DEC, WIDTH, DATABASE, CATALOG_STR,
-                                PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3)
+                                PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
     print(Satellite)
 
     #TODO database account and password here
+
+
 
 
     Satellite.sql_get(HOST, USER, PASSWORD)
@@ -22,7 +23,9 @@ if __name__ == '__main__':
     print(Satellite.datas["phot_g_mean_mag"].shape)
     Satellite.mask_g_mag_astro_noise_cut()
     print(Satellite.datas["phot_g_mean_mag"].shape)
-    print(Satellite.overdensity(SIGMA2))
+    # print(Satellite.overdensity(SIGMA2))
+    print(Satellite.compound_significance().max())
+    print(Satellite.compound_significance())
 
 
     # create mesh

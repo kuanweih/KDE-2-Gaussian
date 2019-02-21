@@ -1,12 +1,12 @@
 import numpy as np
 from param import *
-from get_ra_dec import *
+from classMWSatellite import *
 from scipy.ndimage import gaussian_filter
 
 
 class KDE_MWSatellite(MWSatellite):
     def __init__(self, name_sat, ra_sat, dec_sat, width, database, catalog_str,
-                 pixel_size, sigma1, sigma2, sigma3):
+                 pixel_size, sigma1, sigma2, sigma3, sigma_th):
         """
         Kernel Density Estimation on a MWSatellite object:
         pixel_size: size of pixel in deg
@@ -21,6 +21,7 @@ class KDE_MWSatellite(MWSatellite):
         self.sigma1 = sigma1
         self.sigma2 = sigma2
         self.sigma3 = sigma3
+        self.sigma_th = sigma_th
 
     def __str__(self):
         str1 = "This is a KDE_MWSatellite object inherited from\n----"
@@ -55,6 +56,36 @@ class KDE_MWSatellite(MWSatellite):
         mask2d = np.ones(hist2d.shape)
         od /= gaussian_filter(mask2d, s_grid, mode='constant')
         return od
+
+    def significance(self, sigma1, sigma2):
+        """
+        get significance map using 2 kernels:
+        sigma1: inner kernel
+        sigma2: outer kernel
+        """
+        od_1 = self.overdensity(sigma1)
+        od_2 = self.overdensity(sigma2)
+        s1 = sigma1 / self.pixel_size
+        sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
+        return sig
+
+    def compound_significance(self):
+        """
+        significance s12 inside (s23>sigma_th) and s13 outside (s23<sigma_th)
+        """
+        s12 = self.significance(self.sigma1, self.sigma2)
+        s13 = self.significance(self.sigma1, self.sigma3)
+        s23 = self.significance(self.sigma2, self.sigma3)
+        mask_in = s23 > self.sigma_th    # mask for inside
+        sig = s12 * mask_in + s13 * (~mask_in)
+        return sig
+
+
+
+
+
+
+
 
 
 

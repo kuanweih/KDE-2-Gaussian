@@ -16,6 +16,7 @@ PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
 SIGMA2 = 0.05    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
+SIGMA_TH = 3    # sigma threshold to define inside or outside
 
 
 

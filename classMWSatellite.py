@@ -70,7 +70,7 @@ class MWSatellite(object):
 
     def mask_g_mag_astro_noise_cut(self):
         """
-        hard code of astrometric_excess_noise and phot_g_mean_mag cut
+        hard code the astrometric_excess_noise and phot_g_mean_mag cut
         """
         noise = self.datas["astrometric_excess_noise"]
         g_mag = self.datas["phot_g_mean_mag"]
