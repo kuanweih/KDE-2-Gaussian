@@ -23,6 +23,9 @@ class KDE_MWSatellite(MWSatellite):
         self.sigma3 = sigma3
         self.sigma_th = sigma_th
 
+        self.x_mesh = self.grid_coord(self.ra_sat)
+        self.y_mesh = self.grid_coord(self.dec_sat)
+
     def __str__(self):
         str1 = "This is a KDE_MWSatellite object inherited from\n----"
         str2 = "    pixel size = {}\n".format(self.pixel_size)
@@ -49,8 +52,7 @@ class KDE_MWSatellite(MWSatellite):
         """
         hist2d, x, y = np.histogram2d(self.datas["dec"],
                                       self.datas["ra"],
-                                      bins=(self.grid_coord(self.dec_sat),
-                                            self.grid_coord(self.ra_sat)))
+                                      bins=(self.y_mesh, self.x_mesh))
         s_grid = sigma / self.pixel_size
         od = gaussian_filter(hist2d, s_grid, mode='constant')
         mask2d = np.ones(hist2d.shape)
@@ -78,11 +80,7 @@ class KDE_MWSatellite(MWSatellite):
         s23 = self.significance(self.sigma2, self.sigma3)
         mask_in = s23 > self.sigma_th    # mask for inside
         sig = s12 * mask_in + s13 * (~mask_in)
-        return sig
-
-
-
-
+        self.sig_gaussian = sig
 
 
 

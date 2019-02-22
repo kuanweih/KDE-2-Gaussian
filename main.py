@@ -5,38 +5,50 @@ from param import *
 from kw_wsdb import *
 
 
+def create_dir(dir_name):
+    """
+    create directory with a name 'dir_name'
+    """
+    import os
+    import errno
+    if not os.path.exists(os.path.dirname(dir_name)):
+        try:
+            os.makedirs(os.path.dirname(dir_name))
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+
 if __name__ == '__main__':
-    print('Begin part 1: querying data \n')
+
+    # TODO finish the output part for all the details
+    dir_name = "{}_G{}_{}".format(NAME, G_MAG_MIN, G_MAG_MAX)
+    create_dir(dir_name)
+
+    f= open("stdout.txt".format(dir_name),"w+")
+
+
+    """ file name: FornaxG17_21/gaussian/w0.25/p0.001/s0.004s0.05s1.00sth3 """
+
     # Satellite = MWSatellite(NAME, RA, DEC, WIDTH, DATABASE, CATALOG_STR)
     Satellite = KDE_MWSatellite(NAME, RA, DEC, WIDTH, DATABASE, CATALOG_STR,
                                 PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
-    print(Satellite)
+    f.write(Satellite)
+
+
 
     #TODO database account and password here
 
 
 
-
     Satellite.sql_get(HOST, USER, PASSWORD)
-    print(Satellite.datas["phot_g_mean_mag"].shape)
     Satellite.mask_cut("phot_g_mean_mag", G_MAG_MIN, G_MAG_MAX)
-    print(Satellite.datas["phot_g_mean_mag"].shape)
     Satellite.mask_g_mag_astro_noise_cut()
-    print(Satellite.datas["phot_g_mean_mag"].shape)
-    # print(Satellite.overdensity(SIGMA2))
-    print(Satellite.compound_significance().max())
-    print(Satellite.compound_significance())
+    Satellite.compound_significance()
 
 
-    # create mesh
-    # x_mesh = get_grid_coord(RA, WIDTH, NUM_GRID)
-    # y_mesh = get_grid_coord(DEC, WIDTH, NUM_GRID)
-    # print('Create a mesh with width = %0.2f deg' % WIDTH)
-    # print('There %d grids on a side.' % NUM_GRID)
-    # print('Pixel size of each grid = %0.5f deg' % PIXEL_SIZE)
-    # print('Dectection scale is %0.4f degree' % SIGMA1)
-    # print('Background scale is %0.4f degree' % SIGMA2)
-    # print(' ')
+
+
 
 
 
@@ -51,25 +63,7 @@ if __name__ == '__main__':
     # np.save(INFOFILE, np.array([RA, DEC, RADIUS, len(datas[0])]))
     #
     # print('\nYeah! Done with querying data from {}!\n'.format(DATABASE))
-    #
-    #
-    # """
-    # part 2: calculate kernel density estimation
-    # """
-    # print('Begin part 2: KDE \n')
-    # ra, dec = datas[0], datas[1]
-    #
-    # # create mesh
-    # WIDTH = RADIUS
-    # NUM_GRID = round(WIDTH / PIXEL_SIZE)
-    # x_mesh = get_grid_coord(RA, WIDTH, NUM_GRID)
-    # y_mesh = get_grid_coord(DEC, WIDTH, NUM_GRID)
-    # print('Create a mesh with width = %0.2f deg' % WIDTH)
-    # print('There %d grids on a side.' % NUM_GRID)
-    # print('Pixel size of each grid = %0.5f deg' % PIXEL_SIZE)
-    # print('Dectection scale is %0.4f degree' % SIGMA1)
-    # print('Background scale is %0.4f degree' % SIGMA2)
-    # print(' ')
+
     #
     # # get significance
     # if KERNEL_BG == 'gaussian':

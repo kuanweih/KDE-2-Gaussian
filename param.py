@@ -8,7 +8,7 @@ CATALOG_STR = """
               phot_g_mean_mag, astrometric_excess_noise
               """
 
-""" g-band cut"""
+""" g-band cut """
 G_MAG_MIN = 17
 G_MAG_MAX = 21
 

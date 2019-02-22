@@ -46,16 +46,19 @@ class MWSatellite(object):
                     """.format(self.catalog_str, self.database,
                                ra_min, ra_max, dec_min, dec_max)
 
-        """ use sqlutilpy.get() to query data """
+        print("Using sqlutilpy.get() to query data...")
         datas = sqlutilpy.get(query_str,
                               host=host, user=user, password=password)
 
         """ create 'datas' dic to store queried data """
         for i, catalog in enumerate(self.catalog_list):
             self.datas[catalog] = datas[i]
+        print("{} sources are queried \n".format(len(self.datas[self.catalog_list[0]])))
 
     def cut_datas(self, mask):
-        """ cut datas """
+        """
+        cut datas
+        """
         for key, column in self.datas.items():
             self.datas[key] = column[mask]
 
@@ -67,6 +70,9 @@ class MWSatellite(object):
         maskright = self.datas[catalog] < max_val
         mask = maskleft & maskright
         self.cut_datas(mask)
+        print("--> Cut: {} < {} < {}".format(min_val, catalog, max_val))
+        print("--> {} sources left \n".format(len(self.datas[self.catalog_list[0]])))
+
 
     def mask_g_mag_astro_noise_cut(self):
         """
@@ -78,3 +84,5 @@ class MWSatellite(object):
         maskright = (18. < g_mag) & (noise < np.exp(1.5 + 0.3 * (g_mag - 18.)))
         mask = maskleft | maskright
         self.cut_datas(mask)
+        print("--> Cut: astrometric_excess_noise and phot_g_mean_mag")
+        print("--> {} sources left \n".format(len(self.datas[self.catalog_list[0]])))
