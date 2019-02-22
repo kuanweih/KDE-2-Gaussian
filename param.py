@@ -19,6 +19,9 @@ SIGMA3 = 1.00    # background scale (larger) in deg
 SIGMA_TH = 3    # sigma threshold to define inside or outside
 
 
+KERNEL_BG = 'gaussian'    # background distribution: default 'gaussian'
+if KERNEL_BG == 'poisson':
+    DR_FROM_S2 = 5.    # delta distance outside from sigma2 in degree
 
 #
 #
@@ -52,6 +55,3 @@ SIGMA_TH = 3    # sigma threshold to define inside or outside
 
 #
 #
-# KERNEL_BG = 'poisson'    # background distribution: default 'gaussian'
-# if KERNEL_BG == 'poisson':
-#     DR_FROM_S2 = 5.    # delta distance outside from sigma2 in degree
