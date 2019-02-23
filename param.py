@@ -1,7 +1,7 @@
 NAME = 'Fornax'
 RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
-WIDTH = 0.25     # map width when querying data (in deg)
+WIDTH = 2     # map width when querying data (in deg)
 DATABASE = 'gaia_dr2.gaia_source'
 CATALOG_STR = """
               ra, dec, parallax, pmra, pmdec,
@@ -14,14 +14,22 @@ G_MAG_MAX = 21
 
 PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
-SIGMA2 = 0.05    # background scale (smaller) in deg
+SIGMA2 = 0.06    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
-SIGMA_TH = 3    # sigma threshold to define inside or outside
+SIGMA_TH = 1    # sigma threshold to define inside or outside
 
 
 KERNEL_BG = 'gaussian'    # background distribution: default 'gaussian'
 if KERNEL_BG == 'poisson':
     DR_FROM_S2 = 5.    # delta distance outside from sigma2 in degree
+
+
+""" output file name """
+FILE_STAR = 'queried-data'    # output data file
+FILE_SIG = 'significance'    # output significance file
+FILE_MESH = 'meshgrids'    # output mesh grids
+
+
 
 #
 #

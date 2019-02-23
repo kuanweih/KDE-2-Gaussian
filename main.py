@@ -20,27 +20,25 @@ def create_dir(dir_name):
 
 
 if __name__ == '__main__':
-    """ create result directory """
-    dir_name = "results_{}".format(KERNEL_BG)
-    create_dir(dir_name)
-    dir_name = "{}/{}/G{}_{}/w{}_p{}".format(dir_name, NAME,
-                                             G_MAG_MIN, G_MAG_MAX,
-                                             WIDTH, PIXEL_SIZE)
-    dir_name = "{}/s{}s{}s{}sth{}".format(dir_name,
-                                          SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
+    """
+    create result directory
+    """
+    dir_name = "results-{}".format(KERNEL_BG)
+    dir_name = "{}/{}/G{}-{}".format(dir_name, NAME, G_MAG_MIN, G_MAG_MAX)
+    dir_name = "{}/w{}-lp{}".format(dir_name, WIDTH, PIXEL_SIZE)
+    dir_name = "{}/s{}s{}s{}sth{}".format(dir_name, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
     create_dir(dir_name)
 
-    """ open text file for dumping imformation """
+    """
+    open text file for dumping imformation
+    """
     f= open("{}/stdout.txt".format(dir_name),"w+")
+
+
 
     Satellite = KDE_MWSatellite(NAME, RA, DEC, WIDTH, DATABASE, CATALOG_STR,
                                 PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
     f.write(Satellite.__str__())
-
-
-    #TODO database account and password here
-
-
 
     f.write("\n\nUsing sqlutilpy.get() to query data...\n")
     Satellite.sql_get(HOST, USER, PASSWORD)
@@ -61,23 +59,17 @@ if __name__ == '__main__':
     Satellite.compound_significance()
 
 
+    np.save("{}/{}".format(dir_name, FILE_STAR), Satellite.datas)
+    np.save("{}/{}".format(dir_name, FILE_SIG), Satellite.sig_gaussian)
+    np.save("{}/{}".format(dir_name, FILE_MESH),
+            np.array([Satellite.x_mesh, Satellite.y_mesh]))
+
 
     f.close()
 
 
 
 
-
-
-
-    # # files names
-    # FILENAME = 'queried-data'    # output data file
-    # INFOFILE = 'queried-data-info'    # info of data file
-    # SIGNI_FILE = 'significance'    # output significance file
-    # MESHFILE = 'meshgrids'    # output mesh grids
-    # # output
-    # np.save(FILENAME, np.array(datas))
-    # np.save(INFOFILE, np.array([RA, DEC, RADIUS, len(datas[0])]))
     #
     # print('\nYeah! Done with querying data from {}!\n'.format(DATABASE))
 
@@ -96,8 +88,6 @@ if __name__ == '__main__':
     #                       SIGMA1, SIGMA2, ra, dec, DR_FROM_S2)
     # else:
     #     print('wrong kernel :(')
-    #
-    # np.save(SIGNI_FILE, sig)
-    # np.save(MESHFILE, np.array([x_mesh, y_mesh]))
+
 
     print('Yeah! Done with density estimation! :)')
