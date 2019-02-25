@@ -1,7 +1,7 @@
 NAME = 'Fornax'
 RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
-WIDTH = 2     # map width when querying data (in deg)
+WIDTH = 0.25     # map width when querying data (in deg)
 DATABASE = 'gaia_dr2.gaia_source'
 CATALOG_STR = """
               ra, dec, parallax, pmra, pmdec,

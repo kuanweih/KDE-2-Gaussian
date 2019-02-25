@@ -85,6 +85,7 @@ class KDE_MWSatellite(MWSatellite):
 
 
 
+
 #TODO: add poisson statistics method into the class
 
 # def distance2(x_arr, y_arr, x_cen, y_cen):
