@@ -99,7 +99,7 @@ class KDE_MWSatellite(MWSatellite):
         for i in range(n_source):
             id_x = int(id_xs[i])
             id_y = int(id_ys[i])
-            sig_stars.append(self.sig_gaussian[id_x][id_y])
+            sig_stars.append(self.sig_gaussian[id_y][id_x])
 
         self.datas["significance"] = np.array(sig_stars)
 
