@@ -82,6 +82,35 @@ class KDE_MWSatellite(MWSatellite):
         sig = s12 * mask_in + s13 * (~mask_in)
         self.sig_gaussian = sig
 
+    def append_sig_to_data(self):
+        """
+        append significance of each star to the datas
+        """
+        n_source = len(self.datas["ra"])
+
+        pixel_size_x = np.max(np.diff(self.x_mesh))
+        pixel_size_y = np.max(np.diff(self.y_mesh))
+
+        id_xs = (self.datas["ra"] - self.x_mesh[0]) / pixel_size_x
+        id_ys = (self.datas["dec"] - self.y_mesh[0]) / pixel_size_y
+
+        sig_stars = []
+
+        for i in range(n_source):
+            id_x = int(id_xs[i])
+            id_y = int(id_ys[i])
+            sig_stars.append(self.sig_gaussian[id_x][id_y])
+
+        self.datas["significance"] = np.array(sig_stars)
+
+
+
+
+
+
+
+
+
 
 
 

@@ -54,11 +54,15 @@ if __name__ == '__main__':
     Satellite.compound_significance()
     f.write("calculated significance\n\n")
 
+    """ append 'significance' to datas """
+    Satellite.append_sig_to_data()
+
     """ save queried data, significance, mesh coordinates """
     np.save("{}/{}".format(dir_name, FILE_STAR), Satellite.datas)
     np.save("{}/{}".format(dir_name, FILE_SIG), Satellite.sig_gaussian)
-    np.save("{}/{}".format(dir_name, FILE_MESH),
-            np.array([Satellite.x_mesh, Satellite.y_mesh]))
+    np.save("{}/{}".format(dir_name, FILE_MESH), np.array([Satellite.x_mesh,
+                                                           Satellite.y_mesh]))
+
     f.write("saved output npy files\n\n")
 
     f.write("we are finished :) \n\n".format(n_source))
