@@ -80,6 +80,7 @@ class KDE_MWSatellite(MWSatellite):
         s23 = self.significance(self.sigma2, self.sigma3)
         mask_in = s23 > self.sigma_th    # mask for inside
         sig = s12 * mask_in + s13 * (~mask_in)
+        self.is_inside = mask_in
         self.sig_gaussian = sig
 
     def append_sig_to_data(self):
@@ -95,13 +96,16 @@ class KDE_MWSatellite(MWSatellite):
         id_ys = (self.datas["dec"] - self.y_mesh[0]) / pixel_size_y
 
         sig_stars = []
+        is_insides = []
 
         for i in range(n_source):
             id_x = int(id_xs[i])
             id_y = int(id_ys[i])
             sig_stars.append(self.sig_gaussian[id_y][id_x])
+            is_insides.append(self.is_inside[id_y][id_x])
 
         self.datas["significance"] = np.array(sig_stars)
+        self.datas["is_inside"] = np.array(is_insides)
 
 
 
