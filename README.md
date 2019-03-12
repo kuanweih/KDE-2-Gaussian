@@ -1,12 +1,12 @@
 # KDE-Detector
-Kernel density estimation for 2D observational data, based on [Koposov et al 2008](http://cdsads.u-strasbg.fr/abs/2008ApJ...686..279K). There are two choices of statistics: 
-- 2 Gaussian kernel convolution 
-- Poisson distribution 
+Kernel density estimation for 2D observational data, based on [Koposov et al 2008](http://cdsads.u-strasbg.fr/abs/2008ApJ...686..279K). There are two choices of statistics:
+- 2 Gaussian kernel convolution
+- Poisson distribution (currently unavailable)
 
 
-# How to use it: 
-1. setup paramters in param_get.py and param_den.py
-2. ```python get_ra_dec.py``` to get numpy array by querying data from database
-3. ```python density_estimation.py``` to calculate overdensity and significance 
+# How to use it:
+1. get access to the database and then enter info in kw_wsdb.py
+2. setup paramters in param.py
+3. ```python  main.py``` to execute the code
 
-P.S. If running on clusters, a pbs script is provided also. 
+P.S. If running on clusters, a pbs script is provided also.
