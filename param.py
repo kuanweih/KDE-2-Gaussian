@@ -12,9 +12,12 @@ CATALOG_STR = """
 G_MAG_MIN = 17
 G_MAG_MAX = 21
 
+""" pm cut """
+PM_IN_STD = [3, 2, 1]    # must be in decresing order
+
 PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
-SIGMA2 = 0.06    # background scale (smaller) in deg
+SIGMA2 = 0.02    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
 SIGMA_TH = 1    # sigma threshold to define inside or outside
 

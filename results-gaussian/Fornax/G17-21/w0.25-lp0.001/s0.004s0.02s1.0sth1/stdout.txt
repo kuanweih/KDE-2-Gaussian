@@ -1,0 +1,66 @@
+This is a KDE_MWSatellite object inherited from
+----
+This is a MWSatellite object:
+    name = Fornax
+    ra = 39.997
+    dec = -34.551
+    map width = 0.25 deg
+    database = gaia_dr2.gaia_source
+----
+    pixel size = 0.001
+    number of grids = 250
+    sigma1 = 0.004 deg
+    sigma2 inside the satellite = 0.02 deg
+    sigma2 outside the satellite = 1.0 deg
+
+
+Using sqlutilpy.get() to query data...
+10432 sources are queried 
+
+--> Cut: 17 < phot_g_mean_mag < 21
+--> 6146 sources left 
+
+--> Cut: astrometric_excess_noise and phot_g_mean_mag
+--> 6062 sources left 
+
+calculated significance
+
+saved output npy files
+
+Starting source selection based on proper motion
+
+PM within 3 std 
+--> Cut: -11.910849735559546 < pmra < 13.030033707212217
+--> 5255 sources left 
+
+--> Cut: -11.056652831745122 < pmdec < 10.168314879922988
+--> 5218 sources left 
+
+calculated significance with pm in 3 std
+
+saved output npy files
+
+PM within 2 std 
+--> Cut: -7.7540358284309185 < pmra < 8.87321980008359
+--> 5196 sources left 
+
+--> Cut: -7.51915821313377 < pmdec < 6.630820261311636
+--> 5096 sources left 
+
+calculated significance with pm in 2 std
+
+saved output npy files
+
+PM within 1 std 
+--> Cut: -3.597221921302292 < pmra < 4.716405892954962
+--> 4929 sources left 
+
+--> Cut: -3.981663594522418 < pmdec < 3.093325642700285
+--> 4525 sources left 
+
+calculated significance with pm in 1 std
+
+saved output npy files
+
+we are finished :) 
+

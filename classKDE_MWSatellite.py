@@ -107,6 +107,30 @@ class KDE_MWSatellite(MWSatellite):
         self.datas["significance"] = np.array(sig_stars)
         self.datas["is_inside"] = np.array(is_insides)
 
+    def get_pm_mean_std_inside(self):
+        pmra = self.datas["pmra"]
+        pmdec = self.datas["pmdec"]
+        is_inside = self.datas["is_inside"]
+        
+        pmra = pmra[is_inside & ~np.isnan(pmra)]
+        pmdec = pmdec[is_inside & ~np.isnan(pmdec)]
+
+        pmra_mean = np.mean(pmra)
+        pmdec_mean = np.mean(pmdec)
+        pmra_std = np.std(pmra)
+        pmdec_std = np.std(pmdec)
+
+        self.pm_inside = {"pmra_mean":pmra_mean, "pmra_std":pmra_std,
+                          "pmdec_mean":pmdec_mean, "pmdec_std":pmdec_std}
+
+
+
+
+
+
+
+
+
 
 
 
