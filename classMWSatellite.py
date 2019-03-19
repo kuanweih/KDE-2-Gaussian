@@ -87,15 +87,16 @@ class MWSatellite(object):
         pmra_mean = self.pm_inside["pmra_mean"]
         pmdec_mean = self.pm_inside["pmdec_mean"]
 
-        #  "pmdec_mean":pmdec_mean, "pmdec_std":pmdec_std}
-        # self.datas["is_inside"]
+        n = self.datas["is_inside"].sum()
+        pmra_err = self.pm_inside["pmra_std"] / n
+        pmdec_err = self.pm_inside["pmdec_std"] / n
 
-        maskleft = self.datas["pmra"] - self.datas["pmra_error"] < pmra_mean
-        maskright = pmra_mean < self.datas["pmra"] + self.datas["pmra_error"]
+        maskleft = self.datas["pmra"] - self.datas["pmra_error"] < pmra_mean + pmra_err
+        maskright = pmra_mean - pmra_err < self.datas["pmra"] + self.datas["pmra_error"]
         mask = maskleft & maskright
 
-        maskleft = self.datas["pmdec"] - self.datas["pmdec_error"] < pmdec_mean
-        maskright = pmdec_mean < self.datas["pmdec"] + self.datas["pmdec_error"]
+        maskleft = self.datas["pmdec"] - self.datas["pmdec_error"] < pmdec_mean + pmdec_err
+        maskright = pmdec_mean - pmdec_err < self.datas["pmdec"] + self.datas["pmdec_error"]
         mask = maskleft & maskright & mask
 
         self.cut_datas(mask)
