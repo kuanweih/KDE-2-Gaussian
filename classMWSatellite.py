@@ -94,8 +94,8 @@ class MWSatellite(object):
         maskright = pmra_mean < self.datas["pmra"] + self.datas["pmra_error"]
         mask = maskleft & maskright
 
-        maskleft = self.datas["pmdec"] - self.datas["pmdec_error"] < pmra_mean
-        maskright = pmra_mean < self.datas["pmdec"] + self.datas["pmdec_error"]
+        maskleft = self.datas["pmdec"] - self.datas["pmdec_error"] < pmdec_mean
+        maskright = pmdec_mean < self.datas["pmdec"] + self.datas["pmdec_error"]
         mask = maskleft & maskright & mask
 
         self.cut_datas(mask)
