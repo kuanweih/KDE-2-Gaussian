@@ -10,10 +10,18 @@ CATALOG_STR = """
 
 """ g-band cut """
 G_MAG_MIN = 17
-G_MAG_MAX = 21
+G_MAG_MAX = 22
+
 
 """ pm cut based on std of the dwarf """
-PM_IN_STD = [3, 2, 1]    # must be in decresing order
+IS_PM_CUT_STD = False
+if IS_PM_CUT_STD:
+    PM_IN_STD = [3, 2, 1]    # must be in decresing order
+
+
+""" pm cut based on pm_error """
+IS_PM_ERROR_CUT = True
+
 
 PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
