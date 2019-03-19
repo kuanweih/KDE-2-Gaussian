@@ -79,4 +79,23 @@ class MWSatellite(object):
         maskright = (18. < g_mag) & (noise < np.exp(1.5 + 0.3 * (g_mag - 18.)))
         mask = maskleft | maskright
         self.cut_datas(mask)
-        
+
+    def mask_pm_error_cut(self):
+        """
+        hard code the pm_error cut on pmra and pmdec
+        """
+        pmra_mean = self.pm_inside["pmra_mean"]
+        pmdec_mean = self.pm_inside["pmdec_mean"]
+
+        #  "pmdec_mean":pmdec_mean, "pmdec_std":pmdec_std}
+        # self.datas["is_inside"]
+
+        maskleft = self.datas["pmra"] - self.datas["pmra_error"] < pmra_mean
+        maskright = pmra_mean < self.datas["pmra"] + self.datas["pmra_error"]
+        mask = maskleft & maskright
+
+        maskleft = self.datas["pmdec"] - self.datas["pmdec_error"] < pmra_mean
+        maskright = pmra_mean < self.datas["pmdec"] + self.datas["pmdec_error"]
+        mask = maskleft & maskright & mask
+
+        self.cut_datas(mask)

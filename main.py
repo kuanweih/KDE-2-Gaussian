@@ -68,6 +68,19 @@ if __name__ == '__main__':
     f.write("Starting source selection based on proper motion\n\n")
     Satellite.get_pm_mean_std_inside()
 
+    f.write("--> Cut: pm_mean within pm +- pm_error \n")
+    Satellite.mask_pm_error_cut()
+    n_source = len(Satellite.datas[Satellite.catalog_list[0]])
+    f.write("--> {} sources left \n\n".format(n_source))
+
+    # get significance again
+    Satellite.compound_significance()
+    f.write("calculated significance pm_mean within pm +- pm_error\n\n")
+
+    np.save("{}/{}-pm_error".format(dir_name, FILE_SIG), Satellite.sig_gaussian)
+    f.write("saved output npy files\n\n")
+
+
     for pm_std in PM_IN_STD:
         f.write("PM within {} std \n".format(pm_std))
         pmra_min = Satellite.pm_inside["pmra_mean"]

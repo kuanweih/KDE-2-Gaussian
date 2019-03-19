@@ -4,7 +4,7 @@ DEC = -34.551    # dec of target (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
 DATABASE = 'gaia_dr2.gaia_source'
 CATALOG_STR = """
-              ra, dec, parallax, pmra, pmdec,
+              ra, dec, parallax, pmra, pmdec, pmra_error, pmdec_error,
               phot_g_mean_mag, astrometric_excess_noise
               """
 
@@ -12,7 +12,7 @@ CATALOG_STR = """
 G_MAG_MIN = 17
 G_MAG_MAX = 21
 
-""" pm cut """
+""" pm cut based on std of the dwarf """
 PM_IN_STD = [3, 2, 1]    # must be in decresing order
 
 PIXEL_SIZE = 0.001    # 1d pixel size in deg
