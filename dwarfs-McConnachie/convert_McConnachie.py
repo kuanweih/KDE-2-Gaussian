@@ -99,12 +99,3 @@ if __name__ == '__main__':
 
 
     np.save("dwarfs-McConnachie", dwarfs)
-
-    # name_cols = name_cols.replace("   ", " ").replace("  ", " ")
-    # name_cols = name_cols.replace("  ", " ").replace("  ", " ").replace("\n", "")
-    # name_cols = name_cols.split(" ")
-    #
-    # print(len(name_cols))
-    # print(name_cols)
-
-    # print(galaxys)
