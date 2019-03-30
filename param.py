@@ -20,7 +20,7 @@ if IS_PM_CUT_STD:
 
 
 """ pm cut based on pm_error """
-IS_PM_ERROR_CUT = True
+IS_PM_ERROR_CUT = False
 
 
 PIXEL_SIZE = 0.001    # 1d pixel size in deg

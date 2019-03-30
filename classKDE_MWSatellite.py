@@ -5,10 +5,10 @@ from scipy.ndimage import gaussian_filter
 
 
 class KDE_MWSatellite(MWSatellite):
-    def __init__(self, name_sat, ra_sat, dec_sat, width, database, catalog_str,
-                 pixel_size, sigma1, sigma2, sigma3, sigma_th):
-        """
-        Kernel Density Estimation on a MWSatellite object:
+    def __init__(self, name_sat: str, ra_sat: float, dec_sat: float, width: float,
+                 database: str, catalog_str: str, pixel_size: float, sigma1: float,
+                 sigma2: float, sigma3: float, sigma_th: int):
+        """ Kernel Density Estimation on a MWSatellite object:
         pixel_size: size of pixel in deg
         sigma1: target kernel size in deg: GCs
         sigma2: smaller background kernel size in deg: inside the satellite
@@ -37,19 +37,15 @@ class KDE_MWSatellite(MWSatellite):
                                               str2, str3, str4, str5, str6)
         return str
 
-    def grid_coord(self, center):
-        """
-        get grid coordinates according to the center position and the
-        width of the mesh
-        """
+    def grid_coord(self, center: float) -> np.ndarray:
+        """ get grid coordinates according to the center position and the width
+            of the mesh """
         return np.linspace(center - 0.5 * self.width,
                            center + 0.5 * self.width,
                            num=self.num_grid, endpoint=True)
 
-    def overdensity(self, sigma):
-        """
-        convolved overdensity map with Gaussian kernel size sigma
-        """
+    def overdensity(self, sigma: float) -> np.ndarray:
+        """ convolved overdensity map with Gaussian kernel size sigma """
         hist2d, x, y = np.histogram2d(self.datas["dec"],
                                       self.datas["ra"],
                                       bins=(self.y_mesh, self.x_mesh))
@@ -59,9 +55,8 @@ class KDE_MWSatellite(MWSatellite):
         od /= gaussian_filter(mask2d, s_grid, mode='constant')
         return od
 
-    def significance(self, sigma1, sigma2):
-        """
-        get significance map using 2 kernels:
+    def significance(self, sigma1: float, sigma2: float) -> np.ndarray:
+        """ get significance map using 2 kernels:
         sigma1: inner kernel
         sigma2: outer kernel
         """
@@ -72,9 +67,7 @@ class KDE_MWSatellite(MWSatellite):
         return sig
 
     def compound_significance(self):
-        """
-        significance s12 inside (s23>sigma_th) and s13 outside (s23<sigma_th)
-        """
+        """ significance s12 inside (s23>sigma_th) and s13 outside (s23<sigma_th) """
         s12 = self.significance(self.sigma1, self.sigma2)
         s13 = self.significance(self.sigma1, self.sigma3)
         s23 = self.significance(self.sigma2, self.sigma3)
@@ -84,9 +77,7 @@ class KDE_MWSatellite(MWSatellite):
         self.sig_gaussian = sig
 
     def append_sig_to_data(self):
-        """
-        append significance of each star to the datas
-        """
+        """ append significance of each star to the datas """
         n_source = len(self.datas["ra"])
 
         pixel_size_x = np.max(np.diff(self.x_mesh))
@@ -111,7 +102,7 @@ class KDE_MWSatellite(MWSatellite):
         pmra = self.datas["pmra"]
         pmdec = self.datas["pmdec"]
         is_inside = self.datas["is_inside"]
-        
+
         pmra = pmra[is_inside & ~np.isnan(pmra)]
         pmdec = pmdec[is_inside & ~np.isnan(pmdec)]
 

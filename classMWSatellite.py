@@ -3,12 +3,12 @@ import sqlutilpy
 
 
 class MWSatellite(object):
-    def __init__(self, name_sat, ra_sat, dec_sat, width, database, catalog_str):
-        """
-        Milky Way (MW) Satellite object:
+    def __init__(self, name_sat: str, ra_sat: float, dec_sat: float,
+                 width: float, database: str, catalog_str: str):
+        """ Milky Way (MW) Satellite object:
         name_sat: name of the satellite, e.g. Fornax
-        ra_sat: ra of the satellite in deg
-        dec_sat: dec of the satellite in deg
+        ra_sat: RA of the satellite in deg
+        dec_sat: Dec of the satellite in deg
         width: width of the square area when querying data in deg
         database: database to be queried
         catalog_str: a string of catalogs for querying
@@ -31,10 +31,8 @@ class MWSatellite(object):
         str = "{}{}{}{}{}".format(str1, str2, str3, str4, str5)
         return str
 
-    def sql_get(self, host, user, password):
-        """
-        query 'catalog_str' from 'database' using sqlutilpy.get()
-        """
+    def sql_get(self, host: str, user: str, password: str):
+        """ query 'catalog_str' from 'database' using sqlutilpy.get() """
         ra_min = self.ra_sat - 0.5 * self.width
         ra_max = self.ra_sat + 0.5 * self.width
         dec_min = self.dec_sat - 0.5 * self.width
@@ -49,30 +47,26 @@ class MWSatellite(object):
         datas = sqlutilpy.get(query_str,
                               host=host, user=user, password=password)
 
-        """ update 'datas' dic to store queried data """
+        # update 'datas' dic to store queried data
         for i, catalog in enumerate(self.catalog_list):
             self.datas[catalog] = datas[i]
 
     def cut_datas(self, mask):
-        """
-        cut datas
+        """ cut datas based on the mask
+        mask: numpy array
         """
         for key, column in self.datas.items():
             self.datas[key] = column[mask]
 
-    def mask_cut(self, catalog, min_val, max_val):
-        """
-        cut the data with a min and a max value
-        """
+    def mask_cut(self, catalog: str, min_val: float, max_val: float):
+        """ cut the data with a min and a max value """
         maskleft = min_val < self.datas[catalog]
         maskright = self.datas[catalog] < max_val
         mask = maskleft & maskright
         self.cut_datas(mask)
 
     def mask_g_mag_astro_noise_cut(self):
-        """
-        hard code the astrometric_excess_noise and phot_g_mean_mag cut
-        """
+        """ hard code the astrometric_excess_noise and phot_g_mean_mag cut """
         noise = self.datas["astrometric_excess_noise"]
         g_mag = self.datas["phot_g_mean_mag"]
         maskleft = (g_mag <= 18.) & (noise < np.exp(1.5))
@@ -81,9 +75,7 @@ class MWSatellite(object):
         self.cut_datas(mask)
 
     def mask_pm_error_cut(self):
-        """
-        hard code the pm_error cut on pmra and pmdec
-        """
+        """ hard code the pm_error cut on pmra and pmdec """
         pmra_mean = self.pm_inside["pmra_mean"]
         pmdec_mean = self.pm_inside["pmdec_mean"]
 

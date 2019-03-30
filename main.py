@@ -5,10 +5,8 @@ from param import *
 from kw_wsdb import *
 
 
-def create_dir(dir_name):
-    """
-    create directory with a name 'dir_name'
-    """
+def create_dir(dir_name: str):
+    """ create directory with a name 'dir_name' """
     import os
     import errno
     if not os.path.exists(dir_name):
