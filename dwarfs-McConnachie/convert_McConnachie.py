@@ -1,8 +1,31 @@
 import numpy as np
+from typing import List
+
+np.seterr(invalid='ignore')
 
 
+def get_galaxys_with_quantitys(quantitys: List[str]) -> List[str]:
+    """ get galaxys line by line with quantitys """
+    is_print = False
+    galaxys = []
+    f = open('McConnachie.txt', 'r')
+    for line in f:
+        if is_print:
+            list_line = []
+            for i in range(len(quantitys)):
+                quantity = line[idstarts[i]:idstarts[i] + idoffsets[i]]
+                quantity = quantity.replace("  ", " ").replace("  ", " ")
+                list_line.append(quantity)
+            galaxys.append(list_line)
+        if "0123456789" in line:
+            is_print = True
+    return  galaxys
 
-def split_into_3_float(input_arr):
+
+def split_into_3_float(input_arr) -> List[float]:
+    """ split input numpy array into a list with 3 float-elements
+    input_arr: numpy array
+    """
     output = []
     for ii in input_arr:
         ii = ii.split(" ")
@@ -13,79 +36,75 @@ def split_into_3_float(input_arr):
             else:
                 is_remove = False
         output.append([float(i) for i in ii])
-    return output
+    return  output
 
 
-def get_ra_deg(hour, minute, second):
-    return (hour + minute / 60. + second / 3600.) * 15.
+def get_ra_deg(hour: float, minute: float, second: float) -> float:
+    """ convert RA from (hr, min, sec) -> degree """
+    return  (hour + minute / 60. + second / 3600.) * 15.
 
 
-def get_dec_deg(degree, minute, second):
-    deg_mag = np.absolute(degree)
-    deg_sign = degree / deg_mag
-    return  deg_sign * (deg_mag + minute / 60. + second / 3600.)
+def get_dec_deg(degree: float, minute: float, second: float) -> float:
+    """ convert Dec from (deg, arcmin, arcsec) -> degree """
+    deg_sign = 1. if (degree + np.absolute(degree)) > 0 else - 1.
+    return  deg_sign * (np.absolute(degree) + minute / 60. + second / 3600.)
+
+
+def dist_modulus_to_dist(dm: float, dm_errr: float, dm_errl: float) -> float:
+    """ convert distance modulus -> distance (pc)
+        currently not taking care of error bars though
+    dm: distance modulus
+    dm_errr: dm error +
+    dm_errl: dm error -
+    """
+    return  10.**(dm / 5. + 1.)
 
 
 
+if __name__ == '__main__':
+    # get name_cols from txt file
+    f = open('McConnachie.txt', 'r')
+    for line in f:
+        if "GalaxyName" in line:
+            name_cols = line
+    f.close()
 
-f = open('McConnachie.txt', 'r')
-for line in f:
-    if "GalaxyName" in line:
-        name_cols = line
-f.close()
+    # targeted quantitys
+    quantitys = ["GalaxyName         ",
+                 "RA         ",
+                 "Dec       ",
+                 "(m-M)o          ",
+                 "e=1-b/a        ",
+                 "rh(arcmins)        "]
 
+    idstarts = [name_cols.find(q) for q in quantitys]
+    idoffsets = [len(q) for q in quantitys]
 
-quantitys = ["GalaxyName         ",
-             "RA         ",
-             "Dec       ",
-             "(m-M)o          ",
-             "e=1-b/a        ",
-             "rh(arcmins)        "]
+    galaxys = get_galaxys_with_quantitys(quantitys)
 
-idstarts = [name_cols.find(q) for q in quantitys]
-idoffsets = [len(q) for q in quantitys]
+    keys = [q.replace(" ", "") for q in quantitys]
 
+    dwarfs = {}
 
-is_print = False
-galaxys = []
+    for i, q in enumerate(keys):
+        dwarfs[q] = np.array(galaxys)[:, i]
 
-f = open('McConnachie.txt', 'r')
-for line in f:
-    if is_print:
-        list_line = []
-        for i in range(len(quantitys)):
-            quantity = line[idstarts[i]:idstarts[i] + idoffsets[i]]
-            quantity = quantity.replace("  ", " ").replace("  ", " ")
-            list_line.append(quantity)
-        galaxys.append(list_line)
-    if "0123456789" in line:
-        is_print = True
+    for key, value in dwarfs.items():
+        if key in keys[1:]:
+            dwarfs[key] = split_into_3_float(value)
 
-
-keys = [q.replace(" ", "") for q in quantitys]
-
-dwarfs = {}
-
-for i, q in enumerate(keys):
-    dwarfs[q] = np.array(galaxys)[:, i]
-
-for key, value in dwarfs.items():
-    if key in keys[1:]:
-        dwarfs[key] = split_into_3_float(value)
-
-dwarfs["RA_deg"] = np.array(list(map(lambda x: get_ra_deg(x[0], x[1], x[2]),
-                                     dwarfs["RA"])))
-dwarfs["Dec_deg"] = np.array(list(map(lambda x: get_dec_deg(x[0], x[1], x[2]),
-                                      dwarfs["Dec"])))
+    dwarfs["RA_deg"] = np.array(list(map(lambda x: get_ra_deg(x[0], x[1], x[2]), dwarfs["RA"])))
+    dwarfs["Dec_deg"] = np.array(list(map(lambda x: get_dec_deg(x[0], x[1], x[2]), dwarfs["Dec"])))
+    dwarfs["Distance_pc"] = np.array(list(map(lambda x: dist_modulus_to_dist(x[0], x[1], x[2]), dwarfs["(m-M)o"])))
 
 
-np.save("dwarfs-McConnachie", dwarfs)
+    np.save("dwarfs-McConnachie", dwarfs)
 
-# name_cols = name_cols.replace("   ", " ").replace("  ", " ")
-# name_cols = name_cols.replace("  ", " ").replace("  ", " ").replace("\n", "")
-# name_cols = name_cols.split(" ")
-#
-# print(len(name_cols))
-# print(name_cols)
+    # name_cols = name_cols.replace("   ", " ").replace("  ", " ")
+    # name_cols = name_cols.replace("  ", " ").replace("  ", " ").replace("\n", "")
+    # name_cols = name_cols.split(" ")
+    #
+    # print(len(name_cols))
+    # print(name_cols)
 
-# print(galaxys)
+    # print(galaxys)
