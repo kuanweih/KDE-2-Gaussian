@@ -1,8 +1,6 @@
 import numpy as np
 from typing import List
 
-np.seterr(invalid='ignore')
-
 
 def get_galaxys_with_quantitys(quantitys: List[str]) -> List[str]:
     """ get galaxys line by line with quantitys """
