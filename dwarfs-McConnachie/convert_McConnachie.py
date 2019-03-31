@@ -89,11 +89,13 @@ if __name__ == '__main__':
 
     for key, value in dwarfs.items():
         if key in keys[1:]:
-            dwarfs[key] = split_into_3_float(value)
+            dwarfs[key] = np.array(split_into_3_float(value))
 
+    dwarfs["GalaxyName"] = np.array(list(map(lambda x: x.replace(" ", ""), dwarfs["GalaxyName"])))
     dwarfs["RA_deg"] = np.array(list(map(lambda x: get_ra_deg(x[0], x[1], x[2]), dwarfs["RA"])))
     dwarfs["Dec_deg"] = np.array(list(map(lambda x: get_dec_deg(x[0], x[1], x[2]), dwarfs["Dec"])))
     dwarfs["Distance_pc"] = np.array(list(map(lambda x: dist_modulus_to_dist(x[0], x[1], x[2]), dwarfs["(m-M)o"])))
-
+    dwarfs["rh(arcmins)"] = dwarfs["rh(arcmins)"][:, 0]
 
     np.save("dwarfs-McConnachie", dwarfs)
+    np.savetxt("dwarfs-names.txt", dwarfs["GalaxyName"], fmt="%s")

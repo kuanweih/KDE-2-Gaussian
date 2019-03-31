@@ -1,26 +1,12 @@
-
-
-
 NAME = 'Fornax'
 RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
-
-PIXEL_SIZE = 0.001    # 1d pixel size in deg
-SIGMA1 = 0.004    # searching scale in deg
-SIGMA2 = 0.02    # background scale (smaller) in deg
-SIGMA3 = 1.00    # background scale (larger) in deg
-
-SIGMA_TH = 1    # sigma threshold to define inside or outside
-
-
-""" data base and catalog """
 DATABASE = 'gaia_dr2.gaia_source'
 CATALOG_STR = """
               ra, dec, parallax, pmra, pmdec, pmra_error, pmdec_error,
               phot_g_mean_mag, astrometric_excess_noise
               """
-
 
 """ g-band cut """
 G_MAG_MIN = 17
@@ -37,7 +23,13 @@ if IS_PM_CUT_STD:
 IS_PM_ERROR_CUT = False
 
 
-""" Gaussian or Poisson """
+PIXEL_SIZE = 0.001    # 1d pixel size in deg
+SIGMA1 = 0.004    # searching scale in deg
+SIGMA2 = 0.02    # background scale (smaller) in deg
+SIGMA3 = 1.00    # background scale (larger) in deg
+SIGMA_TH = 1    # sigma threshold to define inside or outside
+
+
 KERNEL_BG = 'gaussian'    # background distribution: default 'gaussian'
 if KERNEL_BG == 'poisson':
     DR_FROM_S2 = 5.    # delta distance outside from sigma2 in degree
@@ -50,22 +42,24 @@ FILE_MESH = 'meshgrids'    # output mesh grids
 
 
 
-""" test how to read the dwarf list """
-import numpy as np
+if __name__ == '__main__':
+    """ test how to read the dwarf list """
+    import numpy as np
 
-path_dwarfs = "dwarfs-McConnachie/dwarfs-McConnachie.npy"
-dwarfs_dict = np.load(path_dwarfs).item()
+    path_dwarfs = "dwarfs-McConnachie/dwarfs-McConnachie.npy"
+    dwarfs_dict = np.load(path_dwarfs).item()
 
-mask = dwarfs_dict["GalaxyName"] == NAME
+    mask = dwarfs_dict["GalaxyName"] == NAME
 
-for key, val in dwarfs_dict.items():
-    dwarfs_dict[key] = val[mask]
+    for key, val in dwarfs_dict.items():
+        dwarfs_dict[key] = val[mask]
 
-keys_need = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
+    keys_need = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
 
-for key in keys_need:
-    print(dwarfs_dict[key])
+    for key in keys_need:
+        print(dwarfs_dict[key])
 
+        # print(key, type(val))
 
 
 
