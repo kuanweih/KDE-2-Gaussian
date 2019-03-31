@@ -1,7 +1,9 @@
 
 
+GC_SIZE = 10.    # size of target globular clusters (pc)
 
-NAME = 'Fornax'
+
+NAME = 'Fornax'    # name of the dwarf
 RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
@@ -10,7 +12,6 @@ PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
 SIGMA2 = 0.02    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
-
 SIGMA_TH = 1    # sigma threshold to define inside or outside
 
 
@@ -49,22 +50,47 @@ FILE_SIG = 'significance'    # output significance file
 FILE_MESH = 'meshgrids'    # output mesh grids
 
 
+""" parse arguments from McConnachie list """
+IS_FROM_McConnachie = True
+if IS_FROM_McConnachie:
+    import argparse
+    import numpy as np
 
-""" test how to read the dwarf list """
-import numpy as np
+    parser = argparse.ArgumentParser(description='Set parameters for a specific dwarf')
+    parser.add_argument('name_dwarf', type=str, help='A dwarf name from McConnachie list')
+    args = parser.parse_args()
 
-path_dwarfs = "dwarfs-McConnachie/dwarfs-McConnachie.npy"
-dwarfs_dict = np.load(path_dwarfs).item()
+    NAME = args.name_dwarf    # name of the dwarf
 
-mask = dwarfs_dict["GalaxyName"] == NAME
+    path_dwarfs = "dwarfs-McConnachie/dwarfs-McConnachie.npy"
+    dwarfs_dict = np.load(path_dwarfs).item()
 
-for key, val in dwarfs_dict.items():
-    dwarfs_dict[key] = val[mask]
+    mask = dwarfs_dict["GalaxyName"] == NAME
 
-keys_need = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
+    for key, val in dwarfs_dict.items():
+        dwarfs_dict[key] = val[mask]
 
-for key in keys_need:
-    print(dwarfs_dict[key])
+    # print(dwarfs_dict)
+
+    keys_need = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
+
+    # for key in keys_need:
+    #     print(dwarfs_dict[key])
+
+    if dwarfs_dict["GalaxyName"][0] != NAME:
+        print("Cannot find %s in GalaxyName" %NAME) # TODO RaiseError?
+
+    RA = dwarfs_dict["RA_deg"][0]
+    DEC = dwarfs_dict["Dec_deg"][0]
+    WIDTH = round(8. * dwarfs_dict["rh(arcmins)"][0] / 60.) # TODO: round? or including e?
+
+    SIGMA1 = GC_SIZE / dwarfs_dict["Distance_pc"][0] * 180. / np.pi
+    SIGMA1 = float("{0:.4f}".format(SIGMA1))
+
+    SIGMA2 = float("{0:.4f}".format(0.1 * dwarfs_dict["rh(arcmins)"][0] / 60.))
+    SIGMA3 = 0.5 * WIDTH
+    PIXEL_SIZE = 0.25 * SIGMA1
+
 
 
 
