@@ -1,8 +1,12 @@
+""" Parameter file for KDE detector """
 
 
-GC_SIZE = 10.    # size of target globular clusters (pc)
+
+GC_SIZE = 10    # size of target globular clusters (pc)
+SIGMA_TH = 1    # sigma threshold to define inside or outside
 
 
+""" default (manual) target parameters """
 NAME = 'Fornax'    # name of the dwarf
 RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
@@ -12,7 +16,6 @@ PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
 SIGMA2 = 0.02    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
-SIGMA_TH = 1    # sigma threshold to define inside or outside
 
 
 """ data base and catalog """
@@ -57,7 +60,9 @@ if IS_FROM_McConnachie:
     import numpy as np
 
     parser = argparse.ArgumentParser(description='Set parameters for a specific dwarf')
-    parser.add_argument('name_dwarf', type=str, help='A dwarf name from McConnachie list')
+    parser.add_argument('--name_dwarf', type=str, help='A dwarf name from McConnachie list')
+    parser.add_argument('--scale_sigma2', type=float, nargs='?', const=1, default=1.,
+                        help='sigma2 = scale_sigma2 * sigma2')
     args = parser.parse_args()
 
     NAME = args.name_dwarf    # name of the dwarf
@@ -70,12 +75,7 @@ if IS_FROM_McConnachie:
     for key, val in dwarfs_dict.items():
         dwarfs_dict[key] = val[mask]
 
-    # print(dwarfs_dict)
-
     keys_need = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
-
-    # for key in keys_need:
-    #     print(dwarfs_dict[key])
 
     if dwarfs_dict["GalaxyName"][0] != NAME:
         print("Cannot find %s in GalaxyName" %NAME) # TODO RaiseError?
@@ -88,6 +88,8 @@ if IS_FROM_McConnachie:
     SIGMA1 = float("{0:.4f}".format(SIGMA1))
 
     SIGMA2 = float("{0:.4f}".format(0.1 * dwarfs_dict["rh(arcmins)"][0] / 60.))
+    SIGMA2 *= args.scale_sigma2
+
     SIGMA3 = 0.5 * WIDTH
     PIXEL_SIZE = 0.25 * SIGMA1
 
