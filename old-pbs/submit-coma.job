@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -N JOBNAME
+#PBS -M kuanweih@andrew.cmu.edu
+#PBS -m abe
+#PBS -l nodes=1:ppn=8
+#PBS -l walltime=7:00:00:00
+export OMP_NUM_THREADS=1
+cd $PBS_O_WORKDIR
+source activate mypython3
+python  main.py             1>stdout  2>stderr
