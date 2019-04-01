@@ -9,6 +9,6 @@ Kernel density estimation for 2D observational data, based on [Koposov et al 200
 2. Setup paramters in `param.py`
 3. Execute the code:
     - `python  main.py  --name_dwarf  "Fornax"`
-    - `python  main.py  --name_dwarf  "Fornax"  --scale_sigma2  2.0`
+    - `python  main.py  --name_dwarf  "Fornax"  --gc_size_pc  20  --scale_sigma2  2.0`
 4. If running on a cluster, a slurm job script is provided:
     - `sbatch  slurm-coma.sh`
