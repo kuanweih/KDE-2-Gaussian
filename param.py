@@ -81,7 +81,8 @@ if IS_FROM_McConnachie:
 
     RA = dwarfs_dict["RA_deg"][0]
     DEC = dwarfs_dict["Dec_deg"][0]
-    WIDTH = round(8. * dwarfs_dict["rh(arcmins)"][0] / 60.) # TODO: round? or including e?
+    WIDTH = 8. * dwarfs_dict["rh(arcmins)"][0] / 60. # TODO: round? or including e?
+    WIDTH = float("{0:.4f}".format(WIDTH))
 
     SIGMA1 = GC_SIZE / dwarfs_dict["Distance_pc"][0] * 180. / np.pi
     SIGMA1 = float("{0:.4f}".format(SIGMA1))
