@@ -5,7 +5,7 @@ Kernel density estimation for 2D observational data, based on [Koposov et al 200
 
 
 # How to use it:
-1. get access to the database and then enter info in kw_wsdb.py
+1. get access to the database and enter information in `kw_wsdb.py`
 2. setup paramters in param.py
 3. ```python  main.py``` to execute the code
 
