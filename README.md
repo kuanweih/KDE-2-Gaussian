@@ -8,9 +8,7 @@ Kernel density estimation for 2D observational data, based on [Koposov et al 200
 1. Get access to the database and enter information in `kw_wsdb.py`
 2. Setup paramters in param.py
 3. Execute the code:
-    - python  main.py  --name_dwarf  "Fornax"
-    - python  main.py  --name_dwarf  "Fornax"  --scale_sigma2  2.0
-
-
-
-P.S. If running on clusters, a pbs script is provided also.
+    - `python  main.py  --name_dwarf  "Fornax"`
+    - `python  main.py  --name_dwarf  "Fornax"  --scale_sigma2  2.0`
+4. If running on a cluster, a slurm job script is provided:
+    - `sbatch  slurm-coma.sh`
