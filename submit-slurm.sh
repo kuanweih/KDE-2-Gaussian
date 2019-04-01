@@ -16,3 +16,5 @@ for gc_size in $gc_size_pcs;  do
 
 python  main.py  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size
 python  main.py  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size  --scale_sigma2  2.0
+
+done
