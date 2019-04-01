@@ -1,11 +1,6 @@
 """ Parameter file for KDE detector """
 
 
-
-GC_SIZE = 10    # size of target globular clusters (pc)
-SIGMA_TH = 1    # sigma threshold to define inside or outside
-
-
 """ default (manual) target parameters """
 NAME = 'Fornax'    # name of the dwarf
 RA = 39.997      # ra of target (in deg)
@@ -16,6 +11,9 @@ PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
 SIGMA2 = 0.02    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
+
+GC_SIZE = 10    # size of target globular clusters (pc)
+SIGMA_TH = 1    # sigma threshold to define inside or outside
 
 
 """ data base and catalog """
@@ -61,6 +59,7 @@ if IS_FROM_McConnachie:
 
     parser = argparse.ArgumentParser(description='Set parameters for a specific dwarf')
     parser.add_argument('--name_dwarf', type=str, help='A dwarf name from McConnachie list')
+    parser.add_argument('--gc_size_pc', type=int, help='Size of globular clusters: 10~100 pc')
     parser.add_argument('--scale_sigma2', type=float, nargs='?', const=1, default=1.,
                         help='sigma2 = scale_sigma2 * sigma2')
     args = parser.parse_args()
@@ -92,6 +91,8 @@ if IS_FROM_McConnachie:
 
     SIGMA3 = 0.5 * WIDTH
     PIXEL_SIZE = 0.25 * SIGMA1
+
+    GC_SIZE = args.gc_size_pc
 
 
 

@@ -7,4 +7,4 @@
 source  activate  mypython3    # use py3 on coma (don't need this if already using py3)
 
 python  main.py  --name_dwarf  "Fornax"
-python  main.py  --name_dwarf  "Fornax"  --scale_sigma2  2.0
+python  main.py  --name_dwarf  "Fornax"  --gc_size_pc  20  --scale_sigma2  2.0
