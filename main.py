@@ -17,12 +17,24 @@ def create_dir(dir_name: str):
                 raise
 
 
-if __name__ == '__main__':
-    # create result directory
+def get_dir_name() -> str:
+    """ get the name of result directory """
     dir_name = "results-{}".format(KERNEL_BG)
     dir_name = "{}/{}/G{}-{}".format(dir_name, NAME, G_MAG_MIN, G_MAG_MAX)
     dir_name = "{}/w{}-lp{}".format(dir_name, WIDTH, PIXEL_SIZE)
     dir_name = "{}/gc{}s{}s{}s{}sth{}".format(dir_name, GC_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
+    return  dir_name
+
+
+
+if __name__ == '__main__':
+    # create result directory
+    # TODO: separate this part as another function!
+    # dir_name = "results-{}".format(KERNEL_BG)
+    # dir_name = "{}/{}/G{}-{}".format(dir_name, NAME, G_MAG_MIN, G_MAG_MAX)
+    # dir_name = "{}/w{}-lp{}".format(dir_name, WIDTH, PIXEL_SIZE)
+    # dir_name = "{}/gc{}s{}s{}s{}sth{}".format(dir_name, GC_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
+    dir_name = get_dir_name()
     create_dir(dir_name)
 
     # open text file for dumping log imformation
