@@ -36,7 +36,9 @@ if IS_PM_CUT_STD:
 
 
 """ pm cut based on pm_error """
-IS_PM_ERROR_CUT = False
+IS_PM_ERROR_CUT = True
+if IS_PM_ERROR_CUT:
+    N_ERRORBAR = 2
 
 
 """ Gaussian or Poisson """

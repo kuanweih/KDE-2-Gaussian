@@ -1,0 +1,96 @@
+import matplotlib
+
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib import ticker
+# from typing import List
+import numpy as np
+import seaborn as sns
+
+
+def visualize_4_panel(path: str, outfile: str):
+    """
+    path:
+    outfile:
+    """
+    # Set up figure with colorbar
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111)
+    # cax = ax.matshow(attention_matrix, cmap='bone')
+    # fig.colorbar(cax)
+
+
+    sns.set(style="white", color_codes=True, font_scale=2)
+
+    fig, axes = plt.subplots(2, 2, figsize=(18, 18))
+    plt.subplots_adjust(wspace=0.1, hspace=0.15)
+
+    mesh = np.load('{}/meshgrids.npy'.format(path))
+
+    x = mesh[0]
+    y = mesh[1]
+
+    sig = np.load('{}/significance.npy'.format(path))
+
+    axes[0, 0].imshow(sig, cmap='RdBu_r', vmin=0, vmax=10,
+                      extent=[x.min(), x.max(), y.min(), y.max()], origin='lower')
+
+    plt.savefig(outfile, bbox_inches='tight', dpi=300)
+
+    # for pm in range(4):
+    #     i = pm // 2
+    #     j = pm % 2
+    #     if pm==0:
+    #         sig = np.load('{}significance.npy'.format(path))
+    #     elif pm==3:
+    #         sig = np.load('{}significance-pm_error.npy'.format(path, pm))
+    #     else:
+    #         sig = np.load('{}significance-pm{}.npy'.format(path, pm))
+
+        # axes[i, j].imshow(sig>above, cmap='RdBu_r', vmin=-0.2, vmax=1.1,
+        #                   extent=[x.min(), x.max(), y.min(), y.max()], origin='lower')
+        #
+        # axes[i, j].set_ylabel('{} deg'.format(width))
+        # axes[i, j].tick_params(axis='both', which='both', labelleft=False, labelbottom=False)
+        # axes[i, j].set_xlabel('sig > {}    s1 = {}    s2 = {}'.format(above, s1, s2))
+        # if pm==0:
+        #     axes[i, j].set_title('{}    {}'.format(dwarf_name, g_band))
+        # elif pm==3:
+        #     axes[i, j].set_title('{}    {}    pm_error'.format(dwarf_name, g_band))
+        # else:
+        #     axes[i, j].set_title('{}    {}    pm<{}'.format(dwarf_name, g_band, pm))
+
+
+
+
+    # # Set up axes
+    # ax.set_xticklabels([''] + source_sentence_str, rotation=90)
+    # ax.set_yticklabels([''] + target_sentence_str)
+    #
+    # # Show label at every tick
+    # ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    # ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+    #
+    # plt.savefig(outfile)
+    #
+    # plt.close()
+
+
+# path = "../KDE-Detector/results-gaussian/Fornax/G17-22/w2-lp0.001/s0.004s0.02s1.0sth1/"
+#
+# print(path.split("/"))
+# print(path.split("/")[6].split("s")[1])
+#
+#     def plot_sig4(path, above=5):
+#     dwarf_name = path.split("/")[3]
+#     g_band = path.split("/")[4]
+#     width = path.split("/")[5].split("-")[0][1:]
+#     s1 = path.split("/")[6].split("s")[1]
+#     s2 = path.split("/")[6].split("s")[2]
+
+
+
+
+
+    # savefig('{}-{}-w{}-s{}-s.png'.format(dwarf_name, g_band, width, s1, s2),
+    #         bbox_inches='tight', dpi=300)

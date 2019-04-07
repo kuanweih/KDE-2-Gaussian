@@ -3,6 +3,7 @@ from classMWSatellite import *
 from classKDE_MWSatellite import *
 from param import *
 from kw_wsdb import *
+from plotting import *
 
 
 def create_dir(dir_name: str):
@@ -76,15 +77,18 @@ if __name__ == '__main__':
 
 
     if IS_PM_ERROR_CUT:
-        f.write("--> Cut: pm_mean within pm +- pm_error \n")
-        Satellite.mask_pm_error_cut()
+        np.seterr(divide='ignore', invalid='ignore')
+
+        Satellite.mask_pm_error_cut(N_ERRORBAR)
+        f.write("--> Cut: pm_mean within pm +- {} * pm_error \n".format(N_ERRORBAR))
         f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
         # get significance again
         Satellite.compound_significance()
         f.write("calculated significance pm_mean within pm +- pm_error\n\n")
 
-        np.save("{}/{}-pm_error".format(dir_name, FILE_SIG), Satellite.sig_gaussian)
+        np.save("{}/{}-pm_error{}".format(dir_name, FILE_STAR, N_ERRORBAR), Satellite.datas)
+        np.save("{}/{}-pm_error{}".format(dir_name, FILE_SIG, N_ERRORBAR), Satellite.sig_gaussian)
         f.write("saved output npy files\n\n")
 
 
@@ -115,6 +119,8 @@ if __name__ == '__main__':
             np.save("{}/{}-pm{}".format(dir_name, FILE_SIG, pm_std),
                     Satellite.sig_gaussian)
             f.write("saved output npy files\n\n")
+
+    visualize_4_panel(dir_name, "test.png")
 
 
     f.write("we are finished :) \n\n")

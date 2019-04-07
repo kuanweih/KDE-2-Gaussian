@@ -74,8 +74,10 @@ class MWSatellite(object):
         mask = maskleft | maskright
         self.cut_datas(mask)
 
-    def mask_pm_error_cut(self):
-        """ hard code the pm_error cut on pmra and pmdec """
+    def mask_pm_error_cut(self, n_err: float):
+        """ hard code the pm_error cut on pmra and pmdec
+        n_err: within n_err of error bars for pm_error
+        """
         pmra_mean = self.pm_inside["pmra_mean"]
         pmdec_mean = self.pm_inside["pmdec_mean"]
 
@@ -83,12 +85,12 @@ class MWSatellite(object):
         pmra_err = self.pm_inside["pmra_std"] / n
         pmdec_err = self.pm_inside["pmdec_std"] / n
 
-        maskleft = self.datas["pmra"] - self.datas["pmra_error"] < pmra_mean + pmra_err
-        maskright = pmra_mean - pmra_err < self.datas["pmra"] + self.datas["pmra_error"]
+        maskleft = self.datas["pmra"] - n_err * self.datas["pmra_error"] < pmra_mean + pmra_err
+        maskright = pmra_mean - pmra_err < self.datas["pmra"] + n_err * self.datas["pmra_error"]
         mask = maskleft & maskright
 
-        maskleft = self.datas["pmdec"] - self.datas["pmdec_error"] < pmdec_mean + pmdec_err
-        maskright = pmdec_mean - pmdec_err < self.datas["pmdec"] + self.datas["pmdec_error"]
+        maskleft = self.datas["pmdec"] - n_err * self.datas["pmdec_error"] < pmdec_mean + pmdec_err
+        maskright = pmdec_mean - pmdec_err < self.datas["pmdec"] + n_err * self.datas["pmdec_error"]
         mask = maskleft & maskright & mask
 
         self.cut_datas(mask)

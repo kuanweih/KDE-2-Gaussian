@@ -29,5 +29,12 @@ saved output npy files
 
 Starting source selection based on proper motion
 
+--> Cut: pm_mean within pm +- 2 * pm_error 
+--> 4078 sources left 
+
+calculated significance pm_mean within pm +- pm_error
+
+saved output npy files
+
 we are finished :) 
 
