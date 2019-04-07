@@ -38,8 +38,7 @@ class KDE_MWSatellite(MWSatellite):
         return str
 
     def grid_coord(self, center: float) -> np.ndarray:
-        """ get grid coordinates according to the center position and the width
-            of the mesh """
+        """ get grid coordinates according to the center position and the width of the mesh """
         return np.linspace(center - 0.5 * self.width,
                            center + 0.5 * self.width,
                            num=self.num_grid, endpoint=True)

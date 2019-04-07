@@ -26,7 +26,7 @@ CATALOG_STR = """
 
 """ g-band cut """
 G_MAG_MIN = 17
-G_MAG_MAX = 22
+G_MAG_MAX = 22    # fainter cut at G=22 for Gaia DR2
 
 
 """ pm cut based on std of the dwarf """
@@ -52,7 +52,7 @@ FILE_MESH = 'meshgrids'    # output mesh grids
 
 
 """ parse arguments from McConnachie list """
-IS_FROM_McConnachie = True
+IS_FROM_McConnachie = False
 if IS_FROM_McConnachie:
     import argparse
     import numpy as np

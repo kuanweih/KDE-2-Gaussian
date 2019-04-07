@@ -25,40 +25,37 @@ def get_dir_name() -> str:
     dir_name = "{}/gc{}s{}s{}s{}sth{}".format(dir_name, GC_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
     return  dir_name
 
+def n_source(Satellite: KDE_MWSatellite) -> int:
+    return  len(Satellite.datas[Satellite.catalog_list[0]])
+
 
 
 if __name__ == '__main__':
     # create result directory
-    # TODO: separate this part as another function!
-    # dir_name = "results-{}".format(KERNEL_BG)
-    # dir_name = "{}/{}/G{}-{}".format(dir_name, NAME, G_MAG_MIN, G_MAG_MAX)
-    # dir_name = "{}/w{}-lp{}".format(dir_name, WIDTH, PIXEL_SIZE)
-    # dir_name = "{}/gc{}s{}s{}s{}sth{}".format(dir_name, GC_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
     dir_name = get_dir_name()
     create_dir(dir_name)
 
-    # open text file for dumping log imformation
-    f= open("{}/stdout.txt".format(dir_name),"w+")
+    f= open("{}/stdout.txt".format(dir_name), "w+")    # dumping log information
 
     # create a KDE_MWSatellite object
     Satellite = KDE_MWSatellite(NAME, RA, DEC, WIDTH, DATABASE, CATALOG_STR,
                                 PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
     f.write(Satellite.__str__())
 
-    f.write("\n\nUsing sqlutilpy.get() to query data...\n")
+    # query data
     Satellite.sql_get(HOST, USER, PASSWORD)
-    n_source = len(Satellite.datas[Satellite.catalog_list[0]])
-    f.write("{} sources are queried \n\n".format(n_source))
+    f.write("\n\nUsing sqlutilpy.get() to query data...\n")
+    f.write("{} sources are queried \n\n".format(n_source(Satellite)))
 
-    f.write("--> Cut: {} < {} < {}\n".format(G_MAG_MIN, "phot_g_mean_mag", G_MAG_MAX))
+    # G band cut
     Satellite.mask_cut("phot_g_mean_mag", G_MAG_MIN, G_MAG_MAX)
-    n_source = len(Satellite.datas[Satellite.catalog_list[0]])
-    f.write("--> {} sources left \n\n".format(n_source))
+    f.write("--> Cut: {} < {} < {}\n".format(G_MAG_MIN, "phot_g_mean_mag", G_MAG_MAX))
+    f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
-    f.write("--> Cut: astrometric_excess_noise and phot_g_mean_mag\n")
+    # astrometric_excess_noise cut
     Satellite.mask_g_mag_astro_noise_cut()
-    n_source = len(Satellite.datas[Satellite.catalog_list[0]])
-    f.write("--> {} sources left \n\n".format(n_source))
+    f.write("--> Cut: astrometric_excess_noise and phot_g_mean_mag\n")
+    f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
     # get significance w/ different background kernels inside and outside
     Satellite.compound_significance()
@@ -70,20 +67,18 @@ if __name__ == '__main__':
     # save queried data, significance, mesh coordinates
     np.save("{}/{}".format(dir_name, FILE_STAR), Satellite.datas)
     np.save("{}/{}".format(dir_name, FILE_SIG), Satellite.sig_gaussian)
-    np.save("{}/{}".format(dir_name, FILE_MESH), np.array([Satellite.x_mesh,
-                                                           Satellite.y_mesh]))
+    np.save("{}/{}".format(dir_name, FILE_MESH), np.array([Satellite.x_mesh, Satellite.y_mesh]))
     f.write("saved output npy files\n\n")
 
-
-    f.write("Starting source selection based on proper motion\n\n")
+    # pm selection
     Satellite.get_pm_mean_std_inside()
+    f.write("Starting source selection based on proper motion\n\n")
 
 
     if IS_PM_ERROR_CUT:
         f.write("--> Cut: pm_mean within pm +- pm_error \n")
         Satellite.mask_pm_error_cut()
-        n_source = len(Satellite.datas[Satellite.catalog_list[0]])
-        f.write("--> {} sources left \n\n".format(n_source))
+        f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
         # get significance again
         Satellite.compound_significance()
@@ -107,13 +102,11 @@ if __name__ == '__main__':
 
             f.write("--> Cut: {} < {} < {}\n".format(pmra_min, "pmra", pmra_max))
             Satellite.mask_cut("pmra", pmra_min, pmra_max)
-            n_source = len(Satellite.datas[Satellite.catalog_list[0]])
-            f.write("--> {} sources left \n\n".format(n_source))
+            f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
             f.write("--> Cut: {} < {} < {}\n".format(pmdec_min, "pmdec", pmdec_max))
             Satellite.mask_cut("pmdec", pmdec_min, pmdec_max)
-            n_source = len(Satellite.datas[Satellite.catalog_list[0]])
-            f.write("--> {} sources left \n\n".format(n_source))
+            f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
             # get significance again
             Satellite.compound_significance()
@@ -124,7 +117,7 @@ if __name__ == '__main__':
             f.write("saved output npy files\n\n")
 
 
-    f.write("we are finished :) \n\n".format(n_source))
+    f.write("we are finished :) \n\n")
     f.close()
 
     #
