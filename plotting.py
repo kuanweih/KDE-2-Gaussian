@@ -2,50 +2,49 @@ import matplotlib
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib import ticker
-# from typing import List
+# from matplotlib import ticker
 import numpy as np
 import seaborn as sns
+from param import *
 
 
-def visualize_4_panel(path: str, outfile: str):
+
+def visualize_4_panel(path: str, outfile: str, n_error: float, s_above=5):
     """
     path:
     outfile:
     """
-    # Set up figure with colorbar
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # cax = ax.matshow(attention_matrix, cmap='bone')
-    # fig.colorbar(cax)
-
-
     sns.set(style="white", color_codes=True, font_scale=2)
-
     fig, axes = plt.subplots(2, 2, figsize=(18, 18))
-    plt.subplots_adjust(wspace=0.1, hspace=0.15)
+    fig.suptitle("{}    GC={}pc    width={}deg    s1={}    s2={}".format(
+                 NAME, GC_SIZE, WIDTH, SIGMA1, SIGMA2), y=0.92)
+    plt.subplots_adjust(wspace=0, hspace=0.05)
 
-    mesh = np.load('{}/meshgrids.npy'.format(path))
+    x, y = np.load('{}/meshgrids.npy'.format(path))    # coordinates
 
-    x = mesh[0]
-    y = mesh[1]
+    sigs = [np.load('{}/significance.npy'.format(path)),
+            np.load('{}/significance-pm_error{}.npy'.format(path, n_error))]
 
-    sig = np.load('{}/significance.npy'.format(path))
+    datas = [np.load('{}/queried-data.npy'.format(path)).item(),
+             np.load('{}/queried-data-pm_error{}.npy'.format(path, n_error)).item()]
 
-    axes[0, 0].imshow(sig, cmap='RdBu_r', vmin=0, vmax=10,
-                      extent=[x.min(), x.max(), y.min(), y.max()], origin='lower')
+    ras = [data["ra"] for data in datas]
+    decs = [data["dec"] for data in datas]
+
+    extent = [x.min(), x.max(), y.min(), y.max()]    # arg extent for imshow
+
+    for v in range(2):
+        axes[v, 0].imshow(sigs[v] > s_above, cmap='copper', vmin=-0.01, vmax=1.01, extent=extent, origin='lower')
+        axes[v, 0].plot(ras[v], decs[v], '.', c='deepskyblue', markersize=0.5, alpha=0.5)
+
+        axes[v, 1].imshow(sigs[v], cmap='RdBu_r', vmin=-5, vmax=5, extent=extent, origin='lower')
+
+        for u in range(2):
+            axes[v, u].tick_params(axis='both', which='both', labelleft=False, labelbottom=False)
 
     plt.savefig(outfile, bbox_inches='tight', dpi=300)
 
-    # for pm in range(4):
-    #     i = pm // 2
-    #     j = pm % 2
-    #     if pm==0:
-    #         sig = np.load('{}significance.npy'.format(path))
-    #     elif pm==3:
-    #         sig = np.load('{}significance-pm_error.npy'.format(path, pm))
-    #     else:
-    #         sig = np.load('{}significance-pm{}.npy'.format(path, pm))
+
 
         # axes[i, j].imshow(sig>above, cmap='RdBu_r', vmin=-0.2, vmax=1.1,
         #                   extent=[x.min(), x.max(), y.min(), y.max()], origin='lower')

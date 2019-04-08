@@ -29,16 +29,16 @@ G_MAG_MIN = 17
 G_MAG_MAX = 22    # fainter cut at G=22 for Gaia DR2
 
 
-""" pm cut based on std of the dwarf """
-IS_PM_CUT_STD = False
-if IS_PM_CUT_STD:
-    PM_IN_STD = [3, 2, 1]    # must be in decresing order
+# """ pm cut based on std of the dwarf """
+# IS_PM_CUT_STD = False
+# if IS_PM_CUT_STD:
+#     PM_IN_STD = [3, 2, 1]    # must be in decresing order
 
 
 """ pm cut based on pm_error """
 IS_PM_ERROR_CUT = True
 if IS_PM_ERROR_CUT:
-    N_ERRORBAR = 2
+    N_ERRORBAR = 5
 
 
 """ Gaussian or Poisson """
@@ -54,7 +54,7 @@ FILE_MESH = 'meshgrids'    # output mesh grids
 
 
 """ parse arguments from McConnachie list """
-IS_FROM_McConnachie = False
+IS_FROM_McConnachie = True
 if IS_FROM_McConnachie:
     import argparse
     import numpy as np
