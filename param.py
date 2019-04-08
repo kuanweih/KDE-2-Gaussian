@@ -86,6 +86,8 @@ if IS_FROM_McConnachie:
     WIDTH = 8. * dwarfs_dict["rh(arcmins)"][0] / 60. # TODO: round? or including e?
     WIDTH = float("{0:.4f}".format(WIDTH))
 
+    GC_SIZE = args.gc_size_pc
+
     SIGMA1 = GC_SIZE / dwarfs_dict["Distance_pc"][0] * 180. / np.pi
     SIGMA1 = float("{0:.4f}".format(SIGMA1))
 
@@ -95,8 +97,10 @@ if IS_FROM_McConnachie:
     SIGMA3 = 0.5 * WIDTH
     PIXEL_SIZE = 0.25 * SIGMA1
 
-    GC_SIZE = args.gc_size_pc
 
+if __name__ == '__main__':
+    if WIDTH>5:
+        print(NAME)
 
 
 
