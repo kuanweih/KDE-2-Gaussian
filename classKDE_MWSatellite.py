@@ -5,17 +5,15 @@ from scipy.ndimage import gaussian_filter
 
 
 class KDE_MWSatellite(MWSatellite):
-    def __init__(self, name_sat: str, ra_sat: float, dec_sat: float, width: float,
-                 database: str, catalog_str: str, pixel_size: float, sigma1: float,
-                 sigma2: float, sigma3: float, sigma_th: int):
+    def __init__(self, name_sat: str, ra_sat: float, dec_sat: float, width: float, database: str,
+                 catalog_str: str, pixel_size: float, sigma1: float, sigma2: float, sigma3: float, sigma_th: int):
         """ Kernel Density Estimation on a MWSatellite object:
         pixel_size: size of pixel in deg
         sigma1: target kernel size in deg: GCs
         sigma2: smaller background kernel size in deg: inside the satellite
         sigma3: larger background kernel size in deg: outside the satellite
         """
-        MWSatellite.__init__(self, name_sat, ra_sat, dec_sat, width,
-                             database, catalog_str)
+        MWSatellite.__init__(self, name_sat, ra_sat, dec_sat, width, database, catalog_str)
         self.pixel_size = pixel_size
         self.num_grid = round(self.width / self.pixel_size)
         self.sigma1 = sigma1
@@ -33,21 +31,16 @@ class KDE_MWSatellite(MWSatellite):
         str4 = "    sigma1 = {} deg\n".format(self.sigma1)
         str5 = "    sigma2 inside the satellite = {} deg\n".format(self.sigma2)
         str6 = "    sigma2 outside the satellite = {} deg\n".format(self.sigma3)
-        str = "{}\n{}----\n{}{}{}{}{}".format(str1, MWSatellite.__str__(self),
-                                              str2, str3, str4, str5, str6)
+        str = "{}\n{}----\n{}{}{}{}{}".format(str1, MWSatellite.__str__(self), str2, str3, str4, str5, str6)
         return str
 
     def grid_coord(self, center: float) -> np.ndarray:
         """ get grid coordinates according to the center position and the width of the mesh """
-        return np.linspace(center - 0.5 * self.width,
-                           center + 0.5 * self.width,
-                           num=self.num_grid, endpoint=True)
+        return np.linspace(center - 0.5 * self.width, center + 0.5 * self.width, num=self.num_grid, endpoint=True)
 
     def overdensity(self, sigma: float) -> np.ndarray:
         """ convolved overdensity map with Gaussian kernel size sigma """
-        hist2d, x, y = np.histogram2d(self.datas["dec"],
-                                      self.datas["ra"],
-                                      bins=(self.y_mesh, self.x_mesh))
+        hist2d, x, y = np.histogram2d(self.datas["dec"], self.datas["ra"], bins=(self.y_mesh, self.x_mesh))
         s_grid = sigma / self.pixel_size
         od = gaussian_filter(hist2d, s_grid, mode='constant')
         mask2d = np.ones(hist2d.shape)
@@ -89,8 +82,7 @@ class KDE_MWSatellite(MWSatellite):
         is_insides = []
 
         for i in range(n_source):
-            id_x = int(id_xs[i])
-            id_y = int(id_ys[i])
+            id_x, id_y = int(id_xs[i]), int(id_ys[i])
             sig_stars.append(self.sig_gaussian[id_y][id_x])
             is_insides.append(self.is_inside[id_y][id_x])
 

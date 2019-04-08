@@ -41,11 +41,9 @@ class MWSatellite(object):
         query_str = """
                     select {} from {}
                     where {} < ra and ra < {} and {} < dec and dec < {}
-                    """.format(self.catalog_str, self.database,
-                               ra_min, ra_max, dec_min, dec_max)
+                    """.format(self.catalog_str, self.database, ra_min, ra_max, dec_min, dec_max)
 
-        datas = sqlutilpy.get(query_str,
-                              host=host, user=user, password=password)
+        datas = sqlutilpy.get(query_str, host=host, user=user, password=password)
 
         # update 'datas' dic to store queried data
         for i, catalog in enumerate(self.catalog_list):
