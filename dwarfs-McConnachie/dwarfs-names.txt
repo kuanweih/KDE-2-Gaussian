@@ -1,5 +1,3 @@
-*CanisMajor
-SagittariusdSph
 *TucanaIII
 *DracoII
 Segue(I)
@@ -12,13 +10,10 @@ SegueII
 Willman1
 ComaBerenices
 *TucanaIV
-*BootesIII
 *GrusII
-LMC
 *TucanaV
 Tucana2
 *SagittariusII
-SMC
 Bootes(I)
 Draco
 UrsaMinor

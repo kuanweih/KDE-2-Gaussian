@@ -98,6 +98,7 @@ if __name__ == '__main__':
     dwarfs["rh(arcmins)"] = dwarfs["rh(arcmins)"][:, 0]
 
     mask = dwarfs["Distance_pc"] < 600000    # skip dwarfs too far
+    mask = mask & (dwarfs["rh(arcmins)"] < 90)    # skip dwarfs with rh = 99.99
 
     np.save("dwarfs-McConnachie", dwarfs)
     np.savetxt("dwarfs-names.txt", dwarfs["GalaxyName"][mask], fmt="%s")

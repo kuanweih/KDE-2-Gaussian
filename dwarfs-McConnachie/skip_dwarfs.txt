@@ -1,4 +1,9 @@
 TheGalaxy
+*CanisMajor
+SagittariusdSph
+*BootesIII
+LMC
+SMC
 Andromeda
 M32
 AndromedaIX
