@@ -2,7 +2,7 @@
 
 
 """ default (manual) target parameters """
-NAME = 'Fornax'    # name of the dwarf
+NAME: str = 'Fornax'    # name of the dwarf
 RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
@@ -54,7 +54,7 @@ FILE_MESH = 'meshgrids'    # output mesh grids
 
 
 """ parse arguments from McConnachie list """
-IS_FROM_McConnachie = True
+IS_FROM_McConnachie = False
 if IS_FROM_McConnachie:
     import argparse
     import numpy as np
