@@ -90,6 +90,7 @@ class KDE_MWSatellite(MWSatellite):
         self.datas["is_inside"] = np.array(is_insides)
 
     def get_pm_mean_std_inside(self):
+        """ calculate the mean and std for the stars in the targeted dwarf """
         pmra = self.datas["pmra"]
         pmdec = self.datas["pmdec"]
         is_inside = self.datas["is_inside"]
@@ -105,16 +106,10 @@ class KDE_MWSatellite(MWSatellite):
         self.pm_inside = {"pmra_mean":pmra_mean, "pmra_std":pmra_std,
                           "pmdec_mean":pmdec_mean, "pmdec_std":pmdec_std}
 
-
-
-
-
-
-
-
-
-
-
+    def distance2(x_arr, y_arr, x_cen, y_cen):
+        """ 2d distance square """
+        d2 = (x_arr - x_cen)**2 + (y_arr - y_cen)**2
+        return d2
 
 
 
