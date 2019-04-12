@@ -7,8 +7,10 @@ RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
 
-PIXEL_SIZE = 0.001    # 1d pixel size in deg
-SIGMA1 = 0.004    # searching scale in deg
+# PIXEL_SIZE = 0.001    # 1d pixel size in deg
+PIXEL_SIZE = 0.02    # 1d pixel size in deg
+SIGMA1 = 0.05    # searching scale in deg
+# SIGMA1 = 0.004    # searching scale in deg
 SIGMA2 = 0.02    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
 
@@ -29,12 +31,6 @@ G_MAG_MIN = 17
 G_MAG_MAX = 22    # fainter cut at G=22 for Gaia DR2
 
 
-# """ pm cut based on std of the dwarf """
-# IS_PM_CUT_STD = False
-# if IS_PM_CUT_STD:
-#     PM_IN_STD = [3, 2, 1]    # must be in decresing order
-
-
 """ pm cut based on pm_error """
 IS_PM_ERROR_CUT = True
 if IS_PM_ERROR_CUT:
@@ -42,9 +38,10 @@ if IS_PM_ERROR_CUT:
 
 
 """ Gaussian or Poisson """
-KERNEL_BG = 'gaussian'    # background distribution: default 'gaussian'
+# KERNEL_BG = 'gaussian'    # background distribution: default 'gaussian'
+KERNEL_BG = 'poisson'
 if KERNEL_BG == 'poisson':
-    DR_FROM_S2 = 5.    # delta distance outside from sigma2 in degree
+    FACTOR_FROM_SIGMA2 = 2.    # ratio of outer_radiu / sigma2 (should be > 1)
 
 
 """ output file name """

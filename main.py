@@ -59,6 +59,13 @@ if __name__ == '__main__':
     f.write("--> Cut: astrometric_excess_noise and phot_g_mean_mag\n")
     f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
+    if KERNEL_BG == "poisson":
+        Satellite.sig_poisson(SIGMA1, SIGMA2, FACTOR_FROM_SIGMA2)
+
+
+        exit()
+
+
     # get significance w/ different background kernels inside and outside
     Satellite.compound_significance()
     f.write("calculated significance\n\n")
@@ -93,32 +100,6 @@ if __name__ == '__main__':
         f.write("saved output npy files\n\n")
 
 
-    # if IS_PM_CUT_STD:
-    #     for pm_std in PM_IN_STD:
-    #         f.write("PM within {} std \n".format(pm_std))
-    #         pmra_min = Satellite.pm_inside["pmra_mean"]
-    #         pmra_min -= pm_std * Satellite.pm_inside["pmra_std"]
-    #         pmra_max = Satellite.pm_inside["pmra_mean"]
-    #         pmra_max += pm_std * Satellite.pm_inside["pmra_std"]
-    #         pmdec_min = Satellite.pm_inside["pmdec_mean"]
-    #         pmdec_min -= pm_std * Satellite.pm_inside["pmdec_std"]
-    #         pmdec_max = Satellite.pm_inside["pmdec_mean"]
-    #         pmdec_max += pm_std * Satellite.pm_inside["pmdec_std"]
-    #
-    #         f.write("--> Cut: {} < {} < {}\n".format(pmra_min, "pmra", pmra_max))
-    #         Satellite.mask_cut("pmra", pmra_min, pmra_max)
-    #         f.write("--> {} sources left \n\n".format(n_source(Satellite)))
-    #
-    #         f.write("--> Cut: {} < {} < {}\n".format(pmdec_min, "pmdec", pmdec_max))
-    #         Satellite.mask_cut("pmdec", pmdec_min, pmdec_max)
-    #         f.write("--> {} sources left \n\n".format(n_source(Satellite)))
-    #
-    #         # get significance again
-    #         Satellite.compound_significance()
-    #         f.write("calculated significance with pm in {} std\n\n".format(pm_std))
-    #
-    #         np.save("{}/{}-pm{}".format(dir_name, FILE_SIG, pm_std), Satellite.sig_gaussian)
-    #         f.write("saved output npy files\n\n")
 
 
     # visualize searching results

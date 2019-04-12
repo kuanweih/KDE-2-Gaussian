@@ -1,0 +1,25 @@
+This is a KDE_MWSatellite object inherited from
+----
+This is a MWSatellite object:
+    name = Fornax
+    ra = 39.997
+    dec = -34.551
+    map width = 0.25 deg
+    database = gaia_dr2.gaia_source
+----
+    pixel size = 0.001
+    number of grids = 250
+    sigma1 = 0.004 deg
+    sigma2 inside the satellite = 0.02 deg
+    sigma2 outside the satellite = 1.0 deg
+
+
+Using sqlutilpy.get() to query data...
+10432 sources are queried 
+
+--> Cut: 17 < phot_g_mean_mag < 22
+--> 10402 sources left 
+
+--> Cut: astrometric_excess_noise and phot_g_mean_mag
+--> 10295 sources left 
+
