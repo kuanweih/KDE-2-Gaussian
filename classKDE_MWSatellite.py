@@ -1,7 +1,10 @@
 import numpy as np
 from param import *
 from classMWSatellite import *
-from scipy.ndimage import gaussian_filter
+from scipy.ndimage import gaussian_filter, convolve
+from scipy.special import erfinv
+from scipy.stats import poisson
+from typing import Tuple
 
 
 class KDE_MWSatellite(MWSatellite):
@@ -32,20 +35,26 @@ class KDE_MWSatellite(MWSatellite):
         str5 = "    sigma2 inside the satellite = {} deg\n".format(self.sigma2)
         str6 = "    sigma2 outside the satellite = {} deg\n".format(self.sigma3)
         str = "{}\n{}----\n{}{}{}{}{}".format(str1, MWSatellite.__str__(self), str2, str3, str4, str5, str6)
-        return str
+        return  str
 
     def grid_coord(self, center: float) -> np.ndarray:
         """ get grid coordinates according to the center position and the width of the mesh """
-        return np.linspace(center - 0.5 * self.width, center + 0.5 * self.width, num=self.num_grid, endpoint=True)
+        return  np.linspace(center - 0.5 * self.width, center + 0.5 * self.width, num=self.num_grid, endpoint=True)
+
+    def np_hist2d(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """ get histogram 2d for the star distribution on the mesh
+        return: hist2d, x_coor, y_coor
+        """
+        return  np.histogram2d(self.datas["dec"], self.datas["ra"], bins=(self.y_mesh, self.x_mesh))
 
     def overdensity(self, sigma: float) -> np.ndarray:
         """ convolved overdensity map with Gaussian kernel size sigma """
-        hist2d, x, y = np.histogram2d(self.datas["dec"], self.datas["ra"], bins=(self.y_mesh, self.x_mesh))
+        hist2d, _, _ = self.np_hist2d()
         s_grid = sigma / self.pixel_size
         od = gaussian_filter(hist2d, s_grid, mode='constant')
         mask2d = np.ones(hist2d.shape)
         od /= gaussian_filter(mask2d, s_grid, mode='constant')
-        return od
+        return  od
 
     def significance(self, sigma1: float, sigma2: float) -> np.ndarray:
         """ get significance map using 2 kernels:
@@ -56,7 +65,7 @@ class KDE_MWSatellite(MWSatellite):
         od_2 = self.overdensity(sigma2)
         s1 = sigma1 / self.pixel_size
         sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
-        return sig
+        return  sig
 
     def compound_significance(self):
         """ significance s12 inside (s23>sigma_th) and s13 outside (s23<sigma_th) """
@@ -106,15 +115,97 @@ class KDE_MWSatellite(MWSatellite):
         self.pm_inside = {"pmra_mean":pmra_mean, "pmra_std":pmra_std,
                           "pmdec_mean":pmdec_mean, "pmdec_std":pmdec_std}
 
-    def distance2(x_arr, y_arr, x_cen, y_cen):
-        """ 2d distance square """
-        d2 = (x_arr - x_cen)**2 + (y_arr - y_cen)**2
-        return d2
+    def z_score_poisson(self, lambda_poisson: np.ndarray, x: np.ndarray) -> np.ndarray:
+        """ z = sqrt(2) * erfinv(1 - 2 * sf(x, lambda)), where sf (survival function) = 1 - CDF
+        lambda_poisson: lambda of poisson, here means the background expected number count
+        x: number count of observed events, here means number of stars in the inner aperture
+        """
+        return  np.sqrt(2.) * erfinv(1. - 2. * poisson.sf(x, lambda_poisson))
+
+    # def distance2(self, x_mesh: np.ndarray, y_mesh: np.ndarray, x_stars: np.ndarray, y_stars: np.ndarray) -> np.ndarray:
+    #     """ 2d distance square between pixels and stars """
+    #     dx = x_mesh[:, None] - x_stars
+    #     dy = y_mesh[:, None] - y_stars
+    #     return  dx**2 + dy**2
+
+    def circular_kernel(self, radius: int) -> np.ndarray:
+        """ a normalized circular kernel with radius according to sigma """
+        kernel = np.zeros((2 * radius + 1, 2 * radius + 1))
+        y,x = np.ogrid[- radius:radius + 1, - radius:radius + 1]
+        mask = x**2 + y**2 <= radius**2
+        kernel[mask] = 1
+        return  kernel / np.sum(kernel)
+
+    def poisson_inner_number_count(self, sigma: float) -> np.ndarray:
+        """ calculate inner number count of stars within sigma """
+        hist2d, _, _ = self.np_hist2d()
+        s_grid = sigma / self.pixel_size
+        kernel = self.circular_kernel(round(s_grid))
+        conv = convolve(hist2d, kernel, mode='constant')
+        mask2d = np.ones(hist2d.shape)
+        conv /= convolve(mask2d, kernel, mode='constant')
+        return  conv
+
+
+    def sig_poisson(self, sigma1: float, sigma2: float, factor_sigma2: float):
+        n_inner = self.poisson_inner_number_count(self, sigma1)
+        print(n_inner)
+
+
+
+
+        # x, y = np.meshgrid(self.x_mesh, self.y_mesh)
+        # print(x)
+        # print(y)
+        # dx = x[:, :, None] - self.datas["ra"]
+        # print(dx.shape)
+        # print(dx)
+        # hist2d, x, y = np.histogram2d(self.datas["dec"], self.datas["ra"], bins=(self.y_mesh, self.x_mesh))
+
+
+    # def sig_poisson(x, y, s1, s2, star_x, star_y, dr_s2):
+    #     """
+    #     get z-score as significance using inverse survival function of Poisson.
+    #     x, y: mesh arrays
+    #     star_x, star_y: position of stars
+    #     s1, s2: inner and outer scales
+    #     dr_s2: r_out = s2 + dr_s2
+    #     """
+    #     r = s2 + dr_s2    # outer radius
+    #     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
+    #                                for i in range(len(star_x))]), axis=0)
+    #     n_outer = np.sum(np.array([(s2**2 < distance2(x, y, star_x[i], star_y[i])) *
+    #                                (distance2(x, y, star_x[i], star_y[i]) < r**2)
+    #                                for i in range(len(star_x))]), axis=0)
+    #
+    #     r12 = s1**2 / (r**2 - s2**2)    # area ratio = inner / outer
+    #     lambda_poisson = n_outer * r12    # estimated background count
+    #     sig = (n_inner - lambda_poisson) / np.sqrt(lambda_poisson)    # z score
+    #     return sig
 
 
 
 
 
+
+
+# >>> x1 = np.array([1, 2, 3, 4, 5])
+# >>> x2 = np.array([1.3, 3.5, 2.8])
+# >>> dx = x1[:,None] - x2
+# >>> dx
+# array([[-0.3, -2.5, -1.8],
+#        [ 0.7, -1.5, -0.8],
+#        [ 1.7, -0.5,  0.2],
+#        [ 2.7,  0.5,  1.2],
+#        [ 3.7,  1.5,  2.2]])
+# >>> dx<1
+# array([[ True,  True,  True],
+#        [ True,  True,  True],
+#        [False,  True,  True],
+#        [False,  True, False],
+#        [False, False, False]])
+# >>> np.sum(dx<1, axis=1)
+# array([3, 3, 2, 1, 0])
 
 
 
