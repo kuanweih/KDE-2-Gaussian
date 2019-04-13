@@ -7,12 +7,16 @@ RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
 
-# PIXEL_SIZE = 0.001    # 1d pixel size in deg
-PIXEL_SIZE = 0.02    # 1d pixel size in deg
-SIGMA1 = 0.05    # searching scale in deg
-# SIGMA1 = 0.004    # searching scale in deg
+PIXEL_SIZE = 0.001    # 1d pixel size in deg
+SIGMA1 = 0.004    # searching scale in deg
 SIGMA2 = 0.02    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
+
+# PIXEL_SIZE = 0.03    # 1d pixel size in deg
+# SIGMA1 = 0.04    # searching scale in deg
+# SIGMA2 = 0.05    # background scale (smaller) in deg
+# SIGMA3 = 1.00    # background scale (larger) in deg
+
 
 GC_SIZE = 10    # size of target globular clusters (pc)
 SIGMA_TH = 1    # sigma threshold to define inside or outside
@@ -41,7 +45,7 @@ if IS_PM_ERROR_CUT:
 # KERNEL_BG = 'gaussian'    # background distribution: default 'gaussian'
 KERNEL_BG = 'poisson'
 if KERNEL_BG == 'poisson':
-    FACTOR_FROM_SIGMA2 = 2.    # ratio of outer_radiu / sigma2 (should be > 1)
+    FACTOR_FROM_SIGMA2 = 1.5    # ratio of outer_radiu / sigma2 (should be > 1)
 
 
 """ output file name """

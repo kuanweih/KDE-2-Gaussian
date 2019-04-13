@@ -122,121 +122,49 @@ class KDE_MWSatellite(MWSatellite):
         """
         return  np.sqrt(2.) * erfinv(1. - 2. * poisson.sf(x, lambda_poisson))
 
-    # def distance2(self, x_mesh: np.ndarray, y_mesh: np.ndarray, x_stars: np.ndarray, y_stars: np.ndarray) -> np.ndarray:
-    #     """ 2d distance square between pixels and stars """
-    #     dx = x_mesh[:, None] - x_stars
-    #     dy = y_mesh[:, None] - y_stars
-    #     return  dx**2 + dy**2
-
     def circular_kernel(self, radius: int) -> np.ndarray:
-        """ a normalized circular kernel with radius according to sigma """
+        """ calculate the circular kernel with radius according to sigma.
+            this kernel is not normalized because we are using it to sum the number count """
         kernel = np.zeros((2 * radius + 1, 2 * radius + 1))
-        y,x = np.ogrid[- radius:radius + 1, - radius:radius + 1]
+        y,x = np.ogrid[-radius:radius + 1, -radius:radius + 1]
         mask = x**2 + y**2 <= radius**2
         kernel[mask] = 1
-        return  kernel / np.sum(kernel)
+        return  kernel
 
-    def poisson_inner_number_count(self, sigma: float) -> np.ndarray:
+    def poisson_inner_number_count(self, sigma: float) -> Tuple[np.ndarray, float]:
         """ calculate inner number count of stars within sigma """
         hist2d, _, _ = self.np_hist2d()
         s_grid = sigma / self.pixel_size
         kernel = self.circular_kernel(round(s_grid))
-        conv = convolve(hist2d, kernel, mode='constant')
+        norm_kernel = np.sum(kernel)
+        conv = convolve(hist2d, kernel / norm_kernel, mode='constant')
         mask2d = np.ones(hist2d.shape)
-        conv /= convolve(mask2d, kernel, mode='constant')
-        return  conv
+        conv /= convolve(mask2d, kernel / norm_kernel, mode='constant')
+        return  conv * norm_kernel, norm_kernel
 
+    def poisson_outer_expected_background(self, sigma: float, factor_sigma: float) -> Tuple[np.ndarray, float]:
+        """ calculate expected outer number count of stars for background estimation,
+            which will be using to calculate 'lambda' for poisson """
+        hist2d, _, _ = self.np_hist2d()
+        # note that in and out here mean sigma2 and outer radius.
+        s_grid_in = round(sigma / self.pixel_size)
+        s_grid_out = round(factor_sigma * sigma / self.pixel_size)
+        kernel_out = self.circular_kernel(s_grid_out)
+        ds_pad = s_grid_out - s_grid_in
+        kernel_in_pad = np.pad(self.circular_kernel(s_grid_in), ds_pad, 'constant', constant_values=0)
+
+        kernel = kernel_out - kernel_in_pad
+        norm_kernel = np.sum(kernel)
+
+        conv = convolve(hist2d, kernel / norm_kernel, mode='constant')
+        mask2d = np.ones(hist2d.shape)
+        conv /= convolve(mask2d, kernel / norm_kernel, mode='constant')
+        return  conv * norm_kernel, norm_kernel
 
     def sig_poisson(self, sigma1: float, sigma2: float, factor_sigma2: float):
-        n_inner = self.poisson_inner_number_count(self, sigma1)
-        print(n_inner)
-
-
-
-
-        # x, y = np.meshgrid(self.x_mesh, self.y_mesh)
-        # print(x)
-        # print(y)
-        # dx = x[:, :, None] - self.datas["ra"]
-        # print(dx.shape)
-        # print(dx)
-        # hist2d, x, y = np.histogram2d(self.datas["dec"], self.datas["ra"], bins=(self.y_mesh, self.x_mesh))
-
-
-    # def sig_poisson(x, y, s1, s2, star_x, star_y, dr_s2):
-    #     """
-    #     get z-score as significance using inverse survival function of Poisson.
-    #     x, y: mesh arrays
-    #     star_x, star_y: position of stars
-    #     s1, s2: inner and outer scales
-    #     dr_s2: r_out = s2 + dr_s2
-    #     """
-    #     r = s2 + dr_s2    # outer radius
-    #     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
-    #                                for i in range(len(star_x))]), axis=0)
-    #     n_outer = np.sum(np.array([(s2**2 < distance2(x, y, star_x[i], star_y[i])) *
-    #                                (distance2(x, y, star_x[i], star_y[i]) < r**2)
-    #                                for i in range(len(star_x))]), axis=0)
-    #
-    #     r12 = s1**2 / (r**2 - s2**2)    # area ratio = inner / outer
-    #     lambda_poisson = n_outer * r12    # estimated background count
-    #     sig = (n_inner - lambda_poisson) / np.sqrt(lambda_poisson)    # z score
-    #     return sig
-
-
-
-
-
-
-
-# >>> x1 = np.array([1, 2, 3, 4, 5])
-# >>> x2 = np.array([1.3, 3.5, 2.8])
-# >>> dx = x1[:,None] - x2
-# >>> dx
-# array([[-0.3, -2.5, -1.8],
-#        [ 0.7, -1.5, -0.8],
-#        [ 1.7, -0.5,  0.2],
-#        [ 2.7,  0.5,  1.2],
-#        [ 3.7,  1.5,  2.2]])
-# >>> dx<1
-# array([[ True,  True,  True],
-#        [ True,  True,  True],
-#        [False,  True,  True],
-#        [False,  True, False],
-#        [False, False, False]])
-# >>> np.sum(dx<1, axis=1)
-# array([3, 3, 2, 1, 0])
-
-
-
-
-
-#TODO: add poisson statistics method into the class
-
-# def distance2(x_arr, y_arr, x_cen, y_cen):
-#     """
-#     2d distance square
-#     """
-#     d2 = (x_arr - x_cen)**2 + (y_arr - y_cen)**2
-#     return d2
-#
-#
-# def sig_poisson(x, y, s1, s2, star_x, star_y, dr_s2):
-#     """
-#     get z-score as significance using inverse survival function of Poisson.
-#     x, y: mesh arrays
-#     star_x, star_y: position of stars
-#     s1, s2: inner and outer scales
-#     dr_s2: r_out = s2 + dr_s2
-#     """
-#     r = s2 + dr_s2    # outer radius
-#     n_inner = np.sum(np.array([(distance2(x, y, star_x[i], star_y[i]) < s1**2)
-#                                for i in range(len(star_x))]), axis=0)
-#     n_outer = np.sum(np.array([(s2**2 < distance2(x, y, star_x[i], star_y[i])) *
-#                                (distance2(x, y, star_x[i], star_y[i]) < r**2)
-#                                for i in range(len(star_x))]), axis=0)
-#     r12 = s1**2 / (r**2 - s2**2)    # area ratio = inner / outer
-#     lambda_poisson = n_outer * r12    # estimated background count
-#     sig = (n_inner - lambda_poisson) / np.sqrt(lambda_poisson)    # z score
-#     return sig
-#
+        n_inner, area_inner = self.poisson_inner_number_count(sigma1)
+        n_outer, area_outer = self.poisson_outer_expected_background(sigma2, factor_sigma2)
+        ratio = area_inner / area_outer    # area ratio = inner / outer
+        lambda_poisson = n_outer * ratio    # estimated background count in inner area
+        sig = self.z_score_poisson(lambda_poisson, n_inner)
+        self.sig_gaussian = sig

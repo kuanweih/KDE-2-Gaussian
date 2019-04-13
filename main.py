@@ -59,6 +59,7 @@ if __name__ == '__main__':
     f.write("--> Cut: astrometric_excess_noise and phot_g_mean_mag\n")
     f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
+    # get significance
     if KERNEL_BG == "poisson":
         Satellite.sig_poisson(SIGMA1, SIGMA2, FACTOR_FROM_SIGMA2)
 
