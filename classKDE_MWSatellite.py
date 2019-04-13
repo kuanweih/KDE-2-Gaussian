@@ -167,4 +167,4 @@ class KDE_MWSatellite(MWSatellite):
         ratio = area_inner / area_outer    # area ratio = inner / outer
         lambda_poisson = n_outer * ratio    # estimated background count in inner area
         sig = self.z_score_poisson(lambda_poisson, n_inner)
-        self.sig_gaussian = sig
+        self.sig_poisson = sig
