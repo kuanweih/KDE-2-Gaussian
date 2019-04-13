@@ -9,7 +9,8 @@ from typing import Tuple
 
 class KDE_MWSatellite(MWSatellite):
     def __init__(self, name_sat: str, ra_sat: float, dec_sat: float, width: float, database: str,
-                 catalog_str: str, pixel_size: float, sigma1: float, sigma2: float, sigma3: float, sigma_th: int):
+                 catalog_str: str, pixel_size: float, sigma1: float, sigma2: float, sigma3: float,
+                 sigma_th: int, factor_from_sigma2: float):
         """ Kernel Density Estimation on a MWSatellite object:
         pixel_size: size of pixel in deg
         sigma1: target kernel size in deg: GCs
@@ -23,6 +24,7 @@ class KDE_MWSatellite(MWSatellite):
         self.sigma2 = sigma2
         self.sigma3 = sigma3
         self.sigma_th = sigma_th
+        self.factor_from_sigma2 = factor_from_sigma2
 
         self.x_mesh = self.grid_coord(self.ra_sat)
         self.y_mesh = self.grid_coord(self.dec_sat)
@@ -56,22 +58,24 @@ class KDE_MWSatellite(MWSatellite):
         od /= gaussian_filter(mask2d, s_grid, mode='constant')
         return  od
 
-    def significance(self, sigma1: float, sigma2: float) -> np.ndarray:
+    def get_sig_gaussian(self, od_1: np.ndarray, od_2: np.ndarray, sigma1: float, sigma2: float) -> np.ndarray:
         """ get significance map using 2 kernels:
+        od1, od2: overdensity with sigma1 and sigma2
         sigma1: inner kernel
         sigma2: outer kernel
         """
-        od_1 = self.overdensity(sigma1)
-        od_2 = self.overdensity(sigma2)
         s1 = sigma1 / self.pixel_size
         sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
         return  sig
 
     def compound_significance(self):
         """ significance s12 inside (s23>sigma_th) and s13 outside (s23<sigma_th) """
-        s12 = self.significance(self.sigma1, self.sigma2)
-        s13 = self.significance(self.sigma1, self.sigma3)
-        s23 = self.significance(self.sigma2, self.sigma3)
+        od_1 = self.overdensity(self.sigma1)
+        od_2 = self.overdensity(self.sigma2)
+        od_3 = self.overdensity(self.sigma3)
+        s12 = self.get_sig_gaussian(od_1, od_2, self.sigma1, self.sigma2)
+        s13 = self.get_sig_gaussian(od_1, od_3, self.sigma1, self.sigma3)
+        s23 = self.get_sig_gaussian(od_2, od_3, self.sigma2, self.sigma3)
         mask_in = s23 > self.sigma_th    # mask for inside
         sig = s12 * mask_in + s13 * (~mask_in)
         self.is_inside = mask_in
@@ -87,16 +91,19 @@ class KDE_MWSatellite(MWSatellite):
         id_xs = (self.datas["ra"] - self.x_mesh[0]) / pixel_size_x
         id_ys = (self.datas["dec"] - self.y_mesh[0]) / pixel_size_y
 
-        sig_stars = []
         is_insides = []
+        sig_gaussian_stars = []
+        sig_poisson_stars = []
 
         for i in range(n_source):
             id_x, id_y = int(id_xs[i]), int(id_ys[i])
-            sig_stars.append(self.sig_gaussian[id_y][id_x])
             is_insides.append(self.is_inside[id_y][id_x])
+            sig_gaussian_stars.append(self.sig_gaussian[id_y][id_x])
+            sig_poisson_stars.append(self.sig_poisson[id_y][id_x])
 
-        self.datas["significance"] = np.array(sig_stars)
         self.datas["is_inside"] = np.array(is_insides)
+        self.datas["sig_gaussian"] = np.array(sig_gaussian_stars)
+        self.datas["sig_poisson"] = np.array(sig_poisson_stars)
 
     def get_pm_mean_std_inside(self):
         """ calculate the mean and std for the stars in the targeted dwarf """
@@ -161,9 +168,9 @@ class KDE_MWSatellite(MWSatellite):
         conv /= convolve(mask2d, kernel / norm_kernel, mode='constant')
         return  conv * norm_kernel, norm_kernel
 
-    def sig_poisson(self, sigma1: float, sigma2: float, factor_sigma2: float):
-        n_inner, area_inner = self.poisson_inner_number_count(sigma1)
-        n_outer, area_outer = self.poisson_outer_expected_background(sigma2, factor_sigma2)
+    def get_sig_poisson(self):
+        n_inner, area_inner = self.poisson_inner_number_count(self.sigma1)
+        n_outer, area_outer = self.poisson_outer_expected_background(self.sigma2, self.factor_from_sigma2)
         ratio = area_inner / area_outer    # area ratio = inner / outer
         lambda_poisson = n_outer * ratio    # estimated background count in inner area
         sig = self.z_score_poisson(lambda_poisson, n_inner)

@@ -1,4 +1,5 @@
 import numpy as np
+import time
 from classMWSatellite import *
 from classKDE_MWSatellite import *
 from param import *
@@ -20,8 +21,7 @@ def create_dir(dir_name: str):
 
 def get_dir_name() -> str:
     """ get the name of results directory """
-    dir_name = "results-{}".format(KERNEL_BG)
-    dir_name = "{}/{}-G{}-{}".format(dir_name, NAME, G_MAG_MIN, G_MAG_MAX)
+    dir_name = "results/{}-G{}-{}".format(NAME, G_MAG_MIN, G_MAG_MAX)
     dir_name = "{}-w{}-lp{}".format(dir_name, WIDTH, PIXEL_SIZE)
     dir_name = "{}-gc{}s{}s{}s{}sth{}".format(dir_name, GC_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
     return  dir_name
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     # create a KDE_MWSatellite object
     Satellite = KDE_MWSatellite(NAME, RA, DEC, WIDTH, DATABASE, CATALOG_STR,
-                                PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
+                                PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH, FACTOR_FROM_SIGMA2)
     f.write(Satellite.__str__())
 
     # query data
@@ -59,24 +59,23 @@ if __name__ == '__main__':
     f.write("--> Cut: astrometric_excess_noise and phot_g_mean_mag\n")
     f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
-    # get significance
-    if KERNEL_BG == "poisson":
-        Satellite.sig_poisson(SIGMA1, SIGMA2, FACTOR_FROM_SIGMA2)
-
-
-        exit()
-
-
-    # get significance w/ different background kernels inside and outside
+    # get significance of gaussian
+    t0 = time.time()
     Satellite.compound_significance()
-    f.write("calculated significance\n\n")
+    f.write("took %s seconds to calculate significance of Gaussian\n\n" % (time.time() - t0))
+
+    # get significance of gaussian
+    t0 = time.time()
+    Satellite.get_sig_poisson()
+    f.write("took %s seconds to calculate significance of Poisson\n\n" % (time.time() - t0))
 
     # append 'significance' and 'is_inside' to datas
     Satellite.append_sig_to_data()
 
     # save queried data, significance, mesh coordinates
     np.save("{}/{}".format(dir_name, FILE_STAR), Satellite.datas)
-    np.save("{}/{}".format(dir_name, FILE_SIG), Satellite.sig_gaussian)
+    np.save("{}/{}".format(dir_name, FILE_SIG_GAUSSIAN), Satellite.sig_gaussian)
+    np.save("{}/{}".format(dir_name, FILE_SIG_POISSON), Satellite.sig_poisson)
     np.save("{}/{}".format(dir_name, FILE_MESH), np.array([Satellite.x_mesh, Satellite.y_mesh]))
     f.write("saved output npy files\n\n")
 
@@ -92,42 +91,31 @@ if __name__ == '__main__':
         f.write("--> Cut: pm_mean within pm +- {} * pm_error \n".format(N_ERRORBAR))
         f.write("--> {} sources left \n\n".format(n_source(Satellite)))
 
-        # get significance again
+        f.write("calculating significance pm_mean within pm +- pm_error\n")
+
+        # get significance of gaussian
+        t0 = time.time()
         Satellite.compound_significance()
-        f.write("calculated significance pm_mean within pm +- pm_error\n\n")
+        f.write("took %s seconds to calculate significance of Gaussian\n\n" % (time.time() - t0))
+
+        # get significance of gaussian
+        t0 = time.time()
+        Satellite.get_sig_poisson()
+        f.write("took %s seconds to calculate significance of Poisson\n\n" % (time.time() - t0))
 
         np.save("{}/{}-pm_error{}".format(dir_name, FILE_STAR, N_ERRORBAR), Satellite.datas)
-        np.save("{}/{}-pm_error{}".format(dir_name, FILE_SIG, N_ERRORBAR), Satellite.sig_gaussian)
+        np.save("{}/{}-pm_error{}".format(dir_name, FILE_SIG_GAUSSIAN, N_ERRORBAR), Satellite.sig_gaussian)
+        np.save("{}/{}-pm_error{}".format(dir_name, FILE_SIG_POISSON, N_ERRORBAR), Satellite.sig_poisson)
         f.write("saved output npy files\n\n")
 
 
-
-
     # visualize searching results
-    plot_dir = "plots-{}".format(KERNEL_BG)
-    fig_name = dir_name.replace("results-{}/".format(KERNEL_BG), "")
+    plot_dir = "plots"
+    fig_name = dir_name.replace("results/", "")
     create_dir(plot_dir)
-    visualize_4_panel(dir_name, "{}/{}.png".format(plot_dir, fig_name), N_ERRORBAR)
+    visualize_4_panel(dir_name, "{}/{}".format(plot_dir, fig_name), N_ERRORBAR, "gaussian")
+    visualize_4_panel(dir_name, "{}/{}".format(plot_dir, fig_name), N_ERRORBAR, "poisson")
 
 
     f.write("we are finished :) \n\n")
     f.close()
-
-    #
-    # print('\nYeah! Done with querying data from {}!\n'.format(DATABASE))
-
-    #
-    # # get significance
-    # if KERNEL_BG == 'gaussian':
-    #     print('We are using 2-Gaussian kernels to estimate the density...')
-    #     s1_grid = SIGMA1 / PIXEL_SIZE
-    #     s2_grid = SIGMA2 / PIXEL_SIZE
-    #     sig = sig_2_gaussian(x_mesh, y_mesh, s1_grid, s2_grid, ra, dec)
-    # elif KERNEL_BG == 'poisson':
-    #     print('We are using Poisson statistics to estimate the density...')
-    #     print('Background area = %0.1f detection area.' % DR_FROM_S2)
-    #     meshgrid = np.meshgrid(x_mesh, y_mesh, sparse=True)
-    #     sig = sig_poisson(meshgrid[0], meshgrid[1],
-    #                       SIGMA1, SIGMA2, ra, dec, DR_FROM_S2)
-    # else:
-    #     print('wrong kernel :(')

@@ -12,15 +12,9 @@ SIGMA1 = 0.004    # searching scale in deg
 SIGMA2 = 0.02    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
 
-# PIXEL_SIZE = 0.03    # 1d pixel size in deg
-# SIGMA1 = 0.04    # searching scale in deg
-# SIGMA2 = 0.05    # background scale (smaller) in deg
-# SIGMA3 = 1.00    # background scale (larger) in deg
-
-
 GC_SIZE = 10    # size of target globular clusters (pc)
 SIGMA_TH = 1    # sigma threshold to define inside or outside
-
+FACTOR_FROM_SIGMA2 = 1.5    # ratio of outer_radiu / sigma2 (should be > 1)
 
 """ data base and catalog """
 DATABASE = 'gaia_dr2.gaia_source'
@@ -41,16 +35,10 @@ if IS_PM_ERROR_CUT:
     N_ERRORBAR = 5
 
 
-""" Gaussian or Poisson """
-# KERNEL_BG = 'gaussian'    # background distribution: default 'gaussian'
-KERNEL_BG = 'poisson'
-if KERNEL_BG == 'poisson':
-    FACTOR_FROM_SIGMA2 = 1.5    # ratio of outer_radiu / sigma2 (should be > 1)
-
-
 """ output file name """
 FILE_STAR = 'queried-data'    # output data file
-FILE_SIG = 'significance'    # output significance file
+FILE_SIG_GAUSSIAN = 'sig_gaussian'    # output significance file
+FILE_SIG_POISSON = 'sig_poisson'    # output significance file
 FILE_MESH = 'meshgrids'    # output mesh grids
 
 
@@ -102,41 +90,3 @@ if IS_FROM_McConnachie:
 if __name__ == '__main__':
     if WIDTH>5:
         print(NAME)
-
-
-
-
-
-
-#
-#
-# """ astro_ex_noise cut in eq. 1 of Koposov et al 2017: MNRAS 470"""
-# ASTRO_EX_NOISE_G_MAG_CUT = True    # True:on, Flase:off
-# if ASTRO_EX_NOISE_G_MAG_CUT:
-#     ASTRO_EX_NOISE_G_MAG_MIN = None
-#     ASTRO_EX_NOISE_G_MAG_MAX = 0
-#
-#
-# """ remove nan proper motion stars """
-# REMOVE_PM_NAN = False    # True:on, Flase:off
-#
-#
-# """ proper motion cut for pmra and pmdec """
-# PM_CUT = False    # True:on, Flase:off
-# if PM_CUT:
-#     PM_CUT_STD = 3.
-#
-#
-# """ remove nan parallax stars """
-# REMOVE_PARALLAX_NAN = False    # True:on, Flase:off
-#
-#
-# """ parallax cut """
-# PARALLAX_CUT = False    # True:on, Flase:off
-# if PARALLAX_CUT:
-#     PARALLAX_CUT_STD = 3.
-#
-#
-
-#
-#

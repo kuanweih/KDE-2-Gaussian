@@ -1,5 +1,4 @@
 import matplotlib
-
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,22 +6,20 @@ import seaborn as sns
 from param import *
 
 
-
-def visualize_4_panel(path: str, outfile: str, n_error: float, s_above=5):
+def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str, s_above=5):
     """
-    path:
-    outfile:
+    kernel: 'gaussian' or 'poisson'
     """
     sns.set(style="white", color_codes=True, font_scale=2)
     fig, axes = plt.subplots(2, 2, figsize=(18, 18))
-    fig.suptitle("{}    GC={}pc    width={}deg    s1={}deg    s2={}deg".format(
-                 NAME, GC_SIZE, WIDTH, SIGMA1, SIGMA2), y=0.93)
+    fig.suptitle("{}    GC={}pc    {}\nwidth={}deg    s1={}deg    s2={}deg".format(
+                 NAME, GC_SIZE, kernel, WIDTH, SIGMA1, SIGMA2), y=0.93)
     plt.subplots_adjust(wspace=0, hspace=0.1)
 
     x, y = np.load('{}/meshgrids.npy'.format(path))    # coordinates
 
-    sigs = [np.load('{}/significance.npy'.format(path)),
-            np.load('{}/significance-pm_error{}.npy'.format(path, n_error))]
+    sigs = [np.load('{}/sig_{}.npy'.format(path, kernel)),
+            np.load('{}/sig_{}-pm_error{}.npy'.format(path, kernel, n_error))]
 
     datas = [np.load('{}/queried-data.npy'.format(path)).item(),
              np.load('{}/queried-data-pm_error{}.npy'.format(path, n_error)).item()]
@@ -30,7 +27,7 @@ def visualize_4_panel(path: str, outfile: str, n_error: float, s_above=5):
     ras = [data["ra"] for data in datas]
     decs = [data["dec"] for data in datas]
 
-    masks = [data["significance"] > s_above for data in datas]    # masks for stars with sig > s_above
+    masks = [data["sig_{}".format(kernel)] > s_above for data in datas]    # masks for stars with sig > s_above
 
     n_stars = [len(data["ra"]) for data in datas]
 
@@ -48,60 +45,10 @@ def visualize_4_panel(path: str, outfile: str, n_error: float, s_above=5):
         for u in range(2):
             axes[v, u].tick_params(axis='both', which='both', labelleft=False, labelbottom=False)
 
-    plt.savefig(outfile, bbox_inches='tight', dpi=300)
+    plt.savefig("{}-{}.png".format(outfile, kernel), bbox_inches='tight', dpi=300)
 
 
 if __name__ == '__main__':
     """ test plotting """
     from  main  import  get_dir_name
     visualize_4_panel(get_dir_name(), "test.png", N_ERRORBAR)
-
-
-
-        # axes[i, j].imshow(sig>above, cmap='RdBu_r', vmin=-0.2, vmax=1.1,
-        #                   extent=[x.min(), x.max(), y.min(), y.max()], origin='lower')
-        #
-        # axes[i, j].set_ylabel('{} deg'.format(width))
-        # axes[i, j].tick_params(axis='both', which='both', labelleft=False, labelbottom=False)
-        # axes[i, j].set_xlabel('sig > {}    s1 = {}    s2 = {}'.format(above, s1, s2))
-        # if pm==0:
-        #     axes[i, j].set_title('{}    {}'.format(dwarf_name, g_band))
-        # elif pm==3:
-        #     axes[i, j].set_title('{}    {}    pm_error'.format(dwarf_name, g_band))
-        # else:
-        #     axes[i, j].set_title('{}    {}    pm<{}'.format(dwarf_name, g_band, pm))
-
-
-
-
-    # # Set up axes
-    # ax.set_xticklabels([''] + source_sentence_str, rotation=90)
-    # ax.set_yticklabels([''] + target_sentence_str)
-    #
-    # # Show label at every tick
-    # ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-    # ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-    #
-    # plt.savefig(outfile)
-    #
-    # plt.close()
-
-
-# path = "../KDE-Detector/results-gaussian/Fornax/G17-22/w2-lp0.001/s0.004s0.02s1.0sth1/"
-#
-# print(path.split("/"))
-# print(path.split("/")[6].split("s")[1])
-#
-#     def plot_sig4(path, above=5):
-#     dwarf_name = path.split("/")[3]
-#     g_band = path.split("/")[4]
-#     width = path.split("/")[5].split("-")[0][1:]
-#     s1 = path.split("/")[6].split("s")[1]
-#     s2 = path.split("/")[6].split("s")[2]
-
-
-
-
-
-    # savefig('{}-{}-w{}-s{}-s.png'.format(dwarf_name, g_band, width, s1, s2),
-    #         bbox_inches='tight', dpi=300)
