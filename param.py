@@ -44,7 +44,7 @@ FILE_MESH = 'meshgrids'    # output mesh grids
 
 
 """ parse arguments from McConnachie list """
-IS_FROM_McConnachie = False
+IS_FROM_McConnachie = True
 if IS_FROM_McConnachie:
     import argparse
     import numpy as np

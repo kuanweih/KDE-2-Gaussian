@@ -18,8 +18,6 @@ input="dwarfs-McConnachie/dwarfs-names.txt"
 
 while IFS= read -r name_dwarf;  do
   for gc_size in $gc_size_pcs;  do
-    # echo $name_dwarf
-    # echo $gc_size
     python  main.py  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size
     # python  main.py  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size  --scale_sigma2  2.0
   done  # for

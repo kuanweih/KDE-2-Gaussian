@@ -110,11 +110,14 @@ if __name__ == '__main__':
 
 
     # visualize searching results
-    plot_dir = "plots"
+    visual_dir = "plots-visual"
+    hist_dir = "plots-hist"
     fig_name = dir_name.replace("results/", "")
-    create_dir(plot_dir)
-    visualize_4_panel(dir_name, "{}/{}".format(plot_dir, fig_name), N_ERRORBAR, "gaussian")
-    visualize_4_panel(dir_name, "{}/{}".format(plot_dir, fig_name), N_ERRORBAR, "poisson")
+    create_dir(visual_dir)
+    visualize_4_panel(dir_name, "{}/{}".format(visual_dir, fig_name), N_ERRORBAR, "gaussian")
+    visualize_4_panel(dir_name, "{}/{}".format(visual_dir, fig_name), N_ERRORBAR, "poisson")
+    hist_2_panel(dir_name, "{}/{}".format(hist_dir, fig_name), N_ERRORBAR, "gaussian")
+    hist_2_panel(dir_name, "{}/{}".format(hist_dir, fig_name), N_ERRORBAR, "poisson")
 
 
     f.write("we are finished :) \n\n")
