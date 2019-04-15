@@ -5,7 +5,8 @@
 NAME: str = 'Fornax'    # name of the dwarf
 RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
-WIDTH = 0.25     # map width when querying data (in deg)
+WIDTH = 2     # map width when querying data (in deg)
+# WIDTH = 0.25     # map width when querying data (in deg)
 
 PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
@@ -14,7 +15,7 @@ SIGMA3 = 1.00    # background scale (larger) in deg
 
 GC_SIZE = 10    # size of target globular clusters (pc)
 SIGMA_TH = 1    # sigma threshold to define inside or outside
-FACTOR_FROM_SIGMA2 = 1.5    # ratio of outer_radiu / sigma2 (should be > 1)
+FACTOR_FROM_SIGMA2 = 5    # ratio of outer_radiu / sigma2 (should be > 1)
 
 """ data base and catalog """
 DATABASE = 'gaia_dr2.gaia_source'
