@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --export=NONE
-#SBATCH --partition=long
+#SBATCH --partition=intel-v4
 #SBATCH --ntasks=20
 #SBATCH --time=72:00:00
 
