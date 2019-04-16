@@ -163,6 +163,9 @@ class KDE_MWSatellite(MWSatellite):
         kernel = kernel_out - kernel_in_pad
         norm_kernel = np.sum(kernel)
 
+        del kernel_out    # clean memory?
+        del kernel_in_pad    # clean memory?
+
         conv = convolve(hist2d, kernel / norm_kernel, mode='constant')
         mask2d = np.ones(hist2d.shape)
         conv /= convolve(mask2d, kernel / norm_kernel, mode='constant')

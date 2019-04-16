@@ -51,7 +51,7 @@ if IS_FROM_McConnachie:
 
     parser = argparse.ArgumentParser(description='Set parameters for a specific dwarf')
     parser.add_argument('--name_dwarf', type=str, help='A dwarf name from McConnachie list')
-    parser.add_argument('--gc_size_pc', type=int, help='Size of globular clusters: 10~100 pc')
+    parser.add_argument('--gc_size_pc', type=int, help='Size of globular clusters: e.g. 1~10 pc')
     parser.add_argument('--scale_sigma2', type=float, nargs='?', const=1, default=1.,
                         help='sigma2 = scale_sigma2 * sigma2')
     args = parser.parse_args()
@@ -73,7 +73,7 @@ if IS_FROM_McConnachie:
 
     RA = dwarfs_dict["RA_deg"][0]
     DEC = dwarfs_dict["Dec_deg"][0]
-    WIDTH = 8. * dwarfs_dict["rh(arcmins)"][0] / 60. # TODO: round? or including e?
+    WIDTH = 7. * dwarfs_dict["rh(arcmins)"][0] / 60. # TODO: round? or including e?
     WIDTH = float("{0:.4f}".format(WIDTH))
 
     GC_SIZE = args.gc_size_pc
@@ -85,7 +85,7 @@ if IS_FROM_McConnachie:
     SIGMA2 *= args.scale_sigma2
 
     SIGMA3 = 0.5 * WIDTH
-    PIXEL_SIZE = 0.25 * SIGMA1
+    PIXEL_SIZE = 0.4 * SIGMA1
 
 
 if __name__ == '__main__':

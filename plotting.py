@@ -58,15 +58,14 @@ def hist_2_panel(path: str, outfile: str, n_error: float, kernel: str, s_above=5
                  NAME, GC_SIZE, kernel, WIDTH, SIGMA1, SIGMA2), y=0.93)
     # plt.subplots_adjust(wspace=0, hspace=0.1)
 
-    x, y = np.load('{}/meshgrids.npy'.format(path))    # coordinates
-
     sigs = [np.load('{}/sig_{}.npy'.format(path, kernel)),
             np.load('{}/sig_{}-pm_error{}.npy'.format(path, kernel, n_error))]
 
     for v in range(2):
         for u in range(2):
             axes[v, u].hist(sigs[v][np.isfinite(sigs[v])], bins=20)
-            axes[v, u].set_title('sig > {}: {} pixels'.format(s_above, np.sum(sigs[v] > s_above)))
+        axes[v, 0].set_title('all stars' if v==0 else 'pm selection')
+        axes[v, 1].set_title('sig > {}: {} pixels'.format(s_above, np.sum(sigs[v] > s_above)))
         axes[v, 1].set_yscale('log')
 
     plt.savefig("{}-{}.png".format(outfile, kernel), bbox_inches='tight', dpi=100)
