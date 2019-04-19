@@ -15,7 +15,7 @@ SIGMA3 = 1.00    # background scale (larger) in deg
 
 GC_SIZE = 10    # size of target globular clusters (pc)
 SIGMA_TH = 1    # sigma threshold to define inside or outside
-FACTOR_FROM_SIGMA2 = 10    # ratio of outer_radiu / sigma2 (should be > 1)
+FACTOR_FROM_SIGMA2 = 5    # ratio of outer_radiu / sigma2 (should be > 1)
 
 """ data base and catalog """
 DATABASE = 'gaia_dr2.gaia_source'

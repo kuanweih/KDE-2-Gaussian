@@ -1,10 +1,12 @@
 import numpy as np
 from param import *
 from classMWSatellite import *
-from scipy.ndimage import gaussian_filter, convolve, uniform_filter
 from scipy.special import erfinv
 from scipy.stats import poisson
 from typing import Tuple
+from scipy.signal import fftconvolve, gaussian, convolve
+# from scipy.ndimage import gaussian_filter, convolve, uniform_filter
+
 
 
 class KDE_MWSatellite(MWSatellite):
@@ -49,13 +51,23 @@ class KDE_MWSatellite(MWSatellite):
         """
         return  np.histogram2d(self.datas["dec"], self.datas["ra"], bins=(self.y_mesh, self.x_mesh))
 
+    def fftconvolve_boundary_adjust(self, hist2d: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+        conv = fftconvolve(hist2d, kernel, mode='same')
+        mask2d = np.ones(hist2d.shape)
+        conv /= fftconvolve(mask2d, kernel, mode='same')
+        return  conv
+
     def overdensity(self, sigma: float) -> np.ndarray:
         """ convolved overdensity map with Gaussian kernel size sigma """
         hist2d, _, _ = self.np_hist2d()
         s_grid = sigma / self.pixel_size
-        od = gaussian_filter(hist2d, s_grid, mode='constant')
-        mask2d = np.ones(hist2d.shape)
-        od /= gaussian_filter(mask2d, s_grid, mode='constant')
+
+        truncate = 5
+        kernel_grid = int(truncate * s_grid)
+        kernel = np.outer(gaussian(kernel_grid, s_grid), gaussian(kernel_grid, s_grid))
+        kernel /= 2. * np.pi * s_grid**2
+
+        od = self.fftconvolve_boundary_adjust(hist2d, kernel)
         return  od
 
     def get_sig_gaussian(self, od_1: np.ndarray, od_2: np.ndarray, sigma1: float, sigma2: float) -> np.ndarray:
@@ -145,58 +157,37 @@ class KDE_MWSatellite(MWSatellite):
         s_grid = sigma / self.pixel_size
         kernel = self.circular_kernel(round(s_grid))
         norm_kernel = np.sum(kernel)
-        conv = convolve(hist2d, kernel / norm_kernel, mode='constant')
+
+        # conv = self.fftconvolve_boundary_adjust(hist2d, kernel / norm_kernel)
+
+        # conv = convolve(hist2d, kernel / norm_kernel, mode='constant')
+        # mask2d = np.ones(hist2d.shape)
+        # conv /= convolve(mask2d, kernel / norm_kernel, mode='constant')
+
+        conv = convolve(hist2d, kernel / norm_kernel, mode='same', method='direct')
         mask2d = np.ones(hist2d.shape)
-        conv /= convolve(mask2d, kernel / norm_kernel, mode='constant')
+        conv /= convolve(mask2d, kernel / norm_kernel, mode='same', method='direct')
+
         return  conv * norm_kernel, norm_kernel
 
-    # def poisson_outer_expected_background(self, sigma: float, factor_sigma: float) -> Tuple[np.ndarray, float]:
-    #     """ [cylindrical but comsuming large amount of memory]
-    #         calculate expected outer number count of stars for background estimation,
-    #         which will be using to calculate 'lambda' for poisson """
-    #     hist2d, _, _ = self.np_hist2d()
-    #     # note that in and out here mean sigma2 and outer radius.
-    #     s_grid_in = round(sigma / self.pixel_size)
-    #     s_grid_out = round(factor_sigma * sigma / self.pixel_size)
-    #     kernel_out = self.circular_kernel(s_grid_out)
-    #     ds_pad = s_grid_out - s_grid_in
-    #     kernel_in_pad = np.pad(self.circular_kernel(s_grid_in), ds_pad, 'constant', constant_values=0)
-    #
-    #     kernel = kernel_out - kernel_in_pad
-    #     norm_kernel = np.sum(kernel)
-    #
-    #     del kernel_out    # clean memory?
-    #     del kernel_in_pad    # clean memory?
-    #
-    #     conv = convolve(hist2d, kernel / norm_kernel, mode='constant')
-    #     mask2d = np.ones(hist2d.shape)
-    #     conv /= convolve(mask2d, kernel / norm_kernel, mode='constant')
-    #     return  conv * norm_kernel, norm_kernel
-
     def poisson_outer_expected_background(self, sigma: float, factor_sigma: float) -> Tuple[np.ndarray, float]:
-        """ ['squered-shape' but comsuming way less memory]
+        """ [cylindrical but comsuming large amount of memory]
             calculate expected outer number count of stars for background estimation,
             which will be using to calculate 'lambda' for poisson """
         hist2d, _, _ = self.np_hist2d()
         # note that in and out here mean sigma2 and outer radius.
-        s_grid_in = sigma / self.pixel_size
-        s_grid_out = factor_sigma * sigma / self.pixel_size
+        s_grid_in = round(sigma / self.pixel_size)
+        s_grid_out = round(factor_sigma * sigma / self.pixel_size)
+        kernel_out = self.circular_kernel(s_grid_out)
+        ds_pad = s_grid_out - s_grid_in
+        kernel_in_pad = np.pad(self.circular_kernel(s_grid_in), ds_pad, 'constant', constant_values=0)
 
-        mask2d = np.ones(hist2d.shape)
-
-        conv_in = uniform_filter(hist2d, size=round(s_grid_in), mode='constant')
-        conv_in /= uniform_filter(mask2d, size=round(s_grid_in), mode='constant')
-
-        conv_out = uniform_filter(hist2d, size=round(s_grid_out), mode='constant')
-        conv_out /= uniform_filter(mask2d, size=round(s_grid_out), mode='constant')
-
-        norm_in = round(np.pi * s_grid_in**2)
-        norm_out = round(np.pi * s_grid_out**2)
-
-        return  conv_out * norm_out - conv_in * norm_in, norm_out - norm_in
+        kernel = kernel_out - kernel_in_pad
+        norm_kernel = np.sum(kernel)
+        conv = self.fftconvolve_boundary_adjust(hist2d, kernel / norm_kernel)
+        return  conv * norm_kernel, norm_kernel
 
     def get_sig_poisson(self):
-        np.set_printoptions(precision=2)
         n_inner, area_inner = self.poisson_inner_number_count(self.sigma1)
         n_outer, area_outer = self.poisson_outer_expected_background(self.sigma2, self.factor_from_sigma2)
 
