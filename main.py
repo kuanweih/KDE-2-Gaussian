@@ -28,6 +28,7 @@ def get_dir_name() -> str:
 
 
 def n_source(Satellite: KDE_MWSatellite) -> int:
+    """ calculter number of stars in queried dictionary """
     return  len(Satellite.datas[Satellite.catalog_list[0]])
 
 
