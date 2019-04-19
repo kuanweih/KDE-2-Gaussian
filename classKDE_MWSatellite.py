@@ -71,10 +71,19 @@ class KDE_MWSatellite(MWSatellite):
         return  od
 
     def get_sig_gaussian(self, od_1: np.ndarray, od_2: np.ndarray, sigma1: float, sigma2: float) -> np.ndarray:
-        """ get significance map using 2 kernels:
-        od1, od2: overdensity with sigma1 and sigma2
-        sigma1: inner kernel
-        sigma2: outer kernel
+        """ get significance map using 2-gaussian kernel
+
+        Parameters
+        ----------
+        od_1 : overdensity with sigma1
+        od_2 : overdensity with sigma2
+        sigma1 : inner kernel
+        sigma2 : outer kernel
+
+        Returns
+        -------
+        np.ndarray
+            significance from 2-gaussian kernel density estimation
         """
         s1 = sigma1 / self.pixel_size
         sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
@@ -136,8 +145,17 @@ class KDE_MWSatellite(MWSatellite):
 
     def z_score_poisson(self, lambda_poisson: np.ndarray, x: np.ndarray) -> np.ndarray:
         """ z = sqrt(2) * erfinv(1 - 2 * sf(x, lambda)), where sf (survival function) = 1 - CDF
-        lambda_poisson: lambda of poisson, here means the background expected number count
-        x: number count of observed events, here means number of stars in the inner aperture
+            calculate the z-score of the tail probability of poisson via N(0, 1)
+
+        Parameters
+        ----------
+        lambda_poisson : lambda of poisson, here means the background expected number count
+        x : number count of observed events, here means number of stars in the inner aperture
+
+        Returns
+        -------
+        np.ndarray
+            z-score of poisson map
         """
         return  np.sqrt(2.) * erfinv(1. - 2. * poisson.sf(x, lambda_poisson))
 
