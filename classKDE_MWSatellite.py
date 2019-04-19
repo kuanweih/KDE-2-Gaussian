@@ -167,7 +167,6 @@ class KDE_MWSatellite(MWSatellite):
         -------
         np.ndarray : z-score of poisson map
         """
-        # return  np.sqrt(2.) * erfinv(1. - 2. * poisson.sf(x, lambda_poisson))
         return  np.sqrt(2.) * erfcinv(2. * poisson.sf(x, lambda_poisson))
 
     def circular_kernel(self, radius: int) -> np.ndarray:
