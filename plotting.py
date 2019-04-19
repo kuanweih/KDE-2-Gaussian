@@ -34,14 +34,12 @@ def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str, s_ab
     extent = [x.min(), x.max(), y.min(), y.max()]    # arg extent for imshow
 
     for v in range(2):
-        print(np.sum(~np.isfinite(sigs[v])))
         axes[v, 0].imshow(sigs[v] > s_above, cmap='copper', vmin=-0.01, vmax=1.01, extent=extent, origin='lower')
         axes[v, 0].plot(ras[v], decs[v], '.', c='deepskyblue', markersize=0.5, alpha=0.5)
         axes[v, 0].plot(ras[v][masks[v]], decs[v][masks[v]], '.', c='orange', markersize=0.5)
         axes[v, 0].set_title('all: {} stars'.format(n_stars[v]) if v==0 else 'pm: {} stars'.format(n_stars[v]))
 
-        axes[v, 1].imshow(sigs[v], cmap='RdBu_r', vmin=0, vmax=10, extent=extent, origin='lower')
-        # axes[v, 1].imshow(sigs[v], cmap='RdBu_r', vmin=0, vmax=8, extent=extent, origin='lower')
+        axes[v, 1].imshow(sigs[v], cmap='RdBu_r', vmin=0, vmax=8, extent=extent, origin='lower')
         axes[v, 1].set_title('sig > {}: {} pixels'.format(s_above, np.sum(sigs[v] > s_above)))
 
         for u in range(2):
@@ -58,7 +56,6 @@ def hist_2_panel(path: str, outfile: str, n_error: float, kernel: str, s_above=5
     fig, axes = plt.subplots(2, 2, figsize=(10, 10))
     fig.suptitle("{}    GC={}pc    {}    width={}deg    s1={}deg    s2={}deg".format(
                  NAME, GC_SIZE, kernel, WIDTH, SIGMA1, SIGMA2), y=0.93)
-    # plt.subplots_adjust(wspace=0, hspace=0.1)
 
     sigs = [np.load('{}/sig_{}.npy'.format(path, kernel)),
             np.load('{}/sig_{}-pm_error{}.npy'.format(path, kernel, n_error))]

@@ -1,11 +1,10 @@
 import numpy as np
 from param import *
 from classMWSatellite import *
-from scipy.special import erfinv
+from scipy.special import erfcinv
 from scipy.stats import poisson
 from typing import Tuple
-from scipy.signal import fftconvolve, gaussian, convolve
-# from scipy.ndimage import gaussian_filter, convolve, uniform_filter
+from scipy.signal import fftconvolve, gaussian
 
 
 
@@ -52,10 +51,23 @@ class KDE_MWSatellite(MWSatellite):
         return  np.histogram2d(self.datas["dec"], self.datas["ra"], bins=(self.y_mesh, self.x_mesh))
 
     def fftconvolve_boundary_adjust(self, hist2d: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+        """ use scipy signal fftconvolve to calculate the convolved map. edge effect is also taken care of.
+            using fftconvolve will yeild some negative elements while they are actuaclly 0 when using
+            convolve. therefore, conv.clip(min=0) is applied for the result.
+
+        Parameters
+        ----------
+        hist2d : 2d histogram of the source distribution
+        kernel : kernel matrix
+
+        Returns
+        -------
+        np.ndarray : convolved map with non negative values
+        """
         conv = fftconvolve(hist2d, kernel, mode='same')
         mask2d = np.ones(hist2d.shape)
         conv /= fftconvolve(mask2d, kernel, mode='same')
-        return  conv
+        return  conv.clip(min=0)
 
     def overdensity(self, sigma: float) -> np.ndarray:
         """ convolved overdensity map with Gaussian kernel size sigma """
@@ -66,9 +78,7 @@ class KDE_MWSatellite(MWSatellite):
         kernel_grid = int(truncate * s_grid)
         kernel = np.outer(gaussian(kernel_grid, s_grid), gaussian(kernel_grid, s_grid))
         kernel /= 2. * np.pi * s_grid**2
-
-        od = self.fftconvolve_boundary_adjust(hist2d, kernel)
-        return  od
+        return  self.fftconvolve_boundary_adjust(hist2d, kernel)
 
     def get_sig_gaussian(self, od_1: np.ndarray, od_2: np.ndarray, sigma1: float, sigma2: float) -> np.ndarray:
         """ get significance map using 2-gaussian kernel
@@ -82,11 +92,11 @@ class KDE_MWSatellite(MWSatellite):
 
         Returns
         -------
-        np.ndarray
-            significance from 2-gaussian kernel density estimation
+        np.ndarray : significance from 2-gaussian kernel density estimation
         """
         s1 = sigma1 / self.pixel_size
-        sig = (od_1 - od_2) / np.sqrt(od_2 / (4. * np.pi * s1**2))
+        sig = (od_1 - od_2) * np.sqrt(4. * np.pi * s1**2)
+        sig = np.divide(sig, np.sqrt(od_2), out=np.zeros_like(sig), where=od_2!=0)   # force 0 / 0 = 0
         return  sig
 
     def compound_significance(self):
@@ -94,6 +104,7 @@ class KDE_MWSatellite(MWSatellite):
         od_1 = self.overdensity(self.sigma1)
         od_2 = self.overdensity(self.sigma2)
         od_3 = self.overdensity(self.sigma3)
+
         s12 = self.get_sig_gaussian(od_1, od_2, self.sigma1, self.sigma2)
         s13 = self.get_sig_gaussian(od_1, od_3, self.sigma1, self.sigma3)
         s23 = self.get_sig_gaussian(od_2, od_3, self.sigma2, self.sigma3)
@@ -154,10 +165,10 @@ class KDE_MWSatellite(MWSatellite):
 
         Returns
         -------
-        np.ndarray
-            z-score of poisson map
+        np.ndarray : z-score of poisson map
         """
-        return  np.sqrt(2.) * erfinv(1. - 2. * poisson.sf(x, lambda_poisson))
+        # return  np.sqrt(2.) * erfinv(1. - 2. * poisson.sf(x, lambda_poisson))
+        return  np.sqrt(2.) * erfcinv(2. * poisson.sf(x, lambda_poisson))
 
     def circular_kernel(self, radius: int) -> np.ndarray:
         """ calculate the circular kernel with radius according to sigma.
@@ -175,17 +186,7 @@ class KDE_MWSatellite(MWSatellite):
         s_grid = sigma / self.pixel_size
         kernel = self.circular_kernel(round(s_grid))
         norm_kernel = np.sum(kernel)
-
-        # conv = self.fftconvolve_boundary_adjust(hist2d, kernel / norm_kernel)
-
-        # conv = convolve(hist2d, kernel / norm_kernel, mode='constant')
-        # mask2d = np.ones(hist2d.shape)
-        # conv /= convolve(mask2d, kernel / norm_kernel, mode='constant')
-
-        conv = convolve(hist2d, kernel / norm_kernel, mode='same', method='direct')
-        mask2d = np.ones(hist2d.shape)
-        conv /= convolve(mask2d, kernel / norm_kernel, mode='same', method='direct')
-
+        conv = self.fftconvolve_boundary_adjust(hist2d, kernel / norm_kernel)
         return  conv * norm_kernel, norm_kernel
 
     def poisson_outer_expected_background(self, sigma: float, factor_sigma: float) -> Tuple[np.ndarray, float]:
@@ -206,13 +207,14 @@ class KDE_MWSatellite(MWSatellite):
         return  conv * norm_kernel, norm_kernel
 
     def get_sig_poisson(self):
+        """ calculate significance on each pixel based on poisson statistics """
         n_inner, area_inner = self.poisson_inner_number_count(self.sigma1)
         n_outer, area_outer = self.poisson_outer_expected_background(self.sigma2, self.factor_from_sigma2)
-
         ratio = area_inner / area_outer    # area ratio = inner / outer
         lambda_poisson = n_outer * ratio    # estimated background count in inner area
         sig = self.z_score_poisson(lambda_poisson, n_inner)
         self.sig_poisson = sig
+
 
 
 
