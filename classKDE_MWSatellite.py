@@ -99,7 +99,7 @@ class KDE_MWSatellite(MWSatellite):
         sig = np.divide(sig, np.sqrt(od_2), out=np.zeros_like(sig), where=od_2!=0)   # force 0 / 0 = 0
         return  sig
 
-    def compound_significance(self):
+    def compound_sig_gaussian(self):
         """ significance s12 inside (s23>sigma_th) and s13 outside (s23<sigma_th) """
         od_1 = self.overdensity(self.sigma1)
         od_2 = self.overdensity(self.sigma2)
@@ -108,10 +108,9 @@ class KDE_MWSatellite(MWSatellite):
         s12 = self.get_sig_gaussian(od_1, od_2, self.sigma1, self.sigma2)
         s13 = self.get_sig_gaussian(od_1, od_3, self.sigma1, self.sigma3)
         s23 = self.get_sig_gaussian(od_2, od_3, self.sigma2, self.sigma3)
-        mask_in = s23 > self.sigma_th    # mask for inside
-        sig = s12 * mask_in + s13 * (~mask_in)
-        self.is_inside = mask_in
-        self.sig_gaussian = sig
+
+        self.is_inside = s23 > self.sigma_th    # mask for inside
+        self.sig_gaussian = s12 * self.is_inside + s13 * (~self.is_inside)
 
     def append_sig_to_data(self):
         """ append significance of each star to the datas """
@@ -205,14 +204,43 @@ class KDE_MWSatellite(MWSatellite):
         conv = self.fftconvolve_boundary_adjust(hist2d, kernel / norm_kernel)
         return  conv * norm_kernel, norm_kernel
 
-    def get_sig_poisson(self):
-        """ calculate significance on each pixel based on poisson statistics """
+    def get_lambda_poisson(self, n_o: np.ndarray, area_o: np.ndarray, area_i: np.ndarray) -> np.ndarray:
+        """ calculate lambda as the estimated background number count
+
+        Parameters
+        ----------
+        n_o : number of sources from outer aperture
+        area_o : area of outer aperture
+        area_i : area of inner aperture
+
+        Returns
+        -------
+        np.ndarray : lambda
+        """
+        lambda_poisson = n_o * area_i / area_o    # estimated background count in inner area
+        return  lambda_poisson
+
+    def compound_sig_poisson(self):
+        """ significance s12 inside (s23>sigma_th) and s13 outside (s23<sigma_th) """
         n_inner, area_inner = self.poisson_inner_number_count(self.sigma1)
+
+        n_star = len(self.datas[self.catalog_list[0]])
+        if n_star < 500:
+            n_outer, area_outer = self.poisson_outer_expected_background(self.sigma2, self.sigma3 / self.sigma2)
+            lambda_poisson = self.get_lambda_poisson(n_outer, area_outer, area_inner)
+            self.sig_poisson = self.z_score_poisson(lambda_poisson, n_inner)
+            return  None
+
         n_outer, area_outer = self.poisson_outer_expected_background(self.sigma2, self.factor_from_sigma2)
-        ratio = area_inner / area_outer    # area ratio = inner / outer
-        lambda_poisson = n_outer * ratio    # estimated background count in inner area
-        sig = self.z_score_poisson(lambda_poisson, n_inner)
-        self.sig_poisson = sig
+        lambda_inside = self.get_lambda_poisson(n_outer, area_outer, area_inner)
+
+        n_outer, area_outer = self.poisson_outer_expected_background(self.sigma2, 2. * self.factor_from_sigma2)
+        lambda_outside = self.get_lambda_poisson(n_outer, area_outer, area_inner)
+
+        s12 = self.z_score_poisson(lambda_inside, n_inner)
+        s13 = self.z_score_poisson(lambda_outside, n_inner)
+        self.sig_poisson = s12 * self.is_inside + s13 * (~self.is_inside)
+
 
 
 

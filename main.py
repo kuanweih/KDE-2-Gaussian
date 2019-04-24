@@ -62,12 +62,12 @@ if __name__ == '__main__':
 
     # get significance of gaussian
     t0 = time.time()
-    Satellite.compound_significance()
+    Satellite.compound_sig_gaussian()
     f.write("took %s seconds to calculate significance of Gaussian\n\n" % (time.time() - t0))
 
     # get significance of gaussian
     t0 = time.time()
-    Satellite.get_sig_poisson()
+    Satellite.compound_sig_poisson()
     f.write("took %s seconds to calculate significance of Poisson\n\n" % (time.time() - t0))
 
     # append 'significance' and 'is_inside' to datas
@@ -96,12 +96,12 @@ if __name__ == '__main__':
 
         # get significance of gaussian
         t0 = time.time()
-        Satellite.compound_significance()
+        Satellite.compound_sig_gaussian()
         f.write("took %s seconds to calculate significance of Gaussian\n\n" % (time.time() - t0))
 
         # get significance of gaussian
         t0 = time.time()
-        Satellite.get_sig_poisson()
+        Satellite.compound_sig_poisson()
         f.write("took %s seconds to calculate significance of Poisson\n\n" % (time.time() - t0))
 
         np.save("{}/{}-pm_error{}".format(dir_name, FILE_STAR, N_ERRORBAR), Satellite.datas)
