@@ -1,0 +1,6 @@
+name,gc_size,n_star,n_star_pm,sig_g_peak,sig_g_pm_peak,sig_p_peak,sig_p_pm_peak
+CanesVenatici(I),6,2758,503,93619,37860,29,437
+CanesVenatici(I),8,2758,501,34442,24806,18,308
+CanesVenatici(I),10,2758,499,6731,13881,42,19
+CanesVenatici(I),9,2758,499,8671,17900,35,15
+CanesVenatici(I),7,2758,504,64949,32709,15,423

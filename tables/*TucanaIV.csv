@@ -1,0 +1,7 @@
+name,gc_size,n_star,n_star_pm,sig_g_peak,sig_g_pm_peak,sig_p_peak,sig_p_pm_peak
+*TucanaIV,7,2889,612,0,0,1,140
+*TucanaIV,8,2889,612,0,0,0,112
+*TucanaIV,6,2889,619,0,0,2,226
+*TucanaIV,5,2889,615,13,0,8,287
+*TucanaIV,9,2889,616,0,0,0,124
+*TucanaIV,10,2889,614,0,0,0,67

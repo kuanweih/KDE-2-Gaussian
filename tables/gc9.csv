@@ -1,0 +1,12 @@
+name,gc_size,n_star,n_star_pm,sig_g_peak,sig_g_pm_peak,sig_p_peak,sig_p_pm_peak
+*GrusII,9,2152,544,0,0,0,59
+UrsaMinor,9,2867,1567,0,0,0,98
+LeoI,9,2201,1142,0,4,0,6253
+Fornax,9,58468,26625,1844,1729,944,711
+*TucanaIV,9,2889,616,0,0,0,124
+NGC6822,9,9845,4188,262,260,18,0
+CanesVenatici(I),9,2758,499,8671,17900,35,15
+Sextans(I),9,40423,8731,2145,10336,13,18
+AndromedaXXIV,9,722,381,5022,541,27,84
+UrsaMajor(I),9,2880,602,286,2998,11,91
+Phoenix,9,733,301,13530,2654,2214,46

@@ -1,0 +1,7 @@
+name,gc_size,n_star,n_star_pm,sig_g_peak,sig_g_pm_peak,sig_p_peak,sig_p_pm_peak
+*GrusII,8,2152,547,0,0,1,103
+*GrusII,6,2152,544,0,0,0,125
+*GrusII,7,2152,545,0,0,0,112
+*GrusII,9,2152,544,0,0,0,59
+*GrusII,5,2152,544,0,0,0,183
+*GrusII,10,2152,542,0,0,0,58
