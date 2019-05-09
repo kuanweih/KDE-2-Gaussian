@@ -160,6 +160,7 @@ class KDE_MWSatellite(MWSatellite):
         pmra_std = np.std(pmra)
         pmdec_std = np.std(pmdec)
 
+        # TODO: it is being used in the parent class!
         self.pm_inside = {"pmra_mean":pmra_mean, "pmra_std":pmra_std,
                           "pmdec_mean":pmdec_mean, "pmdec_std":pmdec_std}
 

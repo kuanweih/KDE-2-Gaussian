@@ -48,11 +48,14 @@ if IS_FROM_McConnachie:
     import argparse
     import numpy as np
 
-    parser = argparse.ArgumentParser(description='Set parameters for a specific dwarf')
-    parser.add_argument('--name_dwarf', type=str, help='A dwarf name from McConnachie list')
-    parser.add_argument('--gc_size_pc', type=int, help='Size of globular clusters: e.g. 1~10 pc')
-    parser.add_argument('--scale_sigma2', type=float, nargs='?', const=1, default=1.,
-                        help='sigma2 = scale_sigma2 * sigma2')
+    parser = argparse.ArgumentParser(
+                description='Set parameters for a specific dwarf')
+    parser.add_argument('--name_dwarf', type=str,
+                        help='A dwarf name from McConnachie list')
+    parser.add_argument('--gc_size_pc', type=int,
+                        help='Size of globular clusters: e.g. 1~10 pc')
+    parser.add_argument('--scale_sigma2', type=float, nargs='?', const=1,
+                        default=1., help='sigma2 = scale_sigma2 * sigma2')
     args = parser.parse_args()
 
     NAME = args.name_dwarf    # name of the dwarf
@@ -65,7 +68,8 @@ if IS_FROM_McConnachie:
     for key, val in dwarfs_dict.items():
         dwarfs_dict[key] = val[mask]
 
-    keys_need = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
+    # TODO redundant variable?
+    # keys_need = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
 
     if dwarfs_dict["GalaxyName"][0] != NAME:
         print("Cannot find %s in GalaxyName" %NAME) # TODO RaiseError?
