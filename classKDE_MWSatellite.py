@@ -120,8 +120,8 @@ class KDE_MWSatellite(MWSatellite):
         self.is_inside = s23 > self.sigma_th    # mask for inside
         self.sig_gaussian = s12 * self.is_inside + s13 * (~self.is_inside)
 
-
-    # TODO separate this method into 3 parts so that I can free sig_gaussian and delete it for memory concern
+    # TODO separate this method into 3 parts so that I can free
+    # sig_gaussian and delete it for memory concern
     def append_sig_to_data(self):
         """ Append significance of each star to the datas """
         n_source = len(self.datas["ra"])
@@ -164,7 +164,7 @@ class KDE_MWSatellite(MWSatellite):
                           "pmdec_mean":pmdec_mean, "pmdec_std":pmdec_std}
 
     def mask_pm(self, pm: np.ndarray, pm_error: np.ndarray,
-                    pm_mean: float, pm_err: float, n_err: float) -> np.ndarray:
+                pm_mean: float, pm_err: float, n_err: float) -> np.ndarray:
         """ Calculate the mask based on the pm selection.
 
         : pm : pm array: pmra or pmdec
@@ -294,6 +294,7 @@ class KDE_MWSatellite(MWSatellite):
 
         s12 = self.z_score_poisson(lambda_in, n_inner)
         s13 = self.z_score_poisson(lambda_out, n_inner)
+        
         self.sig_poisson = s12 * self.is_inside + s13 * (~self.is_inside)
 
 
