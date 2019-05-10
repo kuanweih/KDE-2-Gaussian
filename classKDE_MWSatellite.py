@@ -160,21 +160,66 @@ class KDE_MWSatellite(MWSatellite):
         pmra_std = np.std(pmra)
         pmdec_std = np.std(pmdec)
 
-        # TODO: it is being used in the parent class!
         self.pm_inside = {"pmra_mean":pmra_mean, "pmra_std":pmra_std,
                           "pmdec_mean":pmdec_mean, "pmdec_std":pmdec_std}
 
-    def z_score_poisson(self, lambda_poisson: np.ndarray, x: np.ndarray) -> np.ndarray:
+    def mask_pm(self, pm: np.ndarray, pm_error: np.ndarray,
+                    pm_mean: float, pm_err: float, n_err: float) -> np.ndarray:
+        """ Calculate the mask based on the pm selection.
+
+        : pm : pm array: pmra or pmdec
+        : pm_error : pm_error array: pmra or pmdec
+        : pm_mean : mean pm inside the dwarf
+        : pm_err : pm error on the mean: pm_std / number of stars in the dwarf
+        : n_err : within n_err of error bars for pm_error
+
+        : return : pm mask
+        """
+        maskleft = pm - n_err * pm_error < pm_mean + pm_err
+        maskright = pm_mean - pm_err < pm + n_err * pm_error
+        return  maskleft & maskright
+
+    def mask_pm_error_cut(self, n_err: float):
+        """ Hard code the pm_error cut on pmra and pmdec.
+
+        : n_err : within n_err of error bars for pm_error
+        """
+        pmra_mean = self.pm_inside["pmra_mean"]
+        pmdec_mean = self.pm_inside["pmdec_mean"]
+
+        n = self.datas["is_inside"].sum()
+        pmra_err = self.pm_inside["pmra_std"] / n
+        pmdec_err = self.pm_inside["pmdec_std"] / n
+
+        mk_pmra = self.mask_pm(self.datas["pmra"], self.datas["pmra_error"],
+                               pmra_mean, pmra_err, n_err)
+
+        mk_pmdec = self.mask_pm(self.datas["pmdec"], self.datas["pmdec_error"],
+                                pmdec_mean, pmdec_err, n_err)
+
+
+        # maskleft = self.datas["pmra"] - n_err * self.datas["pmra_error"] < pmra_mean + pmra_err
+        # maskright = pmra_mean - pmra_err < self.datas["pmra"] + n_err * self.datas["pmra_error"]
+        # mask = maskleft & maskright
+
+        # maskleft = self.datas["pmdec"] - n_err * self.datas["pmdec_error"] < pmdec_mean + pmdec_err
+        # maskright = pmdec_mean - pmdec_err < self.datas["pmdec"] + n_err * self.datas["pmdec_error"]
+        # mask = maskleft & maskright & mask
+
+        self.cut_datas(mk_pmra & mk_pmdec)
+        # self.cut_datas(mask)
+
+    def z_score_poisson(self, lamb: np.ndarray, x: np.ndarray) -> np.ndarray:
         """ Calculate the z-score of the tail probability of poisson via N(0, 1)
         according to z = sqrt(2) * erfinv(1 - 2 * sf(x, lambda)), where sf
         (survival function) = 1 - CDF.
 
-        : lambda_poisson : expected background number count from outer aperture
+        : lamb : expected background number count from outer aperture (lambda)
         : x : number count of observed stars in the inner aperture
 
         : return : z-score of poisson map
         """
-        return  np.sqrt(2.) * erfcinv(2. * poisson.sf(x, lambda_poisson))
+        return  np.sqrt(2.) * erfcinv(2. * poisson.sf(x, lamb))
 
     def circular_kernel(self, radius: int) -> np.ndarray:
         """ Calculate the circular kernel with radius according to sigma. This

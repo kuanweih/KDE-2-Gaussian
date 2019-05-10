@@ -92,5 +92,5 @@ if IS_FROM_McConnachie:
 
 
 if __name__ == '__main__':
-    if WIDTH>5:
+    if WIDTH > 5:
         print(NAME)
