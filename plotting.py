@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from param import *
+import scipy.stats as stats
 
 
 def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str, s_above=5):
@@ -60,12 +61,28 @@ def hist_2_panel(path: str, outfile: str, n_error: float, kernel: str, s_above=5
     sigs = [np.load('{}/sig_{}.npy'.format(path, kernel)),
             np.load('{}/sig_{}-pm_error{}.npy'.format(path, kernel, n_error))]
 
+    bins = 20
+    mu, variance = 0., 1.
+    sigma = np.sqrt(variance)
+
     for v in range(2):
-        for u in range(2):
-            axes[v, u].hist(sigs[v][np.isfinite(sigs[v])], bins=20)
+        sig_finite_flat = sigs[v][np.isfinite(sigs[v])].flatten()
+
+        axes[v, 0].hist(sig_finite_flat, bins=bins)
         axes[v, 0].set_title('all stars' if v==0 else 'pm selection')
+        axes[v, 0].set_yscale('log')
+
+        axes[v, 1].hist(sig_finite_flat, bins=bins, density=True)
         axes[v, 1].set_title('sig > {}: {} pixels'.format(s_above, np.sum(sigs[v] > s_above)))
         axes[v, 1].set_yscale('log')
+
+        xmin = sig_finite_flat.min()
+        xmax = sig_finite_flat.max()
+        x = np.linspace(mu + xmin * sigma, mu + xmax * sigma, 100)
+        axes[v, 1].plot(x, stats.norm.pdf(x, mu, sigma), lw=3)
+        axes[v, 1].set_xlim([xmin, 10])
+        axes[v, 1].set_ylim([1e-10, 1])
+
 
     plt.savefig("{}-{}.png".format(outfile, kernel), bbox_inches='tight', dpi=100)
 

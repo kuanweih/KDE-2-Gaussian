@@ -193,21 +193,9 @@ class KDE_MWSatellite(MWSatellite):
 
         mk_pmra = self.mask_pm(self.datas["pmra"], self.datas["pmra_error"],
                                pmra_mean, pmra_err, n_err)
-
         mk_pmdec = self.mask_pm(self.datas["pmdec"], self.datas["pmdec_error"],
                                 pmdec_mean, pmdec_err, n_err)
-
-
-        # maskleft = self.datas["pmra"] - n_err * self.datas["pmra_error"] < pmra_mean + pmra_err
-        # maskright = pmra_mean - pmra_err < self.datas["pmra"] + n_err * self.datas["pmra_error"]
-        # mask = maskleft & maskright
-
-        # maskleft = self.datas["pmdec"] - n_err * self.datas["pmdec_error"] < pmdec_mean + pmdec_err
-        # maskright = pmdec_mean - pmdec_err < self.datas["pmdec"] + n_err * self.datas["pmdec_error"]
-        # mask = maskleft & maskright & mask
-
         self.cut_datas(mk_pmra & mk_pmdec)
-        # self.cut_datas(mask)
 
     def z_score_poisson(self, lamb: np.ndarray, x: np.ndarray) -> np.ndarray:
         """ Calculate the z-score of the tail probability of poisson via N(0, 1)
