@@ -22,7 +22,8 @@ def get_galaxys_with_quantitys(quantitys: List[str]) -> List[str]:
 
 def split_into_3_float(input_arr) -> List[float]:
     """ split input numpy array into a list with 3 float-elements
-    input_arr: numpy array
+
+    : input_arr : numpy array
     """
     output = []
     for ii in input_arr:
@@ -51,9 +52,10 @@ def get_dec_deg(degree: float, minute: float, second: float) -> float:
 def dist_modulus_to_dist(dm: float, dm_errr: float, dm_errl: float) -> float:
     """ convert distance modulus -> distance (pc)
         currently not taking care of error bars though
-    dm: distance modulus
-    dm_errr: dm error +
-    dm_errl: dm error -
+        
+    : dm : distance modulus
+    : dm_errr : dm error +
+    : dm_errl : dm error -
     """
     return  10.**(dm / 5. + 1.)
 

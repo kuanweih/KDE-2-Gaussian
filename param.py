@@ -6,6 +6,7 @@ NAME: str = 'Fornax'    # name of the dwarf
 RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
+DISTANCE = 140000.    # distance in pc
 
 PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
@@ -15,6 +16,7 @@ SIGMA3 = 1.00    # background scale (larger) in deg
 GC_SIZE = 10    # size of target globular clusters (pc)
 SIGMA_TH = 1    # sigma threshold to define inside or outside
 FACTOR_FROM_SIGMA2 = 5    # ratio of outer_radiu / sigma2 (should be > 1)
+
 
 """ data base and catalog """
 DATABASE = 'gaia_dr2.gaia_source'
@@ -68,9 +70,6 @@ if IS_FROM_McConnachie:
     for key, val in dwarfs_dict.items():
         dwarfs_dict[key] = val[mask]
 
-    # TODO redundant variable?
-    # keys_need = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
-
     if dwarfs_dict["GalaxyName"][0] != NAME:
         print("Cannot find %s in GalaxyName" %NAME) # TODO RaiseError?
 
@@ -80,8 +79,9 @@ if IS_FROM_McConnachie:
     WIDTH = float("{0:.4f}".format(WIDTH))
 
     GC_SIZE = args.gc_size_pc
+    DISTANCE = dwarfs_dict["Distance_pc"][0]
 
-    SIGMA1 = GC_SIZE / dwarfs_dict["Distance_pc"][0] * 180. / np.pi
+    SIGMA1 = GC_SIZE / DISTANCE_PC * 180. / np.pi
     SIGMA1 = float("{0:.4f}".format(SIGMA1))
 
     SIGMA2 = float("{0:.4f}".format(0.1 * dwarfs_dict["rh(arcmins)"][0] / 60.))

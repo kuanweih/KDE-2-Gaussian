@@ -55,8 +55,8 @@ def hist_2_panel(path: str, outfile: str, n_error: float, kernel: str, s_above=5
     """
     sns.set(style="white", color_codes=True, font_scale=1)
     fig, axes = plt.subplots(2, 2, figsize=(10, 10))
-    fig.suptitle("{}    GC={}pc    {}    width={}deg    s1={}deg    s2={}deg".format(
-                 NAME, GC_SIZE, kernel, WIDTH, SIGMA1, SIGMA2), y=0.93)
+    fig.suptitle("{}  GC={}pc  {}  d={}kpc  w={}deg  s1={}deg  s2={}deg".format(
+                 NAME, GC_SIZE, kernel, DISTANCE / 1e3, WIDTH, SIGMA1, SIGMA2), y=0.93)
 
     sigs = [np.load('{}/sig_{}.npy'.format(path, kernel)),
             np.load('{}/sig_{}-pm_error{}.npy'.format(path, kernel, n_error))]
