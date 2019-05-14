@@ -81,7 +81,7 @@ if IS_FROM_McConnachie:
     GC_SIZE = args.gc_size_pc
     DISTANCE = dwarfs_dict["Distance_pc"][0]
 
-    SIGMA1 = GC_SIZE / DISTANCE_PC * 180. / np.pi
+    SIGMA1 = GC_SIZE / DISTANCE * 180. / np.pi
     SIGMA1 = float("{0:.4f}".format(SIGMA1))
 
     SIGMA2 = float("{0:.4f}".format(0.1 * dwarfs_dict["rh(arcmins)"][0] / 60.))
