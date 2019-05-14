@@ -35,13 +35,12 @@ def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str, s_ab
     extent = [x.min(), x.max(), y.min(), y.max()]    # arg extent for imshow
 
     for v in range(2):
-        sigs[v] = sigs[v][np.isfinite(sigs[v])]
         axes[v, 0].imshow(sigs[v] > s_above, cmap='copper', vmin=-0.01, vmax=1.01, extent=extent, origin='lower')
         axes[v, 0].plot(ras[v], decs[v], '.', c='deepskyblue', markersize=0.5, alpha=0.5)
         axes[v, 0].plot(ras[v][masks[v]], decs[v][masks[v]], '.', c='orange', markersize=0.5)
         axes[v, 0].set_title('all: {} stars'.format(n_stars[v]) if v==0 else 'pm: {} stars'.format(n_stars[v]))
 
-        axes[v, 1].imshow(sigs[v], cmap='RdBu_r', vmin=0, vmax=8, extent=extent, origin='lower')
+        axes[v, 1].imshow(sigs[v] > s_above, cmap='copper', vmin=-0.01, vmax=1.01, extent=extent, origin='lower')
         axes[v, 1].set_title('sig > {}: {} pixels'.format(s_above, np.sum(sigs[v] > s_above)))
 
         for u in range(2):
