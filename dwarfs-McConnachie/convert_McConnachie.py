@@ -52,7 +52,7 @@ def get_dec_deg(degree: float, minute: float, second: float) -> float:
 def dist_modulus_to_dist(dm: float, dm_errr: float, dm_errl: float) -> float:
     """ convert distance modulus -> distance (pc)
         currently not taking care of error bars though
-        
+
     : dm : distance modulus
     : dm_errr : dm error +
     : dm_errl : dm error -
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     dwarfs["Distance_pc"] = np.array(list(map(lambda x: dist_modulus_to_dist(x[0], x[1], x[2]), dwarfs["(m-M)o"])))
     dwarfs["rh(arcmins)"] = dwarfs["rh(arcmins)"][:, 0]
 
-    mask = dwarfs["Distance_pc"] < 600000    # skip dwarfs too far
+    mask = dwarfs["Distance_pc"] < 500000    # skip dwarfs too far
     mask = mask & (dwarfs["rh(arcmins)"] < 90)    # skip dwarfs with rh = 99.99
 
     np.save("dwarfs-McConnachie", dwarfs)

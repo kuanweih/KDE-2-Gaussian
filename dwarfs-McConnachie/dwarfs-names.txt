@@ -42,7 +42,6 @@ PiscesII
 CanesVenatici(I)
 LeoII
 LeoI
-AndromedaXXIV
 AndromedaXVI
 Phoenix
 Eridanus2

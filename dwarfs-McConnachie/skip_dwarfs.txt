@@ -32,6 +32,7 @@ AndromedaII
 NGC185
 AndromedaXXIX
 Triangulum
+AndromedaXXIV
 AndromedaVII
 IC10
 AndXXXI
