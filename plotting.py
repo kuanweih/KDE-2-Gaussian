@@ -13,8 +13,8 @@ def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str, s_ab
     """
     sns.set(style="white", color_codes=True, font_scale=1)
     fig, axes = plt.subplots(2, 2, figsize=(10, 10))
-    fig.suptitle("{}    GC={}pc    {}    width={}deg    s1={}deg    s2={}deg".format(
-                 NAME, GC_SIZE, kernel, WIDTH, SIGMA1, SIGMA2), y=0.93)
+    fig.suptitle("{}  GC={}pc  {}  d={}kpc  w={}deg  s1={}deg  s2={}deg".format(
+                 NAME, GC_SIZE, kernel, DISTANCE / 1e3, WIDTH, SIGMA1, SIGMA2), y=0.93)
     plt.subplots_adjust(wspace=0, hspace=0.1)
 
     x, y = np.load('{}/meshgrids.npy'.format(path))    # coordinates
