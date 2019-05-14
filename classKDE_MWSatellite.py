@@ -62,10 +62,12 @@ class KDE_MWSatellite(MWSatellite):
 
     def fftconvolve_boundary_adjust(self, hist2d: np.ndarray,
                                     kernel: np.ndarray) -> np.ndarray:
-        """ Use scipy signal fftconvolve to calculate the convolved map. Edge
-        effect is also taken care of. Using fftconvolve will yeild some negative
-        elements while they are actuaclly 0 when using convolve. Therefore,
-        conv.clip(min=0) is applied to take care of that.
+        """ Use scipy signal fftconvolve to calculate the convolved map.
+        Edge effect is also taken care of. Using fftconvolve will yeild
+        some negative elements while they are actuaclly 0 when using
+        convolve. Also, there will be some positive noises which need to
+        be taken care of. Therefore, conv[conv < 1e-15] = 0 is applied
+        to get rid of the false divisions.
 
         : hist2d : 2d histogram of the source distribution
         : kernel : kernel matrix
@@ -75,7 +77,9 @@ class KDE_MWSatellite(MWSatellite):
         conv = fftconvolve(hist2d, kernel, mode='same')
         mask2d = np.ones(hist2d.shape)
         conv /= fftconvolve(mask2d, kernel, mode='same')
-        return  conv.clip(min=0)
+
+        conv[conv < 1e-15] = 0.    # rounding the noise < 1e-15
+        return  conv
 
     def overdensity(self, sigma: float) -> np.ndarray:
         """ Convolved overdensity map with Gaussian kernel size sigma """
@@ -294,7 +298,7 @@ class KDE_MWSatellite(MWSatellite):
 
         s12 = self.z_score_poisson(lambda_in, n_inner)
         s13 = self.z_score_poisson(lambda_out, n_inner)
-        
+
         self.sig_poisson = s12 * self.is_inside + s13 * (~self.is_inside)
 
 
