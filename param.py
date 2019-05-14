@@ -2,7 +2,7 @@
 
 
 """ default (manual) target parameters """
-NAME: str = 'Fornax'    # name of the dwarf
+NAME = 'Fornax'    # name of the dwarf
 RA = 39.997      # ra of target (in deg)
 DEC = -34.551    # dec of target (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
@@ -79,7 +79,7 @@ if IS_FROM_McConnachie:
     WIDTH = float("{0:.4f}".format(WIDTH))
 
     GC_SIZE = args.gc_size_pc
-    DISTANCE = dwarfs_dict["Distance_pc"][0]
+    DISTANCE = float("{0:.4f}".format(dwarfs_dict["Distance_pc"][0]))
 
     SIGMA1 = GC_SIZE / DISTANCE * 180. / np.pi
     SIGMA1 = float("{0:.4f}".format(SIGMA1))
