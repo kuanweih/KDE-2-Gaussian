@@ -3,7 +3,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from param import *
+from param.param import *
 import scipy.stats as stats
 
 

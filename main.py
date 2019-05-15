@@ -1,10 +1,10 @@
 import numpy as np
 import time
-from classMWSatellite import *
-from classKDE_MWSatellite import *
-from param import *
-from kw_wsdb import *
-from plotting import *
+from src.classMWSatellite import *
+from src.classKDE_MWSatellite import *
+from param.param import *
+from param.kw_wsdb import *
+from src.plotting import *
 
 
 def create_dir(dir_name: str):
