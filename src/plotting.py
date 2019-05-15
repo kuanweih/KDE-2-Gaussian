@@ -12,8 +12,8 @@ def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str,
     """ Plotting star distribution (left panels) and density maps (right
     panels). Top row: all stars. Bottom row: pm selection.
 
-    : path : path of all results files
-    : outfile : result file of the dwarf
+    : path : path of the result file
+    : outfile : where to output the plot
     : n_error : N_ERRORBAR for pm selection
     : kernel : 'gaussian' or 'poisson'
     : s_above : significance threshold, default value = 5
@@ -68,8 +68,8 @@ def hist_2_panel(path: str, outfile: str, n_error: float, kernel: str,
     """ Plotting histograms (left panels) and normalized histograms (right
     panels). Top row: all stars. Bottom row: pm selection.
 
-    : path : path of all results files
-    : outfile : result file of the dwarf
+    : path : path of the result file
+    : outfile : where to output the plot
     : n_error : N_ERRORBAR for pm selection
     : kernel : 'gaussian' or 'poisson'
     : s_above : significance threshold, default value = 5
