@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 
 
@@ -13,6 +14,8 @@ def summarize_peaks_csv(path: str, outfile: str, n_error: float, kernel: str,
     : kernel : 'gaussian' or 'poisson'
     : s_above : significance threshold, default value = 5
     """
+    _name = path.replace("results/", "")
+
     datas = [np.load('{}/queried-data.npy'.format(path)).item(),
              np.load('{}/queried-data-pm_error{}.npy'.format(path,
                                                              n_error)).item()]
@@ -22,22 +25,33 @@ def summarize_peaks_csv(path: str, outfile: str, n_error: float, kernel: str,
     sigs = [data["sig_{}".format(kernel)] for data in datas]
 
     # masks for stars with sig > s_above
-    masks = [sigs > s_above for data in datas]
+    masks = [sig > s_above for sig in sigs]
 
     for v in range(2):
         ra_peaks = ras[v][masks[v]]
         dec_peaks = decs[v][masks[v]]
         sig_peaks = sigs[v][masks[v]]
 
+        n_star = len(sig_peaks)
+
         peaks_table = {}
+        peaks_table["name"] = np.array([_name] * n_star)
         peaks_table["ra"] = ra_peaks
         peaks_table["dec"] = dec_peaks
-        peaks_table["ra"] = sig_peaks
+        peaks_table["sig"] = sig_peaks
 
-        df = pd.DataFrame(data=searching_table)
-        df = df[["name", "gc_size", "n_star", "n_star_pm", "sig_g_peak", "sig_g_pm_peak", "sig_p_peak", "sig_p_pm_peak"]]
+        df = pd.DataFrame(data=peaks_table)
+        df = df[["name", "sig", "ra", "dec"]]
 
-        df.to_csv("summary.csv", index=False)
+        assert (v < 2), ("wrong index in the for loop "
+                         "for all stars and pm selection. ")
+
+        if v==0:    # all stars
+            df.to_csv("{}-{}.csv".format(outfile, kernel), index=False)
+        else:    # pm selection
+            df.to_csv("{}-{}-pm.csv".format(outfile, kernel), index=False)
+
+
 
 
 

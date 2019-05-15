@@ -5,6 +5,7 @@ from src.classKDE_MWSatellite import *
 from param.param import *
 from param.kw_wsdb import *
 from src.plotting import *
+from src.peaks import *
 
 
 def create_dir(dir_name: str):
@@ -137,6 +138,12 @@ if __name__ == '__main__':
     hist_2_panel(dir_name, "{}/{}".format(hist_dir, fig_name),
                  N_ERRORBAR, "poisson")
 
+    peaks_dir = "peaks"
+    create_dir(peaks_dir)
+    summarize_peaks_csv(dir_name, "{}/{}".format(peaks_dir, fig_name),
+                        N_ERRORBAR, "gaussian")
+    summarize_peaks_csv(dir_name, "{}/{}".format(peaks_dir, fig_name),
+                        N_ERRORBAR, "poisson")
 
     f.write("we are finished :) \n\n")
     f.close()
