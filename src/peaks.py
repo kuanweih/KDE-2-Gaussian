@@ -35,7 +35,17 @@ def summarize_peaks_csv(path: str, outfile: str, n_error: float, kernel: str,
         n_star = len(sig_peaks)
 
         peaks_table = {}
+
+        if v==0:    # all stars
+            df.to_csv("{}-{}.csv".format(outfile, kernel), index=False)
+        else:    # pm selection
+            df.to_csv("{}-{}-pm.csv".format(outfile, kernel), index=False)
+
         peaks_table["name"] = np.array([_name] * n_star)
+
+
+
+
         peaks_table["ra"] = ra_peaks
         peaks_table["dec"] = dec_peaks
         peaks_table["sig"] = sig_peaks
@@ -43,8 +53,7 @@ def summarize_peaks_csv(path: str, outfile: str, n_error: float, kernel: str,
         df = pd.DataFrame(data=peaks_table)
         df = df[["name", "sig", "ra", "dec"]]
 
-        assert (v < 2), ("wrong index in the for loop "
-                         "for all stars and pm selection. ")
+        assert (v < 2), ("wrong index in the for loop for all stars and pm selection. ")
 
         if v==0:    # all stars
             df.to_csv("{}-{}.csv".format(outfile, kernel), index=False)
