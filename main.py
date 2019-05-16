@@ -6,18 +6,8 @@ from param.param import *
 from param.kw_wsdb import *
 from src.plotting import *
 from src.peaks import *
+from src.tools import *
 
-
-def create_dir(dir_name: str):
-    """ Create directory with a name 'dir_name' """
-    import os
-    import errno
-    if not os.path.exists(dir_name):
-        try:
-            os.makedirs(dir_name)
-        except OSError as exc:  # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
 
 
 def get_dir_name() -> str:
