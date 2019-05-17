@@ -9,7 +9,7 @@ Before starting density estimation, one should set up `param/param.py` and `para
 
 
 # How to use it:
-1. Clean the work directory: ``` bash bashtools/clean.sh ```
+1. Clean the work directory: `bash bashtools/clean.sh`
 2. Get access to the database and enter information in `param/wsdb.py`
 3. Set up parameters in `param/param.py`
 4. Calculate density estimation:
@@ -18,4 +18,5 @@ Before starting density estimation, one should set up `param/param.py` and `para
     - `python  main.py  --name_dwarf  "Fornax"  --gc_size_pc  20  --scale_sigma2  2.0`<br>
     (if using the McConnachie list)
 5. If running on a cluster, a slurm job script is provided:
-    - `sbatch  slurm-coma.sh`
+    - `sbatch  bashtools/slurm-slurm.sh`
+6. Summarize searching result with `python summary.py`
