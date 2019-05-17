@@ -12,7 +12,7 @@ if __name__ == '__main__':
     create_dir(output_file)
 
     """ Concatenate all peaks csv files """
-    paths = glob.glob('peaks/*')
+    paths = glob.glob('peaks/stars/*')
 
     dfs = [pd.read_csv(path) for path in paths]
     df_con = pd.concat(dfs)
