@@ -3,21 +3,21 @@ import numpy as np
 import glob
 import pandas as pd
 
-from src.tools import create_dir
-
+from src.tools import create_dir, df_concat
 
 
 if __name__ == '__main__':
     output_file = 'summary'
     create_dir(output_file)
 
-    """ Concatenate all peaks csv files """
+    """ Concatenate all peaks csv files (both stars and pixels) """
     paths = glob.glob('peaks/stars/*')
+    df_con = df_concat(paths)
+    df_con.to_csv("{}/all_stars_peaks.csv".format(output_file), index=False)
 
-    dfs = [pd.read_csv(path) for path in paths]
-    df_con = pd.concat(dfs)
-
-    df_con.to_csv("{}/all_peaks.csv".format(output_file), index=False)
+    paths = glob.glob('peaks/pixels/*')
+    df_con = df_concat(paths)
+    df_con.to_csv("{}/all_pixels_peaks.csv".format(output_file), index=False)
 
 
     """ Generate summary csv """
@@ -106,23 +106,3 @@ if __name__ == '__main__':
         mask = (df["name"] == target_dwarf) & mask
 
         df[mask].to_csv("{}/{}.csv".format(path, target_dwarf), index=False)
-
-
-
-        # print(df[mask])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    #
