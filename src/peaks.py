@@ -71,8 +71,6 @@ def summarize_peaks_pixel_csv(path: str, outfile: str, n_error: float,
     : s_above : significance threshold, default value = 5
     """
     x, y = np.load('{}/meshgrids.npy'.format(path))
-    meshgrids = np.meshgrid(x, y)
-
     sigs = [np.load('{}/sig_{}.npy'.format(path, kernel)),
             np.load('{}/sig_{}-pm_error{}.npy'.format(path, kernel, n_error))]
 
@@ -89,16 +87,16 @@ def summarize_peaks_pixel_csv(path: str, outfile: str, n_error: float,
         labeled_array, num_features = snlabel(masks[v])
 
         label_s, x_peaks, y_peaks = [], [], []
-
         for nf in range(1, num_features + 1):    # ignore pixels with 0
-            # mask_id = labeled_array == nf
-            peak_xid, peak_yid = np.where(labeled_array == nf)
+            peak_yid, peak_xid = np.where(labeled_array == nf)    # x <-> y
             label_ = [nf] * len(peak_xid)
             label_s.append(label_)
             x_peaks.append(x[peak_xid])
             y_peaks.append(y[peak_yid])
 
-        print(np.array(label_s).flatten())
+        label_s = np.concatenate(label_s)
+        x_peaks = np.concatenate(x_peaks)
+        y_peaks = np.concatenate(y_peaks)
 
         pixel_peaks_table = {}
 
