@@ -1,4 +1,3 @@
-
 import numpy as np
 import glob
 import pandas as pd
@@ -127,6 +126,8 @@ if __name__ == '__main__':
 
     name_set = set(df['name'])
     for name in name_set:
+        if "gaussian" in name:
+            continue    # don't plot images of gaussian kernel
         df_name = df.loc[df['name'] == name]
 
         label_set = set(df_name['label'])
