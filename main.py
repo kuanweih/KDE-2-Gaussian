@@ -130,10 +130,20 @@ if __name__ == '__main__':
 
     peaks_dir = "peaks"
     create_dir(peaks_dir)
-    summarize_peaks_csv(dir_name, "{}/{}".format(peaks_dir, fig_name),
-                        N_ERRORBAR, "gaussian")
-    summarize_peaks_csv(dir_name, "{}/{}".format(peaks_dir, fig_name),
-                        N_ERRORBAR, "poisson")
+
+    star_dir = "{}/stars".format(peaks_dir)
+    create_dir(star_dir)
+    summarize_peaks_star_csv(dir_name, "{}/{}".format(star_dir, fig_name),
+                             N_ERRORBAR, "gaussian")
+    summarize_peaks_star_csv(dir_name, "{}/{}".format(star_dir, fig_name),
+                             N_ERRORBAR, "poisson")
+
+    pixel_dir = "{}/pixels".format(peaks_dir)
+    create_dir(pixel_dir)
+    summarize_peaks_pixel_csv(dir_name, "{}/{}".format(pixel_dir, fig_name),
+                              N_ERRORBAR, "gaussian", RA, DEC, WIDTH)
+    summarize_peaks_pixel_csv(dir_name, "{}/{}".format(pixel_dir, fig_name),
+                              N_ERRORBAR, "poisson", RA, DEC, WIDTH)
 
     f.write("we are finished :) \n\n")
     f.close()

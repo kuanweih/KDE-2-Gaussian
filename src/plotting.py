@@ -1,10 +1,12 @@
 import matplotlib
 matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from param.param import *
 import scipy.stats as stats
+
+from param.param import *
 
 
 def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str,
@@ -106,6 +108,9 @@ def hist_2_panel(path: str, outfile: str, n_error: float, kernel: str,
 
 
     plt.savefig("{}-{}.png".format(outfile, kernel), bbox_inches='tight', dpi=100)
+
+
+
 
 
 if __name__ == '__main__':
