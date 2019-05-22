@@ -3,11 +3,23 @@ import numpy as np
 import glob
 import pandas as pd
 
-from multiprocessing import Process
+import multiprocessing
+from functools import partial
 
 from src.tools import create_dir, df_concat
-from src.hips_image import plot_hips_sky_image
+from src.hips_image import multiprocessing_plot_hips_sky_image
 
+
+s_above = 5    # significance threshold
+
+pixel_th = 12
+n_star_th = 100
+gc_sizes = [5, 10]
+
+# hips_surveys = ['IPAC/P/GLIMPSE360']
+hips_surveys = ['CDS/P/DSS2/red']
+res_image = 1000
+width_fac = 10.    # width of image = width_fac * sigma1
 
 
 def mask_pixel_star_th(df: pd.DataFrame, pixel_th: int, n_star_th:int) -> np.ndarray:
@@ -40,7 +52,6 @@ if __name__ == '__main__':
     sig_g_peaks, sig_g_pm_peaks, sig_p_peaks, sig_p_pm_peaks = [], [], [], []
 
     for path in paths:
-        s_above = 5
         name = path.split("-")[0].replace("results/", "")
         gc_size = int(path.split("-")[5].split("s")[0].replace("gc", ""))
 
@@ -87,12 +98,7 @@ if __name__ == '__main__':
     path = "{}/detail".format(output_file)
     create_dir(path)
 
-    pixel_th = 12
-    n_star_th = 100
-    gc_sizes = [5, 10]
-
     target_dwarfs = []
-
     for gc_size in gc_sizes:
         mask = mask_pixel_star_th(df, pixel_th, n_star_th)
         mask = (df["gc_size"] == gc_size) & mask
@@ -111,61 +117,42 @@ if __name__ == '__main__':
 
 
     """ Create images via hips """
-    # hips_surveys = ['IPAC/P/GLIMPSE360']
-    hips_surveys = ['CDS/P/DSS2/red']
     path = "images"
     create_dir(path)
+
+    name_df, label_df, hips_df = [], [], []
+    ra_df, dec_df, width_df = [], [], []
 
     df = pd.read_csv('summary/all_pixels_peaks.csv')
 
     name_set = set(df['name'])
     for name in name_set:
         df_name = df.loc[df['name'] == name]
+
         label_set = set(df_name['label'])
         for label in label_set:
             df_name_label = df_name.loc[df_name['label'] == label]
             ra = np.mean(df_name_label['ra'])
             dec = np.mean(df_name_label['dec'])
             name_list = name.split("-")
-            width = 5. * float(name_list[5].split('s')[1])
+            width = width_fac * float(name_list[5].split('s')[1])
 
             for hips_survey in hips_surveys:
-                plot_hips_sky_image(ra, dec, width, hips_survey, path, name, label, 1000)
+                name_df.append(name)
+                label_df.append(label)
+                hips_df.append(hips_survey)
+                ra_df.append(ra)
+                dec_df.append(dec)
+                width_df.append(width)
 
+    df = None    # free memory
 
-    # # instantiating process with arguments
-    # for name in names:
-    #     proc = Process(target=print_func, args=(name,))
-    #     procs.append(proc)
-    #     proc.start()
-    #
-    # # complete the processes
-    # for proc in procs:
-    #     proc.join()
+    num_target = len(name_df)
+    iterable = np.arange(num_target)
 
-
-
-
-
-
-
-# def print_func(continent='Asia'):
-#     print('The name of continent is : ', continent)
-#
-# if __name__ == "__main__":  # confirms that the code is under main function
-#     names = ['America', 'Europe', 'Africa']
-#     procs = []
-#     proc = Process(target=print_func)  # instantiating without any argument
-#     procs.append(proc)
-#     proc.start()
-
-    # # instantiating process with arguments
-    # for name in names:
-    #     # print(name)
-    #     proc = Process(target=print_func, args=(name,))
-    #     procs.append(proc)
-    #     proc.start()
-    #
-    # # complete the processes
-    # for proc in procs:
-    #     proc.join()
+    pool = multiprocessing.Pool()
+    func = partial(multiprocessing_plot_hips_sky_image, name_df, label_df, hips_df, ra_df,
+                                            dec_df, width_df, path, res_image)
+    pool.map(func, iterable)
+    pool.close()
+    pool.join()
