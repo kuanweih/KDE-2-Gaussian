@@ -4,12 +4,8 @@
 #SBATCH --ntasks=20
 #SBATCH --time=72:00:00
 
-source  activate  mypython3    # use py3 on coma (don't need this if already using py3)
-
-
-# name_dwarfs="Fornax  UrsaMajorII  UrsaMinor"
-# name_dwarfs="*Eridanus3  Eridanus2  Hercules"
-
+# use py3 on coma (don't need this if already using py3)
+source  activate  mypython3
 
 gc_size_pcs="10"
 # gc_size_pcs="5  10"
