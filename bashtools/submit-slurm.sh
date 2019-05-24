@@ -18,3 +18,5 @@ while IFS= read -r name_dwarf;  do
     # python  main.py  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size  --scale_sigma2  2.0
   done  # for
 done < "$input"  # while
+
+python  summary.py
