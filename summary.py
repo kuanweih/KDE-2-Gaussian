@@ -16,7 +16,10 @@ n_star_th = 100
 gc_sizes = [5, 10]
 
 # hips_surveys = ['IPAC/P/GLIMPSE360']
-hips_surveys = ['CDS/P/DSS2/red']
+# hips_surveys = ['CDS/P/DSS2/red']
+hips_surveys = ['CDS/P/DSS2/color']
+# hips_surveys = ['CDS/P/DES-DR1/g']
+
 res_image = 1000
 width_fac = 10.    # width of image = width_fac * sigma1
 
