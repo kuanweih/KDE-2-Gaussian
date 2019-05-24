@@ -30,18 +30,17 @@ def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str,
 
     sigs = [np.load('{}/sig_{}.npy'.format(path, kernel)),
             np.load('{}/sig_{}-pm_error{}.npy'.format(path, kernel, n_error))]
-
+    
     datas = [np.load('{}/queried-data.npy'.format(path)).item(),
              np.load('{}/queried-data-pm_error{}.npy'.format(path,
                                                              n_error)).item()]
 
     ras = [data["ra"] for data in datas]
     decs = [data["dec"] for data in datas]
+    n_stars = [len(data["ra"]) for data in datas]
 
     # masks for stars with sig > s_above
     masks = [data["sig_{}".format(kernel)] > s_above for data in datas]
-
-    n_stars = [len(data["ra"]) for data in datas]
 
     extent = [x.min(), x.max(), y.min(), y.max()]    # arg extent for imshow
 
@@ -61,6 +60,8 @@ def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str,
         for u in range(2):
             axes[v, u].tick_params(axis='both', which='both',
                                    labelleft=False, labelbottom=False)
+            axes[v, u].set_xlim(axes[v, u].set_xlim()[::-1])    # flipping
+
 
     plt.savefig("{}-{}.png".format(outfile, kernel), bbox_inches='tight', dpi=300)
 
