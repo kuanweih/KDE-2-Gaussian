@@ -46,16 +46,23 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_survey: str,
     """
     # Compute the sky image
     geometry = WCSGeometry.create(skydir=SkyCoord(ra, dec, unit='deg',
-                                                  frame='galactic'),
+                                                  frame='icrs'),
                                   width=res, height=res, fov="%f deg" %width,
-                                  coordsys='galactic', projection='AIT')
+                                  coordsys='icrs', projection='AIT')
 
     result = make_sky_image(geometry=geometry,
                             hips_survey=hips_survey, tile_format='jpg')
 
+    name_split = name.split('-')
+    if 'pm' in name:
+        short_name = '{}-{}'.format(name_split[0], name_split[-1])
+    else:
+        short_name = '{}-all'.format(name_split[0])
+
     # Draw the sky image
     ax = plt.subplot(projection=geometry.wcs)
     ax.imshow(result.image, origin='lower')
+    ax.set_title('{}-label{}-(%0.4f,%0.4f)-width{}'.format(short_name, label, width) %(ra, dec))
     plt.savefig("{}/{}-target{}-{}.jpg".format(outpath, name, label,
                                                hips_survey.replace('/', '-')),
                 bbox_inches='tight', dpi=300)
