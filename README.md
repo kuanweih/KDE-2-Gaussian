@@ -15,8 +15,7 @@ Before starting density estimation, one should set up `param/param.py` and `para
 4. Calculate density estimation:
     - `python  main.py`<br>
     (if using manual mode)
-    - `python  main.py  --dwarf_list  "McConnachie"  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size
-`<br>
+    - `python  main.py  --dwarf_list  "McConnachie"  --name_dwarf  "Fornax"  --gc_size_pc  10`<br>
     (if using a dwarf list: "McConnachie" or "more_dwarfs")
 5. If running on a cluster, a slurm job script is provided:
     - `sbatch  bashtools/slurm-slurm.sh`
