@@ -44,27 +44,32 @@ FILE_SIG_POISSON = 'sig_poisson'    # output significance file
 FILE_MESH = 'meshgrids'    # output mesh grids
 
 
-""" parse arguments from McConnachie list """
-IS_FROM_McConnachie = True
-if IS_FROM_McConnachie:
+""" parse arguments from dwarf lists: McConnachie or more """
+IS_DWARF_LIST = True
+
+if IS_DWARF_LIST:
     import argparse
     import numpy as np
 
-    parser = argparse.ArgumentParser(
-                description='Set parameters for a specific dwarf')
-    parser.add_argument('--name_dwarf', type=str,
-                        help='A dwarf name from McConnachie list')
-    parser.add_argument('--gc_size_pc', type=int,
-                        help='Size of globular clusters: e.g. 1~10 pc')
+    parser = argparse.ArgumentParser(description='Set parameters for a specific dwarf')
+    parser.add_argument('--dwarf_list', type=str, help='A dwarf list: "McConnachie" or "more_dwarfs"')
+    parser.add_argument('--name_dwarf', type=str, help='A dwarf name from McConnachie list')
+    parser.add_argument('--gc_size_pc', type=int, help='Size of globular clusters: e.g. 1~10 pc')
     parser.add_argument('--scale_sigma2', type=float, nargs='?', const=1,
                         default=1., help='sigma2 = scale_sigma2 * sigma2')
     args = parser.parse_args()
 
     NAME = args.name_dwarf    # name of the dwarf
+    dwarf_list = args.dwarf_list    # which list to call dwarfs
 
-    path_dwarfs = "dwarfs-McConnachie/dwarfs-McConnachie.npy"
+
+    if dwarf_list = "McConnachie":
+        path_dwarfs = "dwarfs/McConnachie/dwarfs-McConnachie.npy"
+    elif dwarf_list = "more_dwarfs":
+        path_dwarfs = "dwarfs/20190527/dwarfs-more.npy"
+
     dwarfs_dict = np.load(path_dwarfs).item()
-
+    
     mask = dwarfs_dict["GalaxyName"] == NAME
 
     for key, val in dwarfs_dict.items():
