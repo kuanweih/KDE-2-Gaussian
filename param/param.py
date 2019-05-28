@@ -63,13 +63,13 @@ if IS_DWARF_LIST:
     dwarf_list = args.dwarf_list    # which list to call dwarfs
 
 
-    if dwarf_list = "McConnachie":
+    if dwarf_list == "McConnachie":
         path_dwarfs = "dwarfs/McConnachie/dwarfs-McConnachie.npy"
-    elif dwarf_list = "more_dwarfs":
+    elif dwarf_list == "more_dwarfs":
         path_dwarfs = "dwarfs/20190527/dwarfs-more.npy"
 
     dwarfs_dict = np.load(path_dwarfs).item()
-    
+
     mask = dwarfs_dict["GalaxyName"] == NAME
 
     for key, val in dwarfs_dict.items():
