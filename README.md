@@ -9,14 +9,16 @@ Before starting density estimation, one should set up `param/param.py` and `para
 
 
 # How to use it:
+0. Preprocess a dwarf list (optional): <br>
+   `bash  bashtools/preprocessing_dwarflist.sh`
 1. Clean the work directory: `bash bashtools/clean.sh`
 2. Get access to the database and enter information in `param/wsdb.py`
 3. Set up parameters in `param/param.py`
 4. Calculate density estimation:
     - `python  main.py`<br>
     (if using manual mode)
-    - `python  main.py  --dwarf_list  "McConnachie"  --name_dwarf  "Fornax"  --gc_size_pc  10`<br>
-    (if using a dwarf list: "McConnachie" or "more_dwarfs")
+    - `python  main.py  --name_dwarf  "Fornax"  --gc_size_pc  10`<br>
+    (if using the joint dwarf list)
 5. If running on a cluster, a slurm job script is provided:
     - `sbatch  bashtools/slurm-slurm.sh`
 6. Summarize searching result with `python summary.py`
