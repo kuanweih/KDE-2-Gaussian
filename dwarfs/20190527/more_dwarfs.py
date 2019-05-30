@@ -30,7 +30,7 @@ if __name__ == '__main__':
     dwarfs.append(['Carina3', 114.6298, -57.8997, 27800., 3.75])
 
     # http://cdsads.u-strasbg.fr/abs/2018PASJ...70S..18H
-    dwarfs.append(['Carina2', 31.331, -4.270, 251000., 1.23])
+    dwarfs.append(['Cetus3', 31.331, -4.270, 251000., 1.23])
 
     # https://arxiv.org/pdf/1605.05338.pdf
     dwarfs.append(['Aquarius2', 338.4813, -9.3274, 107900., 5.1])
