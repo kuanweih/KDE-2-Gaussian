@@ -13,18 +13,10 @@ gc_size_pcs="10"
 # gc_size_pcs="5  10"
 
 
-input="dwarfs/McConnachie/dwarfs-names.txt"
+input="dwarfs/dwarfs-names.txt"
 while IFS= read -r name_dwarf;  do
   for gc_size in $gc_size_pcs;  do
-    python  main.py  --dwarf_list  "McConnachie"  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size
-  done  # for
-done < "$input"  # while
-
-
-input="dwarfs/20190527/dwarfs-names.txt"
-while IFS= read -r name_dwarf;  do
-  for gc_size in $gc_size_pcs;  do
-    python  main.py  --dwarf_list  "more_dwarfs"  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size
+    python  main.py  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size
   done  # for
 done < "$input"  # while
 
