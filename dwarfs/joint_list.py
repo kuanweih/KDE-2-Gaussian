@@ -29,4 +29,4 @@ if __name__ == '__main__':
     dict_joint = {q: np.concatenate((dict1[q], dict2[q])) for q in quantitys}
 
     np.save("dwarfs-joint", dict_joint)
-    np.savetxt("dwarfs-names.txt", dict_joint["GalaxyName"], fmt="%s")
+    np.savetxt("dwarfs-names.txt", np.sort(dict_joint["GalaxyName"]), fmt="%s")
