@@ -15,10 +15,13 @@ pixel_th = 12
 n_star_th = 100
 gc_sizes = [5, 10]
 
-# hips_surveys = ['IPAC/P/GLIMPSE360']
-# hips_surveys = ['CDS/P/DSS2/red']
-hips_surveys = ['CDS/P/DSS2/color']
-# hips_surveys = ['CDS/P/DES-DR1/g']
+hips_surveys = ['CDS/P/DES-DR1/g',
+                'CDS/P/DECaLS/DR5/color',
+                'CDS/P/DSS2/color',
+                'CDS/P/SDSS9/color',
+                'CDS/P/PanSTARRS/DR1/color-z-zg-g',
+                'CDS/P/2MASS/color',
+                ]
 
 res_image = 1000
 width_fac = 10.    # width of image = width_fac * sigma1
@@ -122,9 +125,7 @@ if __name__ == '__main__':
     path = "images"
     create_dir(path)
 
-    name_df, label_df, hips_df = [], [], []
-    ra_df, dec_df, width_df = [], [], []
-
+    name_df, label_df, ra_df, dec_df, width_df = [], [], [], [], []
     df = pd.read_csv('summary/all_pixels_peaks.csv')
 
     name_set = set(df['name'])
@@ -143,13 +144,11 @@ if __name__ == '__main__':
             name_list = name.split("-")
             width = width_fac * float(name_list[5].split('s')[1])
 
-            for hips_survey in hips_surveys:
-                name_df.append(name)
-                label_df.append(label)
-                hips_df.append(hips_survey)
-                ra_df.append(ra)
-                dec_df.append(dec)
-                width_df.append(width)
+            name_df.append(name)
+            label_df.append(label)
+            ra_df.append(ra)
+            dec_df.append(dec)
+            width_df.append(width)
 
     df = None    # free memory
 
@@ -157,7 +156,7 @@ if __name__ == '__main__':
     iterable = np.arange(num_target)
 
     pool = multiprocessing.Pool()
-    func = partial(multiprocessing_plot_hips_sky_image, name_df, label_df, hips_df, ra_df,
+    func = partial(multiprocessing_plot_hips_sky_image, name_df, label_df, hips_surveys, ra_df,
                                             dec_df, width_df, path, res_image)
     pool.map(func, iterable)
     pool.close()
