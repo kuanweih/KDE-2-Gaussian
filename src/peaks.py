@@ -86,6 +86,9 @@ def summarize_peaks_pixel_csv(path: str, outfile: str, n_error: float,
 
         labeled_array, num_features = snlabel(masks[v], structure=np.ones((3, 3)))
 
+        if num_features == 1:
+            continue
+
         label_s, x_peaks, y_peaks = [], [], []
         for nf in range(1, num_features + 1):    # ignore pixels with 0
             peak_yid, peak_xid = np.where(labeled_array == nf)    # x <-> y
