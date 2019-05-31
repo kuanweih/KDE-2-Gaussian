@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --export=NONE
 #SBATCH --partition=long
-#SBATCH --ntasks=20
+#SBATCH --ntasks-per-node=20
 #SBATCH --time=72:00:00
 
 
