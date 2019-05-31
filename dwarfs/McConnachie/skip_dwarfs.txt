@@ -1,7 +1,7 @@
 TheGalaxy
-*CanisMajor
+CanisMajor
 SagittariusdSph
-*BootesIII
+BootesIII
 LMC
 SMC
 Andromeda

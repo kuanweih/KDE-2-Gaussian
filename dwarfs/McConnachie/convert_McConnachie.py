@@ -93,7 +93,7 @@ if __name__ == '__main__':
         if key in keys[1:]:
             dwarfs[key] = np.array(split_into_3_float(value))
 
-    dwarfs["GalaxyName"] = np.array(list(map(lambda x: x.replace(" ", ""), dwarfs["GalaxyName"])))
+    dwarfs["GalaxyName"] = np.array(list(map(lambda x: x.replace(" ", "").replace("*", ""), dwarfs["GalaxyName"])))
     dwarfs["RA_deg"] = np.array(list(map(lambda x: get_ra_deg(x[0], x[1], x[2]), dwarfs["RA"])))
     dwarfs["Dec_deg"] = np.array(list(map(lambda x: get_dec_deg(x[0], x[1], x[2]), dwarfs["Dec"])))
     dwarfs["Distance_pc"] = np.array(list(map(lambda x: dist_modulus_to_dist(x[0], x[1], x[2]), dwarfs["(m-M)o"])))
@@ -102,6 +102,10 @@ if __name__ == '__main__':
     mask = dwarfs["Distance_pc"] < 500000    # skip dwarfs too far
     mask = mask & (dwarfs["rh(arcmins)"] < 90)    # skip dwarfs with rh = 99.99
 
-    np.save("dwarfs-McConnachie", dwarfs)
     np.savetxt("dwarfs-names.txt", dwarfs["GalaxyName"][mask], fmt="%s")
     np.savetxt("skip_dwarfs.txt", dwarfs["GalaxyName"][~mask], fmt="%s")
+
+    for key, value in dwarfs.items():
+        dwarfs[key] = dwarfs[key][mask]
+
+    np.save("dwarfs-McConnachie", dwarfs)
