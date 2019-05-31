@@ -27,7 +27,8 @@ if __name__ == '__main__':
     # dwarfs.append(['Tucana2', 342.9796, -58.5689, 57000., 9.83])
 
     # https://arxiv.org/pdf/1811.04082.pdf
-    dwarfs.append(['Antlia2', 143.8868, -36.7673, 129400., 75.6])
+    # dwarfs.append(['Antlia2', 143.8868, -36.7673, 129400., 75.6])
+    dwarfs.append(['Antlia2', 143.8868, -36.7673, 129400., 30.])    # need further check
 
     # https://arxiv.org/pdf/1801.07279.pdf
     dwarfs.append(['Carina2', 114.1066, -57.9991, 36200., 8.69])
