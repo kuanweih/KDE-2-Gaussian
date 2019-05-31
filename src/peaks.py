@@ -86,7 +86,7 @@ def summarize_peaks_pixel_csv(path: str, outfile: str, n_error: float,
 
         labeled_array, num_features = snlabel(masks[v], structure=np.ones((3, 3)))
 
-        if num_features == 1:
+        if num_features == 1:    # skip the case without any peaks
             continue
 
         label_s, x_peaks, y_peaks = [], [], []
@@ -97,14 +97,18 @@ def summarize_peaks_pixel_csv(path: str, outfile: str, n_error: float,
             x_peaks.append(x[peak_xid])
             y_peaks.append(y[peak_yid])
 
-        label_s = np.concatenate(label_s)
-        x_peaks = np.concatenate(x_peaks)
-        y_peaks = np.concatenate(y_peaks)
+        if num_features > 1:
+            label_s = np.concatenate(label_s)
+            x_peaks = np.concatenate(x_peaks)
+            y_peaks = np.concatenate(y_peaks)
+        else:
+            label_s = np.array(label_s)
+            x_peaks = np.array(x_peaks)
+            y_peaks = np.array(y_peaks)
 
         pixel_peaks_table = {}
 
         pixel_peaks_table["name"] = np.array([name.replace("peaks/pixels/", "")] * len(label_s))
-
         pixel_peaks_table["label"] = label_s
         pixel_peaks_table["ra"] = x_peaks
         pixel_peaks_table["dec"] = y_peaks
