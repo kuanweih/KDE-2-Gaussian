@@ -137,8 +137,6 @@ if __name__ == '__main__':
         label_set = set(df_name['label'])
         for label in label_set:
             df_name_label = df_name.loc[df_name['label'] == label]
-            if len(df_name_label) < 2:    # ignore single pixel case
-                continue
             ra = np.mean(df_name_label['ra'])
             dec = np.mean(df_name_label['dec'])
             name_list = name.split("-")
