@@ -1,5 +1,8 @@
 """ Parameter file for KDE detector """
 
+IS_DWARF_LIST = False    # use joint list
+IS_DWARF_SPLIT_LIST = True    # use joint-split list
+
 
 """ default (manual) target parameters """
 NAME = 'Fornax'    # name of the dwarf
@@ -44,9 +47,7 @@ FILE_SIG_POISSON = 'sig_poisson'    # output significance file
 FILE_MESH = 'meshgrids'    # output mesh grids
 
 
-""" parse arguments from dwarf lists """
-IS_DWARF_LIST = True
-
+""" parse arguments from the joint dwarf list """
 if IS_DWARF_LIST:
     import argparse
     import numpy as np
@@ -75,6 +76,46 @@ if IS_DWARF_LIST:
     WIDTH = 8. * dwarfs_dict["rh(arcmins)"][0] / 60. # TODO: round? or including e?
     WIDTH = float("{0:.4f}".format(WIDTH))
 
+    GC_SIZE = args.gc_size_pc
+    DISTANCE = float("{0:.4f}".format(dwarfs_dict["Distance_pc"][0]))
+
+    SIGMA1 = GC_SIZE / DISTANCE * 180. / np.pi
+    SIGMA1 = float("{0:.4f}".format(SIGMA1))
+
+    SIGMA2 = float("{0:.4f}".format(0.1 * dwarfs_dict["rh(arcmins)"][0] / 60.))
+    SIGMA2 *= args.scale_sigma2
+
+    SIGMA3 = 0.5 * WIDTH
+    PIXEL_SIZE = 0.25 * SIGMA1
+
+
+""" parse arguments from the joint-split dwarf list """
+if IS_DWARF_SPLIT_LIST:
+    import argparse
+    import numpy as np
+
+    parser = argparse.ArgumentParser(description='Set parameters for a specific dwarf')
+    parser.add_argument('--name_dwarf', type=str, help='A dwarf name from McConnachie list')
+    parser.add_argument('--gc_size_pc', type=int, help='Size of globular clusters: e.g. 1~10 pc')
+    parser.add_argument('--scale_sigma2', type=float, nargs='?', const=1,
+                        default=1., help='sigma2 = scale_sigma2 * sigma2')
+    args = parser.parse_args()
+
+    path_dwarfs = "dwarfs/dwarfs-joint-split.npy"
+    dwarfs_dict = np.load(path_dwarfs).item()
+
+    NAME = args.name_dwarf    # name of the dwarf
+    mask = dwarfs_dict["GalaxyName"] == NAME
+
+    for key, val in dwarfs_dict.items():
+        dwarfs_dict[key] = val[mask]
+
+    if dwarfs_dict["GalaxyName"][0] != NAME:
+        print("Cannot find %s in GalaxyName" %NAME) # TODO RaiseError?
+
+    RA = dwarfs_dict["RA_deg"][0]
+    DEC = dwarfs_dict["Dec_deg"][0]
+    WIDTH = 2
     GC_SIZE = args.gc_size_pc
     DISTANCE = float("{0:.4f}".format(dwarfs_dict["Distance_pc"][0]))
 
