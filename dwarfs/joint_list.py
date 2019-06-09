@@ -79,14 +79,14 @@ if __name__ == '__main__':
                     xi = ra + i * PATCH_DIST
                     yj = dec + j * PATCH_DIST
                     id_ += 1
-                    name_split.append('{}:%d'.format(name) %id_)
+                    name_split.append('{}=%d'.format(name) %id_)
                     ra_split.append(xi)
                     dec_split.append(yj)
                     dist_split.append(dist)
                     rh_split.append(rh)
 
     list_split = [name_split, ra_split, dec_split, dist_split, rh_split]
-    dict_joint = {q: list_split[i] for i, q in enumerate(quantitys)}
+    dict_joint = {q: np.array(list_split[i]) for i, q in enumerate(quantitys)}
 
     np.save("dwarfs-joint-split", dict_joint)
     np.savetxt("dwarfs-names-split.txt", np.sort(dict_joint["GalaxyName"]), fmt="%s")
