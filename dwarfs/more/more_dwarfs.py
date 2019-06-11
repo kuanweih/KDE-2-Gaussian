@@ -46,6 +46,9 @@ if __name__ == '__main__':
     # https://arxiv.org/pdf/1503.06216.pdf
     # dwarfs.append(['HydraII', 185.4254, -31.9853, 134000., 1.7])
 
+    # https://iopscience.iop.org/article/10.3847/0004-637X/818/1/39/pdf
+    dwarfs.append(['HydraI', 133.9, 3.6, 12700., 0.86])
+
     dwarfs = np.array(dwarfs)
 
     dwarfs_dic = {}

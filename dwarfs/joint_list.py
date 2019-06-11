@@ -1,6 +1,7 @@
 import numpy as np
 
 PATCH_DIST = 1.8
+N_PATCH_MAX = 5
 
 
 def get_dic_list(path: str, quantitys: str):
@@ -70,7 +71,8 @@ if __name__ == '__main__':
         rh = dict_joint['rh(arcmins)'][k]
 
         width = calc_width(r_200, dist)
-        nmax_patch = int(np.ceil(0.5 * (width / PATCH_DIST - 1.)))
+        nmax_patch = np.ceil(0.5 * (width / PATCH_DIST - 1.))
+        nmax_patch = int(min(nmax_patch, N_PATCH_MAX))
 
         id_ = 0
         for i in range(-nmax_patch, nmax_patch + 1):

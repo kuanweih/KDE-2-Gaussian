@@ -23,6 +23,7 @@ GrusII
 Hercules
 Horologium1
 HorologiumII
+HydraI
 HydraII
 Indus1
 IndusI?
