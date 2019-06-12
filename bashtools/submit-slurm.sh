@@ -18,9 +18,9 @@ input="dwarfs/dwarfs-names-split.txt"
 
 while IFS= read -r name_dwarf;  do
   for gc_size in $gc_size_pcs;  do
-    python  -W ignore  main.py  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size
+    python  -W  ignore  main.py  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size
   done  # for
 done < "$input"  # while
 
 
-python  summary.py
+python  -W  ignore  summary.py
