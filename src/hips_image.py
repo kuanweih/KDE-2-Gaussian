@@ -84,7 +84,10 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
     dec_data = dec_data[mask]
 
     if len(ra_data) < NSTAR_MIN:
+        print('skipping image for %s' %short_name)
         return    # skip plotting image with fewer than NSTAR_MIN stars
+
+    print('plotting image for %s' %short_name)
 
     # Draw the sky image
     sns.set(style="white", color_codes=True, font_scale=1)
