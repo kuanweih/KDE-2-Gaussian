@@ -73,7 +73,9 @@ if IS_DWARF_LIST:
 
     RA = dwarfs_dict["RA_deg"][0]
     DEC = dwarfs_dict["Dec_deg"][0]
-    WIDTH = 8. * dwarfs_dict["rh(arcmins)"][0] / 60. # TODO: round? or including e?
+    rh_deg = dwarfs_dict["rh(arcmins)"][0] / 60.
+
+    WIDTH = 8. * rh_deg # TODO: round? or including e?
     WIDTH = float("{0:.4f}".format(WIDTH))
 
     GC_SIZE = args.gc_size_pc
@@ -82,7 +84,7 @@ if IS_DWARF_LIST:
     SIGMA1 = GC_SIZE / DISTANCE * 180. / np.pi
     SIGMA1 = float("{0:.4f}".format(SIGMA1))
 
-    SIGMA2 = float("{0:.4f}".format(0.1 * dwarfs_dict["rh(arcmins)"][0] / 60.))
+    SIGMA2 = float("{0:.4f}".format(0.1 * rh_deg))
     SIGMA2 *= args.scale_sigma2
 
     SIGMA3 = 0.5 * WIDTH
@@ -115,17 +117,20 @@ if IS_DWARF_SPLIT_LIST:
 
     RA = dwarfs_dict["RA_deg"][0]
     DEC = dwarfs_dict["Dec_deg"][0]
-    WIDTH = 2
+    rh_deg = dwarfs_dict["rh(arcmins)"][0] / 60.
+
+    WIDTH = 1
+
     GC_SIZE = args.gc_size_pc
     DISTANCE = float("{0:.4f}".format(dwarfs_dict["Distance_pc"][0]))
 
     SIGMA1 = GC_SIZE / DISTANCE * 180. / np.pi
     SIGMA1 = float("{0:.4f}".format(SIGMA1))
 
-    SIGMA2 = float("{0:.4f}".format(0.1 * dwarfs_dict["rh(arcmins)"][0] / 60.))
+    SIGMA2 = float("{0:.4f}".format(0.1 * rh_deg))    # factor 0.1 is made up
     SIGMA2 *= args.scale_sigma2
 
-    SIGMA3 = 0.5 * WIDTH
+    SIGMA3 = float("{0:.4f}".format(4. * rh_deg))    # factor 4 is made up
     PIXEL_SIZE = 0.25 * SIGMA1
 
 
