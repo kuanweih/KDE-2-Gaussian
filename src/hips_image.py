@@ -10,6 +10,9 @@ from hips import WCSGeometry, make_sky_image
 from typing import List
 
 
+NSTAR_MIN = 10    # plotting image if the candidate contains more than 10 stars
+
+
 def multiprocessing_plot_hips_sky_image(name_df: List, label_df: List,
                                         hips_df: List, ra_df: List,
                                         dec_df: List, width_df: List,
@@ -79,6 +82,9 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
 
     ra_data = ra_data[mask]
     dec_data = dec_data[mask]
+
+    if len(ra_data) < NSTAR_MIN:
+        return
 
     # Draw the sky image
     sns.set(style="white", color_codes=True, font_scale=1)
