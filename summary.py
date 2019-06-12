@@ -60,13 +60,17 @@ if __name__ == '__main__':
         name = path.split("-")[0].replace("results/", "")
         gc_size = int(path.split("-")[5].split("s")[0].replace("gc", ""))
 
-        n_star = len(np.load("{}/queried-data.npy".format(path)).item()['ra'])
-        n_star_pm = len(np.load("{}/queried-data-pm_error5.npy".format(path)).item()['ra'])
+        try:
+            n_star = len(np.load("{}/queried-data.npy".format(path)).item()['ra'])
+            n_star_pm = len(np.load("{}/queried-data-pm_error5.npy".format(path)).item()['ra'])
 
-        sig_g = np.load("{}/sig_gaussian.npy".format(path))
-        sig_g_pm = np.load("{}/sig_gaussian-pm_error5.npy".format(path))
-        sig_p = np.load("{}/sig_poisson.npy".format(path))
-        sig_p_pm = np.load("{}/sig_poisson-pm_error5.npy".format(path))
+            sig_g = np.load("{}/sig_gaussian.npy".format(path))
+            sig_g_pm = np.load("{}/sig_gaussian-pm_error5.npy".format(path))
+            sig_p = np.load("{}/sig_poisson.npy".format(path))
+            sig_p_pm = np.load("{}/sig_poisson-pm_error5.npy".format(path))
+        except:
+            print('skipping: %s for csv' %name)
+            continue
 
         sig_g_peak = np.sum(sig_g > s_above)
         sig_g_pm_peak = np.sum(sig_g_pm > s_above)
