@@ -1,7 +1,7 @@
 import numpy as np
 
-PATCH_DIST = 1.8
-N_PATCH_MAX = 5
+PATCH_DIST = 0.9
+N_PATCH_MAX = 4
 
 
 def get_dic_list(path: str, quantitys: str):
@@ -92,34 +92,3 @@ if __name__ == '__main__':
 
     np.save("dwarfs-joint-split", dict_joint)
     np.savetxt("dwarfs-names-split.txt", np.sort(dict_joint["GalaxyName"]), fmt="%s")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    #
