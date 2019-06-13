@@ -10,6 +10,17 @@
 source  activate  mypython3
 
 
+# pre-processing dwarf list
+cd  dwarfs/more
+python  more_dwarfs.py
+cd  ../McConnachie
+python  convert_McConnachie.py
+cd  ..
+python  joint_list.py
+cd ..
+
+
+# main search
 gc_size_pcs="10"
 # gc_size_pcs="5  10"
 
@@ -23,4 +34,5 @@ while IFS= read -r name_dwarf;  do
 done < "$input"  # while
 
 
+# summary and images
 python  -W  ignore  summary.py
