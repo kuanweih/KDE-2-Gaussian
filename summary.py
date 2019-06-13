@@ -69,7 +69,7 @@ if __name__ == '__main__':
             sig_p = np.load("{}/sig_poisson.npy".format(path))
             sig_p_pm = np.load("{}/sig_poisson-pm_error5.npy".format(path))
         except:
-            print('skipping: %s for csv' %name)
+            print('skipping Error csv: %s' %name)
             continue
 
         sig_g_peak = np.sum(sig_g > s_above)
