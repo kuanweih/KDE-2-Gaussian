@@ -33,9 +33,9 @@ if __name__ == '__main__':
     f= open("{}/stdout.txt".format(dir_name), "w+")    # dumping log information
 
     # create a KDE_MWSatellite object
-    Satellite = KDE_MWSatellite(NAME, RA, DEC, WIDTH, DATABASE, CATALOG_STR,
-                                PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3, SIGMA_TH,
-                                FACTOR_FROM_SIGMA2)
+    Satellite = KDE_MWSatellite(NAME, RA, DEC, DISTANCE, WIDTH, DATABASE,
+                                CATALOG_STR, PIXEL_SIZE, SIGMA1, SIGMA2,
+                                SIGMA3, SIGMA_TH)
     f.write(Satellite.__str__())
 
     # query data
@@ -116,15 +116,15 @@ if __name__ == '__main__':
 
     visual_dir = "{}/visual".format(plot_dir)
     create_dir(visual_dir)
-    visualize_4_panel(dir_name, "{}/{}".format(visual_dir, fig_name),
-                      N_ERRORBAR, "gaussian")
+    # visualize_4_panel(dir_name, "{}/{}".format(visual_dir, fig_name),
+    #                   N_ERRORBAR, "gaussian")
     visualize_4_panel(dir_name, "{}/{}".format(visual_dir, fig_name),
                       N_ERRORBAR, "poisson")
 
     hist_dir = "{}/hist".format(plot_dir)
     create_dir(hist_dir)
-    hist_2_panel(dir_name, "{}/{}".format(hist_dir, fig_name),
-                 N_ERRORBAR, "gaussian")
+    # hist_2_panel(dir_name, "{}/{}".format(hist_dir, fig_name),
+    #              N_ERRORBAR, "gaussian")
     hist_2_panel(dir_name, "{}/{}".format(hist_dir, fig_name),
                  N_ERRORBAR, "poisson")
 
@@ -133,15 +133,15 @@ if __name__ == '__main__':
 
     star_dir = "{}/stars".format(peaks_dir)
     create_dir(star_dir)
-    summarize_peaks_star_csv(dir_name, "{}/{}".format(star_dir, fig_name),
-                             N_ERRORBAR, "gaussian")
+    # summarize_peaks_star_csv(dir_name, "{}/{}".format(star_dir, fig_name),
+    #                          N_ERRORBAR, "gaussian")
     summarize_peaks_star_csv(dir_name, "{}/{}".format(star_dir, fig_name),
                              N_ERRORBAR, "poisson")
 
     pixel_dir = "{}/pixels".format(peaks_dir)
     create_dir(pixel_dir)
-    summarize_peaks_pixel_csv(dir_name, "{}/{}".format(pixel_dir, fig_name),
-                              N_ERRORBAR, "gaussian", RA, DEC, WIDTH)
+    # summarize_peaks_pixel_csv(dir_name, "{}/{}".format(pixel_dir, fig_name),
+    #                           N_ERRORBAR, "gaussian", RA, DEC, WIDTH)
     summarize_peaks_pixel_csv(dir_name, "{}/{}".format(pixel_dir, fig_name),
                               N_ERRORBAR, "poisson", RA, DEC, WIDTH)
 
