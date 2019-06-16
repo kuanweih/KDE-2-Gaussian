@@ -156,6 +156,7 @@ if __name__ == '__main__':
 
     num_target = len(name_df)
     iterable = np.arange(num_target)
+    print('\nThere are %d candidates\n' %num_target)
 
     pool = multiprocessing.Pool()
     func = partial(multiprocessing_plot_hips_sky_image, name_df, label_df, hips_surveys, ra_df,
