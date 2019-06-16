@@ -4,6 +4,7 @@
 #SBATCH --constraint=intel_e5_v4
 #SBATCH --ntasks-per-node=20
 #SBATCH --time=72:00:00
+#SBATCH --job-name=dwarf-1
 
 
 # use py3 on coma (don't need this if already using py3)
@@ -25,7 +26,8 @@ gc_size_pcs="10"
 # gc_size_pcs="5  10"
 
 # input="dwarfs/dwarfs-names.txt"
-input="dwarfs/dwarfs-names-split.txt"
+# input="dwarfs/dwarfs-names-split.txt"
+input="dwarfs/dwarfs-names-split-1.txt"
 
 while IFS= read -r name_dwarf;  do
   for gc_size in $gc_size_pcs;  do
@@ -34,5 +36,6 @@ while IFS= read -r name_dwarf;  do
 done < "$input"  # while
 
 
+
 # summary and images
-python  -W  ignore  summary.py
+# python  -W  ignore  summary.py 
