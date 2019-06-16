@@ -10,9 +10,9 @@ from scipy.signal import fftconvolve, gaussian
 
 class KDE_MWSatellite(MWSatellite):
     def __init__(self, name_sat: str, ra_sat: float, dec_sat: float,
-                 width: float, database: str, catalog_str: str,
+                 dist: float, width: float, database: str, catalog_str: str,
                  pixel_size: float, sigma1: float, sigma2: float,
-                 sigma3: float, sigma_th: int, factor_from_sigma2: float):
+                 sigma3: float, sigma_th: int):
         """ Kernel Density Estimation on a MWSatellite object
 
         : pixel_size : size of pixel in deg
@@ -20,8 +20,8 @@ class KDE_MWSatellite(MWSatellite):
         : sigma2 : smaller background kernel size in deg: inside the satellite
         : sigma3 : larger background kernel size in deg: outside the satellite
         """
-        MWSatellite.__init__(self, name_sat,
-                             ra_sat, dec_sat, width, database, catalog_str)
+        MWSatellite.__init__(self, name_sat, ra_sat, dec_sat,
+                             dist, width, database, catalog_str)
 
         self.pixel_size = pixel_size
         self.num_grid = round(self.width / self.pixel_size)
@@ -29,7 +29,6 @@ class KDE_MWSatellite(MWSatellite):
         self.sigma2 = sigma2
         self.sigma3 = sigma3
         self.sigma_th = sigma_th
-        self.factor_from_sigma2 = factor_from_sigma2
 
         self.x_mesh = self.grid_coord(self.ra_sat)
         self.y_mesh = self.grid_coord(self.dec_sat)
@@ -238,18 +237,21 @@ class KDE_MWSatellite(MWSatellite):
         conv = self.fftconvolve_boundary_adjust(hist2d, kernel / norm_kernel)
         return  conv * norm_kernel, norm_kernel
 
-    def poisson_outer_expected_background(self, sigma: float,
-            factor_sigma: float) -> Tuple[np.ndarray, float]:
+
+    def poisson_outer_expected_background(self, sigma_in: float,
+            sigma_out: float) -> Tuple[np.ndarray, float]:
         """ Calculate expected backgound number count of stars based on the
         outer aperture, which will be using to calculate 'lambda' for poisson.
+
+        : sigma_in : inner radius of the outer aperture
+        : sigma_out : outer radius of the outer aperture
 
         : return : convolved map (backgound estimation)
         : return : number of pixels of the outer aperture
         """
         hist2d, _, _ = self.np_hist2d()
-        # note that in and out here mean sigma2 and outer radius.
-        s_grid_in = round(sigma / self.pixel_size)
-        s_grid_out = round(factor_sigma * sigma / self.pixel_size)
+        s_grid_in = round(sigma_in / self.pixel_size)
+        s_grid_out = round(sigma_out / self.pixel_size)
         kernel_out = self.circular_kernel(s_grid_out)
         ds_pad = s_grid_out - s_grid_in
         kernel_in_pad = np.pad(self.circular_kernel(s_grid_in),
@@ -259,6 +261,7 @@ class KDE_MWSatellite(MWSatellite):
         norm_kernel = np.sum(kernel)
         conv = self.fftconvolve_boundary_adjust(hist2d, kernel / norm_kernel)
         return  conv * norm_kernel, norm_kernel
+
 
     def get_lambda_poisson(self, n_o: np.ndarray, area_o: np.ndarray,
                            area_i: np.ndarray) -> np.ndarray:
@@ -276,44 +279,26 @@ class KDE_MWSatellite(MWSatellite):
     def compound_sig_poisson(self):
         """ Compound the Poisson significance map: s12 inside (s23 > sigma_th)
         and s13 outside (s23 < sigma_th) """
+        # factors using for outer aperture
+        f_in2out = 2.
+        f_out2out = 50.
+
+        # inner aperture
         n_inner, area_inner = self.poisson_inner_number_count(self.sigma1)
 
-        n_star = len(self.datas[self.catalog_list[0]])
-
-        if n_star < 500:    # for extreme sparse area
-            n_outer, area_outer = self.poisson_outer_expected_background(
-                                      self.sigma2, self.sigma3 / self.sigma2)
-            lambda_poisson = self.get_lambda_poisson(n_outer,
-                                                     area_outer, area_inner)
-            self.sig_poisson = self.z_score_poisson(lambda_poisson, n_inner)
-            return  None
-
-        n_outer, area_outer = self.poisson_outer_expected_background(
-                                      self.sigma2, self.factor_from_sigma2)
+        # outer aperture inside the dwarf
+        r_i = f_in2out * self.sigma1
+        r_o = f_out2out * self.sigma1
+        n_outer, area_outer = self.poisson_outer_expected_background(r_i, r_o)
         lambda_in = self.get_lambda_poisson(n_outer, area_outer, area_inner)
 
-        n_outer, area_outer = self.poisson_outer_expected_background(
-                                      self.sigma2, 2. * self.factor_from_sigma2)
+        # outer aperture outside of the dwarf
+        r_i = f_in2out * self.sigma1
+        r_o = self.sigma3
+        n_outer, area_outer = self.poisson_outer_expected_background(r_i, r_o)
         lambda_out = self.get_lambda_poisson(n_outer, area_outer, area_inner)
 
         s12 = self.z_score_poisson(lambda_in, n_inner)
         s13 = self.z_score_poisson(lambda_out, n_inner)
 
         self.sig_poisson = s12 * self.is_inside + s13 * (~self.is_inside)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        #
