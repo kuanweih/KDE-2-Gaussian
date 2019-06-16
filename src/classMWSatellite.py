@@ -4,12 +4,13 @@ import sqlutilpy
 
 class MWSatellite(object):
     def __init__(self, name_sat: str, ra_sat: float, dec_sat: float,
-                 width: float, database: str, catalog_str: str):
+                 dist: float, width: float, database: str, catalog_str: str):
         """ Milky Way (MW) Satellite object.
 
         : name_sat : name of the satellite, e.g. Fornax
         : ra_sat : RA of the satellite in deg
         : dec_sat : Dec of the satellite in deg
+        : dist : distance of the satellite (pc)
         : width : width of the square area when querying data in deg
         : database : database to be queried
         : catalog_str : a string of catalogs for querying
@@ -17,6 +18,7 @@ class MWSatellite(object):
         self.name_sat = name_sat
         self.ra_sat = ra_sat
         self.dec_sat = dec_sat
+        self.dist = dist
         self.width = width
         self.database = database
         self.catalog_str = catalog_str
