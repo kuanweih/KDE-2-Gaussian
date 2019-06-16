@@ -22,15 +22,16 @@ def visualize_4_panel(path: str, outfile: str, n_error: float, kernel: str,
     """
     sns.set(style="white", color_codes=True, font_scale=1)
     fig, axes = plt.subplots(2, 2, figsize=(10, 10))
-    fig.suptitle("{}  GC={}pc  {}  d={}kpc  w={}deg  s1={}deg  s2={}deg".format(
-                 NAME, GC_SIZE, kernel, DISTANCE / 1e3, WIDTH, SIGMA1, SIGMA2), y=0.93)
+    fig.suptitle("{}  GC={}pc  {}  d={}pc  w={}deg  s1={}deg  s2={}deg".format(
+                 NAME, GC_SIZE, kernel, round(DISTANCE),
+                 WIDTH, SIGMA1, SIGMA2), y=0.93)
     plt.subplots_adjust(wspace=0, hspace=0.1)
 
     x, y = np.load('{}/meshgrids.npy'.format(path))    # coordinates
 
     sigs = [np.load('{}/sig_{}.npy'.format(path, kernel)),
             np.load('{}/sig_{}-pm_error{}.npy'.format(path, kernel, n_error))]
-    
+
     datas = [np.load('{}/queried-data.npy'.format(path)).item(),
              np.load('{}/queried-data-pm_error{}.npy'.format(path,
                                                              n_error)).item()]
