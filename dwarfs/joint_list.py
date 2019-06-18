@@ -57,6 +57,52 @@ if __name__ == '__main__':
     np.savetxt("dwarfs-names.txt", np.sort(dict_joint["GalaxyName"]), fmt="%s")
 
 
+    # TODO debug
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import pandas as pd
+
+    rh_deg_sort = dict_joint["rh(arcmins)"] / 60.
+    rh_deg_sort = rh_deg_sort[np.argsort(dict_joint["GalaxyName"])]
+    dist_sort = dict_joint["Distance_pc"][np.argsort(dict_joint["GalaxyName"])]
+
+    rh_pc = dist_sort * rh_deg_sort * np.pi / 180.
+
+    rh_fornax = rh_pc[np.sort(dict_joint["GalaxyName"])=='Fornax']
+    dist_fornax = dist_sort[np.sort(dict_joint["GalaxyName"])=='Fornax']
+    s2 = 50. * 0.004 * np.pi / 180. * dist_fornax * rh_pc / rh_fornax
+    print(50. * 0.004 * np.pi / 180. * dist_fornax / rh_fornax)
+    print(50. * 10. / rh_fornax)
+
+    sns.set(style="whitegrid")
+    f, ax = plt.subplots(figsize=(10, 15))
+    # sns.set_color_codes("pastel")
+    sns.set_color_codes("muted")
+
+    sns.barplot(x=rh_pc, y=np.sort(dict_joint["GalaxyName"]),
+                label="rh [pc]", color="b", alpha=0.5)
+
+    sns.barplot(x=s2, y=np.sort(dict_joint["GalaxyName"]),
+                label="s2 [pc]", color="r", alpha=0.5)
+
+    sns.barplot(x=[10] * len(s2), y=np.sort(dict_joint["GalaxyName"]),
+                label="10 [pc]", color="g", alpha=0.5)
+
+    ax.legend(ncol=3, loc="lower right", frameon=True)
+    # ax.set(xlim=(0, 24), ylabel="",
+    #    xlabel="Automobile collisions per billion miles")
+    sns.despine(left=True, bottom=True)
+
+    plt.savefig("rh_pc.png", bbox_inches='tight', dpi=100)
+
+
+
+
+
+
+
     """ Expend the joint list by splitting the original map """
     r_200 = calc_r_200()    # R_200 in pc
 
