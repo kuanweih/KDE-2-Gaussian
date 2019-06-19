@@ -1,8 +1,9 @@
 import numpy as np
+from typing import Dict
 
 PATCH_DIST = 0.9
 N_PATCH_MAX = 4
-N_LINE_SPLIT = 250
+N_LINE_SPLIT = 500
 
 
 
@@ -40,6 +41,49 @@ def calc_width(r_200: float, dist: float, factor: int = 1) -> float:
     return  factor * r_200 / dist * 360. / 2. / np.pi
 
 
+def plot_rh_sigma(dict_joint: Dict):
+    """ Plotting half-light radius and different sigmas
+
+    : dict_joint : dictionary of the dwarf list
+    """
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import pandas as pd
+
+    rh_deg = dict_joint["rh(arcmins)"] / 60.
+    s1 = 10. / dict_joint["Distance_pc"] * 180. / np.pi
+    r2 = 2. * s1
+    r3out = 0.5    # sigma 3: 0.5 deg
+    r3in = 0.7 * rh_deg    # need to check the final value of 0.7
+
+    masksort = np.argsort(dict_joint["GalaxyName"])
+
+    sns.set(style="whitegrid", font_scale=1)
+    f, ax = plt.subplots(figsize=(8, 12))
+    sns.set_color_codes("muted")
+
+    sns.barplot(x=rh_deg[masksort],
+                y=np.sort(dict_joint["GalaxyName"]),
+                label="rh", color="b", alpha=0.5)
+    sns.barplot(x=r3in[masksort],
+                y=np.sort(dict_joint["GalaxyName"]),
+                label="r3in", color="r", alpha=0.5)
+    sns.barplot(x=r2[masksort],
+                y=np.sort(dict_joint["GalaxyName"]),
+                label="r2", color="g", alpha=0.5)
+    sns.barplot(x=10. * s1[masksort],
+                y=np.sort(dict_joint["GalaxyName"]),
+                label="10 s1", color="orange", alpha=0.5)
+
+    ax.legend(ncol=2, loc="lower right", frameon=True)
+    ax.set(xlabel="angular size [deg]")
+    sns.despine(left=True, bottom=True)
+
+    plt.savefig("rh_sigma.png", bbox_inches='tight', dpi=200)
+
+
 
 if __name__ == '__main__':
     """ Concatenate the McConnachie list and my list into a joint one """
@@ -55,6 +99,9 @@ if __name__ == '__main__':
 
     np.save("dwarfs-joint", dict_joint)
     np.savetxt("dwarfs-names.txt", np.sort(dict_joint["GalaxyName"]), fmt="%s")
+
+    # plotting half-light radius and simgas
+    plot_rh_sigma(dict_joint)
 
 
     """ Expend the joint list by splitting the original map """

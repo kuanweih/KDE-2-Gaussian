@@ -18,6 +18,7 @@ SIGMA3 = 1.00    # background scale (larger) in deg
 
 GC_SIZE = 10    # size of target globular clusters (pc)
 SIGMA_TH = 1    # sigma threshold to define inside or outside
+R_HALFLIGHT = 0.28    # half light radius in deg
 
 
 """ data base and catalog """
@@ -78,12 +79,12 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
 
     RA = dwarfs_dict["RA_deg"][0]
     DEC = dwarfs_dict["Dec_deg"][0]
-    rh_deg = dwarfs_dict["rh(arcmins)"][0] / 60.
+    R_HALFLIGHT = dwarfs_dict["rh(arcmins)"][0] / 60.
 
     if IS_DWARF_SPLIT_LIST:
         WIDTH = 1
     elif IS_DWARF_LIST:
-        WIDTH = float('%0.4f' %(8. * rh_deg))
+        WIDTH = float('%0.4f' %(8. * R_HALFLIGHT))
     else:
         raise ValueError('Wrong list boolean')
 
@@ -93,10 +94,10 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     SIGMA1 = GC_SIZE / DISTANCE * 180. / np.pi
     SIGMA1 = float('%0.4f' %(SIGMA1))
 
-    SIGMA2 = float('%0.4f' %(0.2 * rh_deg))    # factor 0.1 is made up
+    SIGMA2 = float('%0.4f' %(0.2 * R_HALFLIGHT))    # factor 0.2 is made up
     SIGMA2 *= args.scale_sigma2
 
-    SIGMA3 = 0.5 * WIDTH
+    SIGMA3 = 0.5    # always use 0.5 deg as outer kernel
     PIXEL_SIZE = 0.25 * SIGMA1
 
 

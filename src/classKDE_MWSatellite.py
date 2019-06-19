@@ -12,13 +12,15 @@ class KDE_MWSatellite(MWSatellite):
     def __init__(self, name_sat: str, ra_sat: float, dec_sat: float,
                  dist: float, width: float, database: str, catalog_str: str,
                  pixel_size: float, sigma1: float, sigma2: float,
-                 sigma3: float, sigma_th: int):
+                 sigma3: float, sigma_th: int, rh: float):
         """ Kernel Density Estimation on a MWSatellite object
 
         : pixel_size : size of pixel in deg
         : sigma1 : target kernel size in deg: GCs
         : sigma2 : smaller background kernel size in deg: inside the satellite
         : sigma3 : larger background kernel size in deg: outside the satellite
+        : sigma_th : sigma threshold to define inside or outside
+        : rh : half-light radius of the satellite in deg
         """
         MWSatellite.__init__(self, name_sat, ra_sat, dec_sat,
                              dist, width, database, catalog_str)
@@ -29,6 +31,7 @@ class KDE_MWSatellite(MWSatellite):
         self.sigma2 = sigma2
         self.sigma3 = sigma3
         self.sigma_th = sigma_th
+        self.rh = rh
 
         self.x_mesh = self.grid_coord(self.ra_sat)
         self.y_mesh = self.grid_coord(self.dec_sat)
@@ -280,23 +283,26 @@ class KDE_MWSatellite(MWSatellite):
         """ Compound the Poisson significance map: s12 inside (s23 > sigma_th)
         and s13 outside (s23 < sigma_th) """
         # factors using for outer aperture
-        f_in2out = 2.
-        f_out2out = 50.
+        f_in2out = 2.    # r_i = f_in2out * s1
+        f_out2out = 0.68    # r_o = f_out2out * rh
+        rh_th = 0.1    # threshold of minimum half-light radius in deg
 
         # inner aperture
         n_inner, area_inner = self.poisson_inner_number_count(self.sigma1)
-
-        # outer aperture inside the dwarf
-        r_i = f_in2out * self.sigma1
-        r_o = f_out2out * self.sigma1
-        n_outer, area_outer = self.poisson_outer_expected_background(r_i, r_o)
-        lambda_in = self.get_lambda_poisson(n_outer, area_outer, area_inner)
 
         # outer aperture outside of the dwarf
         r_i = f_in2out * self.sigma1
         r_o = self.sigma3
         n_outer, area_outer = self.poisson_outer_expected_background(r_i, r_o)
         lambda_out = self.get_lambda_poisson(n_outer, area_outer, area_inner)
+
+        # outer aperture inside the dwarf
+        if self.rh < rh_th:
+            lambda_in = lambda_out
+        else:
+            r_o = f_out2out * float(self.rh)
+            n_outer, area_outer = self.poisson_outer_expected_background(r_i, r_o)
+            lambda_in = self.get_lambda_poisson(n_outer, area_outer, area_inner)
 
         s12 = self.z_score_poisson(lambda_in, n_inner)
         s13 = self.z_score_poisson(lambda_out, n_inner)
