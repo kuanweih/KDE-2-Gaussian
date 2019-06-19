@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # create a KDE_MWSatellite object
     Satellite = KDE_MWSatellite(NAME, RA, DEC, DISTANCE, WIDTH, DATABASE,
                                 CATALOG_STR, PIXEL_SIZE, SIGMA1, SIGMA2,
-                                SIGMA3, SIGMA_TH)
+                                SIGMA3, SIGMA_TH, R_HALFLIGHT)
     f.write(Satellite.__str__())
 
     # query data

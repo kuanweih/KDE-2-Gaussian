@@ -17,10 +17,10 @@ Before starting density estimation, one should set up `param/param.py` and `para
     - `IS_DWARF_LIST = False`    # use joint list
     - `IS_DWARF_SPLIT_LIST = True`    # use joint-split list
 4. Calculate density estimation:
-    - `python  main.py`<br>
+    - `python  -W  ignore  main.py`<br>
     (if using manual mode)
-    - `python  main.py  --name_dwarf  "Fornax"  --gc_size_pc  10`<br>
+    - `python  -W  ignore  main.py  --name_dwarf  "Fornax"  --gc_size_pc  10`<br>
     (if using the joint or joint-split dwarf list: names can be find in the txt files in `dwarfs/`)
 5. If running on a cluster, a slurm job script is provided:
     - `sbatch  bashtools/slurm-slurm.sh`
-6. Summarize searching result with `python summary.py`
+6. Summarize searching result with `python  -W  ignore  summary.py`
