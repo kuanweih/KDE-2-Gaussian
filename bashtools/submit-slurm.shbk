@@ -1,4 +1,10 @@
 #!/bin/bash
+#SBATCH --export=NONE
+#SBATCH --partition=long
+#SBATCH --constraint=intel_e5_v4
+#SBATCH --ntasks-per-node=20
+#SBATCH --time=72:00:00
+#SBATCH --job-name=dwarf-1
 
 
 # use py3 on coma (don't need this if already using py3)
@@ -6,7 +12,7 @@ source  activate  mypython3
 
 
 # pre-processing dwarf list
-cd  ../dwarfs/more
+cd  dwarfs/more
 python  more_dwarfs.py
 cd  ../McConnachie
 python  convert_McConnachie.py
@@ -16,20 +22,20 @@ cd ..
 
 
 # main search
-# gc_size_pcs="10"
-gc_size_pcs="5  10"
+gc_size_pcs="10"
+# gc_size_pcs="5  10"
 
 # input="dwarfs/dwarfs-names.txt"
-input="dwarfs/dwarfs-names-split.txt"
-
+# input="dwarfs/dwarfs-names-split.txt"
+input="dwarfs/dwarfs-names-split-1.txt"
 
 while IFS= read -r name_dwarf;  do
   for gc_size in $gc_size_pcs;  do
-    sbatch  bashtools/submit-slurm-single.sh  $name_dwarf  $gc_size
+    python  -W  ignore  main.py  --name_dwarf  $name_dwarf  --gc_size_pc  $gc_size
   done  # for
 done < "$input"  # while
 
 
 
 # summary and images
-# python  -W  ignore  summary.py
+# python  -W  ignore  summary.py 
