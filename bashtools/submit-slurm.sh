@@ -25,7 +25,7 @@ input="dwarfs/dwarfs-names-split.txt"
 
 while IFS= read -r name_dwarf;  do
   for gc_size in $gc_size_pcs;  do
-    sbatch  submit-slurm-single.sh  $name_dwarf  $gc_size
+    sbatch  bashtools/submit-slurm-single.sh  $name_dwarf  $gc_size
   done  # for
 done < "$input"  # while
 
