@@ -1,6 +1,8 @@
 import numpy as np
 import sqlutilpy
 
+from src.tools import dist2d
+
 
 
 class PatchMWSatellite(object):
@@ -85,3 +87,15 @@ class PatchMWSatellite(object):
         mask = maskleft | maskright
         self.cut_datas(mask)
         print("    %d sources left \n"  %self.n_source())
+
+    def append_is_inside(self, ra_df: float, dec_df: float, radius: float):
+        """ Assign a boolean value to specify if a source is in the area
+        within the radius from the dwarf.
+
+        : ra_df : ra of the dwarf
+        : dec_df : dec of the dwarf
+        : radius : the radius telling inside or outside
+        """
+        _dist2d = dist2d(self.datas['ra'], self.datas['dec'], ra_df, dec_df)
+        self.datas['is_inside'] = np.array(_dist2d < radius ** 2)
+        print('Appended a boolean array telling is_inside. \n')
