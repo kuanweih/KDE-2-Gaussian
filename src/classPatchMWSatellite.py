@@ -34,8 +34,7 @@ class PatchMWSatellite(object):
         str3 = "    ra = {}\n    dec = {}\n".format(self.ra_sat, self.dec_sat)
         str4 = "    map width = {} deg\n".format(self.width)
         str5 = "    database = {}\n".format(self.database)
-        str = "{}{}{}{}{}".format(str1, str2, str3, str4, str5)
-        return str
+        return  "{}{}{}{}{}".format(str1, str2, str3, str4, str5)
 
     def n_source(self) -> int:
         """ Calculate the number of stars in the patch """
@@ -99,3 +98,23 @@ class PatchMWSatellite(object):
         _dist2d = dist2d(self.datas['ra'], self.datas['dec'], ra_df, dec_df)
         self.datas['is_inside'] = np.array(_dist2d < radius ** 2)
         print('Appended a boolean array telling is_inside. \n')
+
+    def append_sig_to_data(self, x_mesh, y_mesh, sig_gaussian, sig_poisson):
+        """ Append significance of each star to the datas """
+        pixel_size_x = np.max(np.diff(x_mesh))
+        pixel_size_y = np.max(np.diff(y_mesh))
+        id_xs = (self.datas["ra"] - x_mesh[0]) / pixel_size_x
+        id_ys = (self.datas["dec"] - y_mesh[0]) / pixel_size_y
+
+        # is_insides = []
+        sig_gaussian_stars = []
+        sig_poisson_stars = []
+        for i in range(self.n_source()):
+            id_x, id_y = int(id_xs[i]), int(id_ys[i])
+            # is_insides.append(self.is_inside[id_y][id_x])
+            sig_gaussian_stars.append(sig_gaussian[id_y][id_x])
+            sig_poisson_stars.append(sig_poisson[id_y][id_x])
+
+        # self.datas["is_inside"] = np.array(is_insides)
+        self.datas["sig_gaussian"] = np.array(sig_gaussian_stars)
+        self.datas["sig_poisson"] = np.array(sig_poisson_stars)
