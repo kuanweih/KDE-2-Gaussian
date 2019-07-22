@@ -1,7 +1,7 @@
 import numpy as np
 import sqlutilpy
 
-from src.tools import dist2d
+from src.tools import dist2
 
 
 
@@ -95,8 +95,8 @@ class PatchMWSatellite(object):
         : dec_df : dec of the dwarf
         : radius : the radius telling inside or outside
         """
-        _dist2d = dist2d(self.datas['ra'], self.datas['dec'], ra_df, dec_df)
-        self.datas['is_inside'] = np.array(_dist2d < radius ** 2)
+        _dist2 = dist2(self.datas['ra'], self.datas['dec'], ra_df, dec_df)
+        self.datas['is_inside'] = np.array(_dist2 < radius ** 2)
         print('Appended a boolean array telling is_inside. \n')
 
     def append_sig_to_data(self, x_mesh, y_mesh, sig_gaussian, sig_poisson):

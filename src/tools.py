@@ -7,7 +7,7 @@ from typing import List
 
 
 
-def dist2d(x: np.ndarray, y: np.ndarray, x0: float, y0: float) -> np.ndarray:
+def dist2(x: np.ndarray, y: np.ndarray, x0: float, y0: float) -> np.ndarray:
     """ Calculate the square of distance between a numpy array and (x0, y0).
 
     : x : x coordinates
@@ -20,7 +20,6 @@ def dist2d(x: np.ndarray, y: np.ndarray, x0: float, y0: float) -> np.ndarray:
     dx = x - x0
     dy = y - y0
     return  dx ** 2 + dy ** 2
-
 
 
 def create_dir(dir_name: str):
