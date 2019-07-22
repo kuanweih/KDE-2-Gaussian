@@ -7,6 +7,7 @@ from scipy.special import erfcinv
 from scipy.stats import poisson
 from typing import Tuple
 from scipy.signal import fftconvolve, gaussian
+from src.tools import dist2
 
 
 
@@ -56,21 +57,29 @@ class KDE_MWSatellite(object):
         _max = center + 0.5 * self.width
         return  np.linspace(_min, _max, num=self.num_grid, endpoint=True)
 
-    def np_hist2d(self, ra: np.ndarray, dec: np.ndarray, is_inside: np.ndarray):
+    def np_hist2d(self, ra: np.ndarray, dec: np.ndarray):
         """ Get histogram 2d for the star distribution on the mesh
 
         : ra : PatchMWSatellite.datas['ra']
         : dec : PatchMWSatellite.datas['dec']
-        : is_inside: PatchMWSatellite.datas['is_inside']
         """
-        hist2d, _, _ = np.histogram2d(dec, ra, bins=(self.y_mesh, self.x_mesh))
-        self.hist2d = hist2d
+        self.hist2d, _, _ = np.histogram2d(dec, ra, bins=(self.y_mesh, self.x_mesh))
         print('Added hist2d according to the sources on the patch.')
 
-        mask2d, _, _ = np.histogram2d(dec, ra, weights=is_inside,
-                                      bins=(self.y_mesh, self.x_mesh))
-        self.is_inside = mask2d > 0    # mask2d of is_inside on the map
-        print('Added is_inside according to the sources on the patch. \n')
+    def is_inside_2d(self, ra_df: float, dec_df: float, radius: float):
+        """ Get histogram 2d for the star distribution on the mesh
+
+        : ra_df : ra of the dwarf
+        : dec_df : dec of the dwarf
+        : radius : the radius telling inside or outside
+        """
+        x2d, y2d = np.meshgrid(self.x_mesh, self.y_mesh)
+        # reshape the array to be like hist2d
+        x2d = 0.5 * (x2d[1:, 1:] + x2d[:-1, :-1])
+        y2d = 0.5 * (y2d[1:, 1:] + y2d[:-1, :-1])
+        _dist2 = dist2(x2d, y2d, ra_df, dec_df)
+        self.is_inside2d = np.array(_dist2 < radius ** 2)
+        print('Added a 2D boolean array telling is_inside. \n')
 
     def fftconvolve_boundary_adjust(self, kernel: np.ndarray) -> np.ndarray:
         """ Use scipy signal fftconvolve to calculate the convolved map.
@@ -111,9 +120,8 @@ class KDE_MWSatellite(object):
         """
         s1 = sigma1 / self.pixel_size
         sig = (od_1 - od_2) * np.sqrt(4. * np.pi * s1**2)
-        sig = np.divide(sig, np.sqrt(od_2),
-                        out=np.zeros_like(sig), where=od_2!=0)  # force 0/0 = 0
-        return  sig
+        return  np.divide(sig, np.sqrt(od_2),
+                    out=np.zeros_like(sig), where=od_2!=0)  # force 0/0 = 0
 
     def compound_sig_gaussian(self):
         """ Compound the Gaussian significance map: s12 inside (s23 > sigma_th)
@@ -126,7 +134,7 @@ class KDE_MWSatellite(object):
         s12 = self.get_sig_gaussian(od_1, od_2, self.sigma1, self.sigma2)
         s13 = self.get_sig_gaussian(od_1, od_3, self.sigma1, self.sigma3)
 
-        self.sig_gaussian = s12 * self.is_inside + s13 * (~self.is_inside)
+        self.sig_gaussian = s12 * self.is_inside2d + s13 * (~self.is_inside2d)
         print("Took %0.4fs to calculate Gaussian sig." % (time.time() - t0))
         print('Added sig_gaussian to the KDE_MWSatellite object. \n')
 
@@ -234,6 +242,6 @@ class KDE_MWSatellite(object):
         s12 = self.z_score_poisson(lambda_in, n_inner)
         s13 = self.z_score_poisson(lambda_out, n_inner)
 
-        self.sig_poisson = s12 * self.is_inside + s13 * (~self.is_inside)
+        self.sig_poisson = s12 * self.is_inside2d + s13 * (~self.is_inside2d)
         print("Took %0.4fs to calculate Poisson sig." % (time.time() - t0))
         print('Added sig_poisson to the KDE_MWSatellite object. \n')
