@@ -17,8 +17,7 @@ def summarize_peaks_star_csv(path: str, outfile: str, n_error: float,
     : s_above : significance threshold, default value = 5
     """
     datas = [np.load('{}/queried-data.npy'.format(path)).item(),
-             np.load('{}/queried-data-pm_error{}.npy'.format(path,
-                                                             n_error)).item()]
+             np.load('{}/queried-data-pm{}std.npy'.format(path, n_error)).item()]
 
     ras = [data["ra"] for data in datas]
     decs = [data["dec"] for data in datas]
@@ -72,7 +71,7 @@ def summarize_peaks_pixel_csv(path: str, outfile: str, n_error: float,
     """
     x, y = np.load('{}/meshgrids.npy'.format(path))
     sigs = [np.load('{}/sig_{}.npy'.format(path, kernel)),
-            np.load('{}/sig_{}-pm_error{}.npy'.format(path, kernel, n_error))]
+            np.load('{}/sig_{}-pm{}std.npy'.format(path, kernel, n_error))]
 
     masks = [sig > s_above for sig in sigs]
 

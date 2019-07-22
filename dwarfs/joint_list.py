@@ -1,10 +1,9 @@
 import numpy as np
 from typing import Dict
 
+
 PATCH_DIST = 0.9
 N_PATCH_MAX = 4
-N_LINE_SPLIT = 500
-
 
 
 def get_dic_list(path: str, quantitys: str):
@@ -110,6 +109,7 @@ if __name__ == '__main__':
     name_split = []
     ra_split, dec_split = [], []
     dist_split, rh_split = [], []
+    ra_dwarf, dec_dwarf = [], []
 
     n_dwarf = len(dict_joint['GalaxyName'])
     for k in range(n_dwarf):
@@ -135,8 +135,15 @@ if __name__ == '__main__':
                     dec_split.append(yj)
                     dist_split.append(dist)
                     rh_split.append(rh)
+                    ra_dwarf.append(ra)
+                    dec_dwarf.append(dec)
 
-    list_split = [name_split, ra_split, dec_split, dist_split, rh_split]
+    list_split = [name_split, ra_split, dec_split, dist_split, rh_split,
+                  ra_dwarf, dec_dwarf]
+
+    quantitys.append("RA_dwarf_deg")
+    quantitys.append("Dec_dwarf_deg")
+
     dict_joint = {q: np.array(list_split[i]) for i, q in enumerate(quantitys)}
 
     sorted_name = np.sort(dict_joint["GalaxyName"])
@@ -144,11 +151,12 @@ if __name__ == '__main__':
     np.save("dwarfs-joint-split", dict_joint)
     np.savetxt("dwarfs-names-split.txt", sorted_name, fmt="%s")
 
-    n_patch = len(sorted_name)
-    n_split_txt = int(np.ceil(n_patch / N_LINE_SPLIT))
 
-    for i in range(n_split_txt):
-        id_i = i * N_LINE_SPLIT
-        id_f = (i + 1) * N_LINE_SPLIT
-        np.savetxt("dwarfs-names-split-%d.txt" %(i + 1),
-                   sorted_name[id_i:id_f], fmt="%s")
+    # n_patch = len(sorted_name)
+    # n_split_txt = int(np.ceil(n_patch / N_LINE_SPLIT))
+    #
+    # for i in range(n_split_txt):
+    #     id_i = i * N_LINE_SPLIT
+    #     id_f = (i + 1) * N_LINE_SPLIT
+    #     np.savetxt("dwarfs-names-split-%d.txt" %(i + 1),
+    #                sorted_name[id_i:id_f], fmt="%s")
