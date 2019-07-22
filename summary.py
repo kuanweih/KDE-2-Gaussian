@@ -62,12 +62,12 @@ if __name__ == '__main__':
 
         try:
             n_star = len(np.load("{}/queried-data.npy".format(path)).item()['ra'])
-            n_star_pm = len(np.load("{}/queried-data-pm_error5.npy".format(path)).item()['ra'])
+            n_star_pm = len(np.load("{}/queried-data-pm5std.npy".format(path)).item()['ra'])
 
             sig_g = np.load("{}/sig_gaussian.npy".format(path))
-            sig_g_pm = np.load("{}/sig_gaussian-pm_error5.npy".format(path))
+            sig_g_pm = np.load("{}/sig_gaussian-pm5std.npy".format(path))
             sig_p = np.load("{}/sig_poisson.npy".format(path))
-            sig_p_pm = np.load("{}/sig_poisson-pm_error5.npy".format(path))
+            sig_p_pm = np.load("{}/sig_poisson-pm5std.npy".format(path))
         except:
             print('skipping Error csv: %s' %name)
             continue
