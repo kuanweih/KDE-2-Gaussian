@@ -123,5 +123,5 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
 
     # axes = plt.subplot(projection=geometry.wcs)
 
-    plt.savefig("{}/{}-tg{}-ra%0.4f-dec%0.4f.jpg".format(
+    plt.savefig("{}/{}-target{}-ra%0.4f-dec%0.4f.jpg".format(
         outpath, name, label) % (ra, dec), bbox_inches='tight', dpi=300)
