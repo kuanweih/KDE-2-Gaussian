@@ -6,10 +6,13 @@ IS_DWARF_SPLIT_LIST = True    # use joint-split list
 
 """ default (manual) target parameters """
 NAME = 'Fornax'    # name of the dwarf
-RA = 39.997      # ra of target (in deg)
-DEC = -34.551    # dec of target (in deg)
+RA = 39.997      # ra of the center of a patch (in deg)
+DEC = -34.551    # dec of the center of a patch (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
 DISTANCE = 140000.    # distance in pc
+
+RA_DWARF = RA      # ra of the dwarf (in deg)
+DEC_DWARF = DEC    # dec of the dwarf (in deg)
 
 PIXEL_SIZE = 0.001    # 1d pixel size in deg
 SIGMA1 = 0.004    # searching scale in deg
@@ -17,16 +20,13 @@ SIGMA2 = 0.02    # background scale (smaller) in deg
 SIGMA3 = 1.00    # background scale (larger) in deg
 
 GC_SIZE = 10    # size of target globular clusters (pc)
-SIGMA_TH = 1    # sigma threshold to define inside or outside
 R_HALFLIGHT = 0.28    # half light radius in deg
 
 
 """ data base and catalog """
 DATABASE = 'gaia_dr2.gaia_source'
-CATALOG_STR = """
-              ra, dec, parallax, pmra, pmdec, pmra_error, pmdec_error,
-              phot_g_mean_mag, astrometric_excess_noise
-              """
+CATALOG_STR = """ ra, dec, parallax, pmra, pmdec, phot_g_mean_mag,
+                  astrometric_excess_noise """
 
 
 """ g-band cut """
@@ -77,9 +77,9 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     if dwarfs_dict["GalaxyName"][0] != NAME:
         raise ValueError("Cannot find %s in GalaxyName" %NAME)
 
-    RA = dwarfs_dict["RA_deg"][0]
-    DEC = dwarfs_dict["Dec_deg"][0]
-    R_HALFLIGHT = dwarfs_dict["rh(arcmins)"][0] / 60.
+    RA = dwarfs_dict["RA_deg"][0]    # RA of the center of a patch
+    DEC = dwarfs_dict["Dec_deg"][0]    # Dec of the center of a patch
+    R_HALFLIGHT = dwarfs_dict["rh(arcmins)"][0] / 60.    # rh in deg
 
     if IS_DWARF_SPLIT_LIST:
         WIDTH = 1

@@ -1,6 +1,6 @@
 import numpy as np
-import time
-from src.classMWSatellite import *
+
+from src.classPatchMWSatellite import *
 from src.classKDE_MWSatellite import *
 from param.param import *
 from param.kw_wsdb import *
@@ -8,20 +8,30 @@ from src.plotting import *
 from src.peaks import *
 from src.tools import *
 
+np.seterr(divide='ignore', invalid='ignore')
+
+
+
+def print_sep_line():
+    print('------------------------------------------------------------ \n')
 
 
 def get_dir_name() -> str:
     """ Get the name of results directory """
     dir_name = "results/{}-G{}-{}".format(NAME, G_MAG_MIN, G_MAG_MAX)
     dir_name = "{}-w{}-lp{}".format(dir_name, WIDTH, PIXEL_SIZE)
-    dir_name = "{}-gc{}s{}s{}s{}sth{}".format(dir_name, GC_SIZE,
-                                              SIGMA1, SIGMA2, SIGMA3, SIGMA_TH)
+    dir_name = "{}-gc{}s{}s{}s{}".format(dir_name, GC_SIZE, SIGMA1, SIGMA2, SIGMA3)
     return  dir_name
 
 
-def n_source(Satellite: KDE_MWSatellite) -> int:
-    """ Calculter number of stars in queried dictionary """
-    return  len(Satellite.datas[Satellite.catalog_list[0]])
+def query_patch_gmag_cut_astro_noise_cut(patch: PatchMWSatellite):
+    """ Query data and then apply G band cut and astro noise cut.
+    This function just calls a few methods from PatchMWSatellite
+    to modify Patch object.
+    """
+    patch.sql_get(HOST, USER, PASSWORD)    # query data
+    patch.mask_cut("phot_g_mean_mag", G_MAG_MIN, G_MAG_MAX)    # G band cut
+    patch.mask_g_mag_astro_noise_cut()    # astrometric_excess_noise cut
 
 
 
@@ -30,84 +40,109 @@ if __name__ == '__main__':
     dir_name = get_dir_name()
     create_dir(dir_name)
 
-    f= open("{}/stdout.txt".format(dir_name), "w+")    # dumping log information
 
-    # create a KDE_MWSatellite object
-    Satellite = KDE_MWSatellite(NAME, RA, DEC, DISTANCE, WIDTH, DATABASE,
-                                CATALOG_STR, PIXEL_SIZE, SIGMA1, SIGMA2,
-                                SIGMA3, SIGMA_TH, R_HALFLIGHT)
-    f.write(Satellite.__str__())
+    print('Creating a Dwarf object within rh to evaluate its proper motion: \n')
+    Dwarf = PatchMWSatellite(NAME, RA_DWARF, DEC_DWARF,
+                             DISTANCE, R_HALFLIGHT, DATABASE, CATALOG_STR)
+    print(Dwarf.__str__())
 
-    # query data
-    Satellite.sql_get(HOST, USER, PASSWORD)
-    f.write("\n\nUsing sqlutilpy.get() to query data...\n")
-    f.write("{} sources are queried \n\n".format(n_source(Satellite)))
+    query_patch_gmag_cut_astro_noise_cut(Dwarf)
 
-    # G band cut
-    Satellite.mask_cut("phot_g_mean_mag", G_MAG_MIN, G_MAG_MAX)
-    f.write("--> Cut: {} < {} < {}\n".format(G_MAG_MIN,
-                                             "phot_g_mean_mag", G_MAG_MAX))
-    f.write("--> {} sources left \n\n".format(n_source(Satellite)))
+    pmra_mean = np.nanmean(Dwarf.datas['pmra'])
+    pmra_std = np.nanstd(Dwarf.datas['pmra'])
+    pmdec_mean = np.nanmean(Dwarf.datas['pmdec'])
+    pmdec_std = np.nanstd(Dwarf.datas['pmdec'])
+    n_source_rh = Dwarf.n_source()    # number of stars are withing rh
 
-    # astrometric_excess_noise cut
-    Satellite.mask_g_mag_astro_noise_cut()
-    f.write("--> Cut: astrometric_excess_noise and phot_g_mean_mag\n")
-    f.write("--> {} sources left \n\n".format(n_source(Satellite)))
+    print('The proper motions of the dwarf are:')
+    print('    pmra: mean = %0.4f, std = %0.4f' %(pmra_mean, pmra_std))
+    print('    pmdec: mean = %0.4f, std = %0.4f \n' %(pmdec_mean, pmdec_std))
 
-    # get significance of gaussian
-    t0 = time.time()
-    Satellite.compound_sig_gaussian()
-    f.write("took %s sec to calculate Gaussian sig\n\n" % (time.time() - t0))
+    del Dwarf    # free the memory though it might not be necessary
+    print('Removed the Dwarf object since it is no longer needed. \n')
 
-    # get significance of gaussian
-    t0 = time.time()
-    Satellite.compound_sig_poisson()
-    f.write("took %s sec to calculate Poisson sig\n\n" % (time.time() - t0))
 
-    # append 'significance' and 'is_inside' to datas
-    Satellite.append_sig_to_data()
+    print_sep_line()
 
-    # save queried data, significance, mesh coordinates
-    np.save("{}/{}".format(dir_name, FILE_STAR), Satellite.datas)
-    np.save("{}/{}".format(dir_name, FILE_SIG_GAUSSIAN), Satellite.sig_gaussian)
-    np.save("{}/{}".format(dir_name, FILE_SIG_POISSON), Satellite.sig_poisson)
-    np.save("{}/{}".format(dir_name, FILE_MESH), np.array([Satellite.x_mesh,
-                                                           Satellite.y_mesh]))
-    f.write("saved output npy files\n\n")
 
-    # pm selection
-    Satellite.get_pm_mean_std_inside()
-    f.write("Starting source selection based on proper motion\n\n")
+    print('Creating a Patch object for main KDE calcuation: \n')
+    Patch = PatchMWSatellite(NAME, RA, DEC, DISTANCE, WIDTH, DATABASE, CATALOG_STR)
+    print(Patch.__str__())
+
+    query_patch_gmag_cut_astro_noise_cut(Patch)
+
+    Patch.append_is_inside(RA_DWARF, DEC_DWARF, R_HALFLIGHT)    # TODO add a factor here
+
+
+    print_sep_line()
+
+
+    print('Creating a KDEPatch object and start the KDE calcuation: \n')
+    KDEPatch = KDE_MWSatellite(RA, DEC, WIDTH, PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3)
+    print(KDEPatch.__str__())
+
+    KDEPatch.np_hist2d(Patch.datas['ra'], Patch.datas['dec'])
+    KDEPatch.is_inside_2d(RA_DWARF, DEC_DWARF, R_HALFLIGHT)    # TODO add a factor here
+
+    KDEPatch.compound_sig_gaussian()
+    KDEPatch.compound_sig_poisson(R_HALFLIGHT)
+
+    Patch.append_sig_to_data(KDEPatch.x_mesh, KDEPatch.y_mesh,
+                             KDEPatch.sig_gaussian, KDEPatch.sig_poisson)
+
+    print('Saving datas, sigs, meshgrids ...')
+    np.save('{}/{}'.format(dir_name, FILE_STAR), Patch.datas)
+    np.save("{}/{}".format(dir_name, FILE_SIG_GAUSSIAN), KDEPatch.sig_gaussian)
+    np.save("{}/{}".format(dir_name, FILE_SIG_POISSON), KDEPatch.sig_poisson)
+    np.save("{}/{}".format(dir_name, FILE_MESH), np.array([KDEPatch.x_mesh,
+                                                           KDEPatch.y_mesh]))
+    print('Done =) \n')
+
+
+    print_sep_line()
 
 
     if IS_PM_ERROR_CUT:
-        np.seterr(divide='ignore', invalid='ignore')
+        print('Selecting proper motion within %d sigma: \n' % N_ERRORBAR)
+        pmramax = pmra_mean + N_ERRORBAR * pmra_std
+        pmramin = pmra_mean - N_ERRORBAR * pmra_std
+        pmdecmax = pmdec_mean + N_ERRORBAR * pmdec_std
+        pmdecmin = pmdec_mean - N_ERRORBAR * pmdec_std
 
-        Satellite.mask_pm_error_cut(N_ERRORBAR)
-        f.write("--> Cut: pm_mean within pm +- {} * pm_error\n".format(
-                N_ERRORBAR))
-        f.write("--> {} sources left \n\n".format(n_source(Satellite)))
+        # proper motion selection
+        Patch.mask_cut("pmra", pmramin, pmramax)
+        Patch.mask_cut("pmdec", pmdecmin, pmdecmax)
 
-        f.write("calculating significance pm_mean within pm +- pm_error\n")
+        print('Creating a KDEPatch object and start the KDE calcuation: \n')
+        KDEPatch = KDE_MWSatellite(RA, DEC, WIDTH, PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3)
+        print(KDEPatch.__str__())
 
-        # get significance of gaussian
-        t0 = time.time()
-        Satellite.compound_sig_gaussian()
-        f.write("took %s sec to calculate Gaussian sig\n\n" %(time.time() - t0))
+        KDEPatch.np_hist2d(Patch.datas['ra'], Patch.datas['dec'])
+        KDEPatch.is_inside_2d(RA_DWARF, DEC_DWARF, R_HALFLIGHT)    # TODO add a factor here
 
-        # get significance of gaussian
-        t0 = time.time()
-        Satellite.compound_sig_poisson()
-        f.write("took %s sec to calculate Poisson sig\n\n" % (time.time() - t0))
+        KDEPatch.compound_sig_gaussian()
+        KDEPatch.compound_sig_poisson(R_HALFLIGHT)
 
-        np.save("{}/{}-pm_error{}".format(dir_name, FILE_STAR,
-                                          N_ERRORBAR), Satellite.datas)
-        np.save("{}/{}-pm_error{}".format(dir_name, FILE_SIG_GAUSSIAN,
-                                          N_ERRORBAR), Satellite.sig_gaussian)
-        np.save("{}/{}-pm_error{}".format(dir_name, FILE_SIG_POISSON,
-                                          N_ERRORBAR), Satellite.sig_poisson)
-        f.write("saved output npy files\n\n")
+        Patch.append_sig_to_data(KDEPatch.x_mesh, KDEPatch.y_mesh,
+                                 KDEPatch.sig_gaussian, KDEPatch.sig_poisson)
 
+        print('Saving datas, sigs, meshgrids ...')
+        np.save('{}/{}-pm{}std'.format(dir_name, FILE_STAR, N_ERRORBAR), Patch.datas)
+        np.save("{}/{}-pm{}std".format(dir_name,
+                FILE_SIG_GAUSSIAN, N_ERRORBAR), KDEPatch.sig_gaussian)
+        np.save("{}/{}-pm{}std".format(dir_name,
+                FILE_SIG_POISSON, N_ERRORBAR), KDEPatch.sig_poisson)
+        np.save("{}/{}-pm{}std".format(dir_name, FILE_MESH,
+                N_ERRORBAR), np.array([KDEPatch.x_mesh, KDEPatch.y_mesh]))
+        print('Done =) \n')
+
+    print('Finished KDE calculation. \n')
+
+
+    print_sep_line()
+
+
+    print('Generating plots and tables ... \n')
 
     # visualize searching results
     fig_name = dir_name.replace("results/", "")
@@ -145,5 +180,5 @@ if __name__ == '__main__':
     summarize_peaks_pixel_csv(dir_name, "{}/{}".format(pixel_dir, fig_name),
                               N_ERRORBAR, "poisson", RA, DEC, WIDTH)
 
-    f.write("we are finished :) \n\n")
-    f.close()
+    print("Done. \n")
+    print("We are finished :) \n")

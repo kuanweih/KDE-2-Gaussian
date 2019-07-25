@@ -59,7 +59,7 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
     if 'pm' in name:
         short_name = '{}-{}'.format(name_split[0], name_split[-1])
         data = np.load('results/{}'.format(name.replace(
-                       '-poisson-pm', '/queried-data-pm_error5.npy'))).item()
+                       '-poisson-pm', '/queried-data-pm5std.npy'))).item()
     else:
         short_name = '{}-all'.format(name_split[0])
         data = np.load('results/{}'.format(name.replace(
@@ -123,5 +123,5 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
 
     # axes = plt.subplot(projection=geometry.wcs)
 
-    plt.savefig("{}/{}-target{}.jpg".format(outpath, name, label),
-                bbox_inches='tight', dpi=300)
+    plt.savefig("{}/{}-target{}-ra%0.4f-dec%0.4f.jpg".format(
+        outpath, name, label) % (ra, dec), bbox_inches='tight', dpi=300)
