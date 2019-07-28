@@ -41,7 +41,8 @@ if __name__ == '__main__':
     create_dir(dir_name)
 
 
-    print('Creating a Dwarf object within rh to evaluate its proper motion: \n')
+    print('Creating a Dwarf object within rh = %0.4f deg for proper motion selection: \n'
+          % R_HALFLIGHT)    # hard coding of the size for pm selection.
     Dwarf = PatchMWSatellite(NAME, RA_DWARF, DEC_DWARF,
                              DISTANCE, R_HALFLIGHT, DATABASE, CATALOG_STR)
     print(Dwarf.__str__())
