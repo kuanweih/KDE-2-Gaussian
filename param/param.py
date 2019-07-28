@@ -79,6 +79,8 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
 
     RA = dwarfs_dict["RA_deg"][0]    # RA of the center of a patch
     DEC = dwarfs_dict["Dec_deg"][0]    # Dec of the center of a patch
+    RA_DWARF = dwarfs_dict["RA_dwarf_deg"][0]      # ra of the dwarf (in deg)
+    DEC_DWARF = dwarfs_dict["Dec_dwarf_deg"][0]    # dec of the dwarf (in deg)
     R_HALFLIGHT = dwarfs_dict["rh(arcmins)"][0] / 60.    # rh in deg
 
     if IS_DWARF_SPLIT_LIST:
