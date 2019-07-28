@@ -28,8 +28,3 @@ while IFS= read -r name_dwarf;  do
     sbatch  bashtools/submit-slurm-single.sh  $name_dwarf  $gc_size
   done  # for
 done < "$input"  # while
-
-
-
-# summary and images
-# python  -W  ignore  summary.py
