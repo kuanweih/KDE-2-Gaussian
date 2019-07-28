@@ -21,6 +21,7 @@ Before starting density estimation, one should set up `param/param.py` and `para
     (if using manual mode)
     - `python  -W  ignore  main.py  --name_dwarf  "Fornax"  --gc_size_pc  10`<br>
     (if using the joint or joint-split dwarf list: names can be find in the txt files in `dwarfs/`)
-5. If running on a cluster, a slurm job script is provided:
+5. Summarize searching result with `python  -W  ignore  summary.py`
+6. If running step 4 and 5 on a cluster, slurm job scripts are provided:
     - `bash  bashtools/slurm-slurm.sh`
-6. Summarize searching result with `python  -W  ignore  summary.py`
+    - `bash  bashtools/slurm-summary.sh`    # make sure all the KDE searches are done and then run this command
