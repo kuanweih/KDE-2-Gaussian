@@ -26,6 +26,9 @@ hips_surveys = ['CDS/P/DES-DR1/g',
 res_image = 1000
 width_fac = 10.    # width of image = width_fac * sigma1
 
+num_workers = multiprocessing.cpu_count()
+num_workers = int(0.5 * num_workers)
+
 
 def mask_pixel_star_th(df: pd.DataFrame, pixel_th: int, n_star_th:int) -> np.ndarray:
     mask = df["sig_p_peak"] > pixel_th
@@ -158,9 +161,9 @@ if __name__ == '__main__':
     iterable = np.arange(num_target)
     print('\nThere are %d candidates\n' %num_target)
 
-    pool = multiprocessing.Pool()
-    func = partial(multiprocessing_plot_hips_sky_image, name_df, label_df, hips_surveys, ra_df,
-                                            dec_df, width_df, path, res_image)
+    pool = multiprocessing.Pool(num_workers)
+    func = partial(multiprocessing_plot_hips_sky_image, name_df, label_df,
+                   hips_surveys, ra_df, dec_df, width_df, path, res_image)
     pool.map(func, iterable)
     pool.close()
     pool.join()
