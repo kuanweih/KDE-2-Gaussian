@@ -1,7 +1,24 @@
 """ Parameter file for KDE detector """
 
+
+""" which dwarf list to be used, if none, then use the default manual one """
 IS_DWARF_LIST = False    # use joint list
 IS_DWARF_SPLIT_LIST = True    # use joint-split list
+
+
+""" data base and catalog """
+DATABASE = 'gaia_dr2.gaia_source'
+# DATABASE = 'panstarrs_dr1.stackobjectthin'
+
+if DATABASE == 'gaia_dr2.gaia_source':
+    DATABASE_SHORT = 'gaia'
+    CATALOG_STR = """ ra, dec, parallax, pmra, pmdec,
+                      phot_g_mean_mag, astrometric_excess_noise """
+elif DATABASE == 'panstarrs_dr1.stackobjectthin':
+    DATABASE_SHORT = 'panstarrs'
+    CATALOG_STR = 'ra, dec'
+else:
+    raise ValueError('Wrong database name: %s is not valid.' % DATABASE)
 
 
 """ default (manual) target parameters """
@@ -23,21 +40,22 @@ GC_SIZE = 10    # size of target globular clusters (pc)
 R_HALFLIGHT = 0.28    # half light radius in deg
 
 
-""" data base and catalog """
-DATABASE = 'gaia_dr2.gaia_source'
-CATALOG_STR = """ ra, dec, parallax, pmra, pmdec, phot_g_mean_mag,
-                  astrometric_excess_noise """
+""" gaia cuts """
+if DATABASE == 'gaia_dr2.gaia_source':
+    # g-band cut
+    G_MAG_MIN = 17
+    G_MAG_MAX = 22    # fainter cut at G=22 for Gaia DR2
+
+    # pm cut based on pm_error
+    IS_PM_ERROR_CUT = True
+    if IS_PM_ERROR_CUT:
+        N_ERRORBAR = 5
 
 
-""" g-band cut """
-G_MAG_MIN = 17
-G_MAG_MAX = 22    # fainter cut at G=22 for Gaia DR2
-
-
-""" pm cut based on pm_error """
-IS_PM_ERROR_CUT = True
-if IS_PM_ERROR_CUT:
-    N_ERRORBAR = 5
+""" panstarrs cuts """
+if DATABASE == 'panstarrs_dr1.stackobjectthin':
+    # pm cut based on pm_error
+    IS_PM_ERROR_CUT = False
 
 
 """ output file name """
