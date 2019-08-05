@@ -98,12 +98,3 @@ def hist_2_panel(path: str, outfile: str, kernel: str, s_above=5):
 
     _filename = "{}-{}.png".format(outfile, kernel)
     plt.savefig(_filename, bbox_inches='tight', dpi=100)
-
-
-if __name__ == '__main__':
-    """ test plotting """
-    from main import get_dir_name
-    path_dir = get_dir_name()
-    visualize_4_panel(path_dir, "test_g.png", N_ERRORBAR, "gaussian")
-    visualize_4_panel(path_dir, "test_p.png", N_ERRORBAR, "poisson")
-    # hist_2_panel(path_dir, "test_p_hist.png", N_ERRORBAR, "poisson")
