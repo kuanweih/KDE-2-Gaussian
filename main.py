@@ -3,7 +3,7 @@ import numpy as np
 from src.classPatchMWSatellite import *
 from src.classKDE_MWSatellite import *
 from param.param import *
-from param.kw_wsdb import *
+from param.wsdb import *
 from src.plotting import *
 from src.peaks import *
 from src.tools import *
@@ -168,7 +168,6 @@ if __name__ == '__main__':
     _name_pixel = "{}/{}".format(pixel_dir, fig_name)
     summarize_peaks_star_csv(dir_name, _name_star, 'poisson')
     summarize_peaks_pixel_csv(dir_name, _name_pixel, 'poisson', RA, DEC, WIDTH)
-
 
     print("Done. \n")
     print("We are finished :) \n")
