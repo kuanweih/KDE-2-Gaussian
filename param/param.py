@@ -16,7 +16,7 @@ if DATABASE == 'gaia_dr2.gaia_source':
                       phot_g_mean_mag, astrometric_excess_noise """
 elif DATABASE == 'panstarrs_dr1.stackobjectthin':
     DATABASE_SHORT = 'panstarrs'
-    CATALOG_STR = 'ra, dec'
+    CATALOG_STR = 'ra, dec, rpsfmag, rkronmag'
 else:
     raise ValueError('Wrong database name: %s is not valid.' % DATABASE)
 
