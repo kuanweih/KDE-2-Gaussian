@@ -158,7 +158,7 @@ if __name__ == '__main__':
     create_dir(star_dir)
     create_dir(pixel_dir)
 
-    _kernels = ['gaussian', 'poisson']
+    _kernels = ['poisson']    # ['gaussian', 'poisson']
 
     for k in _kernels:
         visualize_2_panel(dir_name, "{}/{}".format(visual_dir, fig_name), k)
