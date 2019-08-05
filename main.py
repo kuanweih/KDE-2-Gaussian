@@ -36,37 +36,41 @@ def gaia_patch_gmag_cut_astro_noise_cut(patch: PatchMWSatellite):
     patch.mask_g_mag_astro_noise_cut()    # astrometric_excess_noise cut
 
 
+def calc_pm_dwarf_gaia(dwarf: PatchMWSatellite) -> Tuple[float]:
+    """ Calculate the proper motions of a dwarf.
+
+    : dwarf : PatchMWSatellite of the dwarf with a size of rh
+    : return : mean and std of pmra and pmdec
+    """
+    dwarf.sql_get(HOST, USER, PASSWORD)    # query data
+    gaia_patch_gmag_cut_astro_noise_cut(dwarf)
+
+    pmra_mean = np.nanmean(dwarf.datas['pmra'])
+    pmra_std = np.nanstd(dwarf.datas['pmra'])
+    pmdec_mean = np.nanmean(dwarf.datas['pmdec'])
+    pmdec_std = np.nanstd(dwarf.datas['pmdec'])
+
+    print('The proper motions of the dwarf are:')
+    print('    pmra: mean = %0.4f, std = %0.4f' %(pmra_mean, pmra_std))
+    print('    pmdec: mean = %0.4f, std = %0.4f \n' %(pmdec_mean, pmdec_std))
+
+    return  pmra_mean, pmra_std, pmdec_mean, pmdec_std
+
+
+def execute_kde_routine(patch: PatchMWSatellite, kdepatch: KDE_MWSatellite):
+    kdepatch.np_hist2d(patch.datas['ra'], patch.datas['dec'])
+    kdepatch.is_inside_2d(RA_DWARF, DEC_DWARF, R_HALFLIGHT)    # TODO add a factor here
+    kdepatch.compound_sig_gaussian()
+    kdepatch.compound_sig_poisson(R_HALFLIGHT)
+    patch.append_sig_to_data(kdepatch.x_mesh, kdepatch.y_mesh,
+                             kdepatch.sig_gaussian, kdepatch.sig_poisson)
+
+
 
 if __name__ == '__main__':
     # create result directory
     dir_name = get_dir_name()
     create_dir(dir_name)
-
-    if DATABASE == 'gaia_dr2.gaia_source':
-        print('Creating a Dwarf object within rh = %0.4f deg for proper motion selection: \n'
-              % R_HALFLIGHT)    # hard coding of the size for pm selection.
-        Dwarf = PatchMWSatellite(NAME, RA_DWARF, DEC_DWARF,
-                                 DISTANCE, R_HALFLIGHT, DATABASE, CATALOG_STR)
-        print(Dwarf.__str__())
-
-        Dwarf.sql_get(HOST, USER, PASSWORD)    # query data
-        gaia_patch_gmag_cut_astro_noise_cut(Dwarf)
-
-        pmra_mean = np.nanmean(Dwarf.datas['pmra'])
-        pmra_std = np.nanstd(Dwarf.datas['pmra'])
-        pmdec_mean = np.nanmean(Dwarf.datas['pmdec'])
-        pmdec_std = np.nanstd(Dwarf.datas['pmdec'])
-        n_source_rh = Dwarf.n_source()    # number of stars are withing rh
-
-        print('The proper motions of the dwarf are:')
-        print('    pmra: mean = %0.4f, std = %0.4f' %(pmra_mean, pmra_std))
-        print('    pmdec: mean = %0.4f, std = %0.4f \n' %(pmdec_mean, pmdec_std))
-
-        del Dwarf    # free the memory though it might not be necessary
-        print('Removed the Dwarf object since it is no longer needed. \n')
-
-
-        print_sep_line()
 
 
     print('Creating a Patch object for main KDE calcuation: \n')
@@ -87,14 +91,7 @@ if __name__ == '__main__':
     KDEPatch = KDE_MWSatellite(RA, DEC, WIDTH, PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3)
     print(KDEPatch.__str__())
 
-    KDEPatch.np_hist2d(Patch.datas['ra'], Patch.datas['dec'])
-    KDEPatch.is_inside_2d(RA_DWARF, DEC_DWARF, R_HALFLIGHT)    # TODO add a factor here
-
-    KDEPatch.compound_sig_gaussian()
-    KDEPatch.compound_sig_poisson(R_HALFLIGHT)
-
-    Patch.append_sig_to_data(KDEPatch.x_mesh, KDEPatch.y_mesh,
-                             KDEPatch.sig_gaussian, KDEPatch.sig_poisson)
+    execute_kde_routine(Patch, KDEPatch)
 
     print('Saving datas, sigs, meshgrids ...')
     np.save('{}/{}'.format(dir_name, FILE_STAR), Patch.datas)
@@ -109,6 +106,23 @@ if __name__ == '__main__':
 
 
     if IS_PM_ERROR_CUT:
+        _str1 = 'Creating a Dwarf object within'
+        _str2 = 'for proper motion selection: \n'
+        print('{} rh = %0.4f deg {}'.format(_str1, _str2) % R_HALFLIGHT)
+        # hard coding of the size for pm selection.
+        Dwarf = PatchMWSatellite(NAME, RA_DWARF, DEC_DWARF,
+                                 DISTANCE, R_HALFLIGHT, DATABASE, CATALOG_STR)
+        print(Dwarf.__str__())
+
+        pmra_mean, pmra_std, pmdec_mean, pmdec_std = calc_pm_dwarf_gaia(Dwarf)
+
+        del Dwarf    # free the memory though it might not be necessary
+        print('Removed the Dwarf object since it is no longer needed. \n')
+
+
+        print_sep_line()
+
+
         print('Selecting proper motion within %d sigma: \n' % N_ERRORBAR)
         pmramax = pmra_mean + N_ERRORBAR * pmra_std
         pmramin = pmra_mean - N_ERRORBAR * pmra_std
@@ -123,14 +137,7 @@ if __name__ == '__main__':
         KDEPatch = KDE_MWSatellite(RA, DEC, WIDTH, PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3)
         print(KDEPatch.__str__())
 
-        KDEPatch.np_hist2d(Patch.datas['ra'], Patch.datas['dec'])
-        KDEPatch.is_inside_2d(RA_DWARF, DEC_DWARF, R_HALFLIGHT)    # TODO add a factor here
-
-        KDEPatch.compound_sig_gaussian()
-        KDEPatch.compound_sig_poisson(R_HALFLIGHT)
-
-        Patch.append_sig_to_data(KDEPatch.x_mesh, KDEPatch.y_mesh,
-                                 KDEPatch.sig_gaussian, KDEPatch.sig_poisson)
+        execute_kde_routine(Patch, KDEPatch)
 
         print('Saving datas, sigs, meshgrids ...')
         np.save('{}/{}-pm{}std'.format(dir_name, FILE_STAR, N_ERRORBAR), Patch.datas)
