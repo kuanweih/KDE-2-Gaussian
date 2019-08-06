@@ -13,10 +13,9 @@ from typing import List
 NSTAR_MIN = 10    # plotting image if the candidate contains more than 10 stars
 
 
-def multiprocessing_plot_hips_sky_image(name_df: List, label_df: List,
-                                        hips_df: List, ra_df: List,
-                                        dec_df: List, width_df: List,
-                                        path: str, res: int, id_: int):
+def multiprocessing_plot_hips_sky_image(
+        name_df: List, label_df: List, hips_df: List, ra_df: List,
+        dec_df: List, width_df: List, path: str, res: int, id_: int):
     """ Re-arange the order of arguments such that the only iterable 'id_'
     is at the last one. With this arangement, we can use multiprocessing
     under the help of partial from the functools.
@@ -50,23 +49,16 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
     : res : resolution of the image (number of pixels for the image)
     """
     # Compute the sky image
-    geometry = WCSGeometry.create(skydir=SkyCoord(ra, dec, unit='deg',
-                                                  frame='icrs'),
-                                  width=res, height=res, fov="%f deg" %width,
-                                  coordsys='icrs', projection='AIT')
+    geometry = WCSGeometry.create(
+        skydir=SkyCoord(ra, dec, unit='deg', frame='icrs'), width=res,
+        height=res, fov="%f deg" %width, coordsys='icrs', projection='AIT')
 
     name_split = name.split('-')
-    if 'pm' in name:
-        short_name = '{}-{}'.format(name_split[0], name_split[-1])
-        data = np.load('results/{}'.format(name.replace(
-                       '-poisson-pm', '/queried-data-pm5std.npy'))).item()
-    else:
-        short_name = '{}-all'.format(name_split[0])
-        data = np.load('results/{}'.format(name.replace(
-                       '-poisson', '/queried-data.npy'))).item()
+    short_name = name_split[0]
+    data = np.load('results/{}'.format(name.replace(
+        '-poisson' or '-gaussian', '/queried-data.npy'))).item()
 
-    ra_data = data['ra']
-    dec_data = data['dec']
+    ra_data, dec_data = data['ra'], data['dec']
 
     data = None    # free memory
 
@@ -74,7 +66,6 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
     ra_max = ra + 0.5 * width
     dec_min = dec - 0.5 * width
     dec_max = dec + 0.5 * width
-
 
     mask1 = (ra_min < ra_data) & (ra_data < ra_max)
     mask2 = (dec_min < dec_data) & (dec_data < dec_max)
@@ -88,19 +79,20 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
         return    # skip plotting image with fewer than NSTAR_MIN stars
 
     print('plotting image for %s' %short_name)
-
-    # Draw the sky image
     sns.set(style="white", color_codes=True, font_scale=1)
     fig, axes = plt.subplots(1, 4, figsize=(15, 5))
-    fig.suptitle('{}-label{}-(%0.4f,%0.4f)-width{}'.format(short_name, label, width) %(ra, dec), y=0.9)
+
+    _st1 = '{}-label{}-'.format(short_name, label)
+    _st2 = '-width{}'.format(width)
+    fig.suptitle('{}(%0.4f,%0.4f){}'.format(_st1, _st2) %(ra, dec), y=0.9)
 
     # plot GAIA sources
-    axes[0].set_title('GAIA DR2')
+    axes[0].set_title(short_name)
     sns.scatterplot(ra_data, dec_data, ax=axes[0])
     axes[0].set_xlim([ra_min, ra_max])
     axes[0].set_ylim([dec_min, dec_max])
-    asp = np.diff(axes[0].get_xlim())[0] / np.diff(axes[0].get_ylim())[0]
-    axes[0].set_aspect(asp)
+    _asp = np.diff(axes[0].get_xlim())[0] / np.diff(axes[0].get_ylim())[0]
+    axes[0].set_aspect(_asp)
     axes[0].set_xlim(axes[0].set_xlim([ra_min, ra_max])[::-1])    # flipping
 
     cnt = 0    # counter for how many images have been plotted
@@ -123,5 +115,6 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
 
     # axes = plt.subplot(projection=geometry.wcs)
 
-    plt.savefig("{}/{}-target{}-ra%0.4f-dec%0.4f.jpg".format(
-        outpath, name, label) % (ra, dec), bbox_inches='tight', dpi=300)
+    _str = '{}/{}-target{}-'.format(outpath, name, label)
+    _str = '{}ra%0.4f-dec%0.4f.jpg'.format(_str) % (ra, dec)
+    plt.savefig(_str, bbox_inches='tight', dpi=300)
