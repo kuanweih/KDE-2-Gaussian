@@ -9,9 +9,9 @@ Before starting density estimation, one should set up `param/param.py` and `para
 
 
 # How to use it:
-0. Preprocess a dwarf list (optional): <br>
+0. Clean the work directory: `bash bashtools/clean.sh`
+1. Preprocess a dwarf list (optional): <br>
    `bash  bashtools/preprocessing_dwarflist.sh`
-1. Clean the work directory: `bash bashtools/clean.sh`
 2. Get access to the database and enter information in `param/wsdb.py`
 3. Set up parameters in `param/param.py`, especially the following:
     - `IS_DWARF_LIST = False`    # use joint list

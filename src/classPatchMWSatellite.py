@@ -87,6 +87,15 @@ class PatchMWSatellite(object):
         self.cut_datas(mask)
         print("    %d sources left \n"  %self.n_source())
 
+    def mask_panstarrs_stargalaxy_sep(self):
+        """ Hard code the star galaxy separation """
+        print("Applying star galaxy separation: (rpsfmag - rkronmag) < 0.05")
+        rpsfmag = self.datas["rpsfmag"]
+        rkronmag = self.datas["rkronmag"]
+        mask = (rpsfmag - rkronmag) < 0.05
+        self.cut_datas(mask)
+        print("    %d sources left \n"  %self.n_source())
+
     def append_is_inside(self, ra_df: float, dec_df: float, radius: float):
         """ Assign a boolean value to specify if a source is in the area
         within the radius from the dwarf.
