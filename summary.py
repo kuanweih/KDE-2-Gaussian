@@ -20,7 +20,6 @@ hips_surveys = ['CDS/P/DES-DR1/g',
                 ]
 
 res_image = 1000    # image resolution of hips
-width_fac = 10.    # width of image = width_fac * sigma1
 
 num_workers = multiprocessing.cpu_count()
 # num_workers = int(0.5 * num_workers)
@@ -88,7 +87,7 @@ if __name__ == '__main__':
     path = "images"
     create_dir(path)
 
-    name_df, label_df, ra_df, dec_df, width_df = [], [], [], [], []
+    name_df, label_df, ra_df, dec_df, sigma1_df = [], [], [], [], []
     df = pd.read_csv("{}/all_pixels_peaks.csv".format(output_file))
 
     name_set = set(df['name'])
@@ -104,15 +103,15 @@ if __name__ == '__main__':
             dec = np.mean(df_name_label['dec'])
             name_list = name.split("-")
             if 'gaia' in name:
-                width = width_fac * float(name_list[5].split('s')[1])
+                sigma1 = float('%0.4f' % float(name_list[5].split('s')[1]))
             else:
-                width = width_fac * float(name_list[3].split('s')[1])
+                sigma1 = float('%0.4f' % float(name_list[3].split('s')[1]))
 
             name_df.append(name)
             label_df.append(label)
             ra_df.append(ra)
             dec_df.append(dec)
-            width_df.append(width)
+            sigma1_df.append(sigma1)
 
     df = None    # free memory
 
@@ -122,7 +121,7 @@ if __name__ == '__main__':
 
     pool = multiprocessing.Pool(num_workers)
     func = partial(multiprocessing_plot_hips_sky_image, name_df, label_df,
-                   hips_surveys, ra_df, dec_df, width_df, path, res_image)
+                   hips_surveys, ra_df, dec_df, sigma1_df, path, res_image)
     pool.map(func, iterable)
     pool.close()
     pool.join()
