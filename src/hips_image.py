@@ -11,11 +11,12 @@ from typing import List
 
 
 NSTAR_MIN = 10    # plotting image if the candidate contains more than 10 stars
+WIDTH_FAC = 10    # width of image = width_fac * sigma1
 
 
 def multiprocessing_plot_hips_sky_image(
         name_df: List, label_df: List, hips_df: List, ra_df: List,
-        dec_df: List, width_df: List, path: str, res: int, id_: int):
+        dec_df: List, sigma1_df: List, path: str, res: int, id_: int):
     """ Re-arange the order of arguments such that the only iterable 'id_'
     is at the last one. With this arangement, we can use multiprocessing
     under the help of partial from the functools.
@@ -25,29 +26,31 @@ def multiprocessing_plot_hips_sky_image(
     : hips_df : list of hips_surveyss
     : ra_df : list of average ra of pixels
     : dec_df : list of average dec of pixels
-    : width_df : list of width of images
+    : sigma1_df : list of sigma1 of images
     : path : output dir path
     : res : resolution of the image (number of pixels for the image)
     : id_ : iterable of all the target clusters
     """
-    plot_hips_sky_image(ra_df[id_], dec_df[id_], width_df[id_],
+    plot_hips_sky_image(ra_df[id_], dec_df[id_], sigma1_df[id_],
                         hips_df, path, name_df[id_], label_df[id_], res)
 
 
 
-def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
+def plot_hips_sky_image(ra: float, dec: float, sigma1: float, hips_surveys: List,
                         outpath: str, name: str, label: int, res: int):
     """ Plot sky image using hips
 
     : ra : ra of the pixel
     : dec : dec of the pixel
-    : width : width of the map
+    : sigma1 : sigma1 of the map
     : hips_surveys : list of surveys
     : outpath : output dir path
     : name : name of the system (dwarf and more info)
     : label : label of a cluster pixels
     : res : resolution of the image (number of pixels for the image)
     """
+    width = WIDTH_FAC * sigma1
+
     # Compute the sky image
     geometry = WCSGeometry.create(
         skydir=SkyCoord(ra, dec, unit='deg', frame='icrs'), width=res,
@@ -94,6 +97,10 @@ def plot_hips_sky_image(ra: float, dec: float, width: float, hips_surveys: List,
     _asp = np.diff(axes[0].get_xlim())[0] / np.diff(axes[0].get_ylim())[0]
     axes[0].set_aspect(_asp)
     axes[0].set_xlim(axes[0].set_xlim([ra_min, ra_max])[::-1])    # flipping
+
+    # plot circle of the size of sigma1
+    circle = plt.Circle((ra, dec), sigma1, color='orange', fill=False, lw=2)
+    axes[0].add_artist(circle)
 
     cnt = 0    # counter for how many images have been plotted
     for hips_survey in hips_surveys:

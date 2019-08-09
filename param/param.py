@@ -47,7 +47,7 @@ if DATABASE == 'gaia_dr2.gaia_source':
     G_MAG_MAX = 22    # fainter cut at G=22 for Gaia DR2
 
     # pm cut based on pm_error
-    IS_PM_ERROR_CUT = True
+    IS_PM_ERROR_CUT = False
     if IS_PM_ERROR_CUT:
         N_ERRORBAR = 5
 
@@ -114,7 +114,7 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     SIGMA1 = GC_SIZE / DISTANCE * 180. / np.pi
     SIGMA1 = float('%0.4f' %(SIGMA1))
 
-    SIGMA2 = float('%0.4f' %(0.2 * R_HALFLIGHT))    # factor 0.2 is made up
+    SIGMA2 = float('%0.4f' %(0.2 * R_HALFLIGHT * GC_SIZE / 10.))    # factor 0.2 is made up
     SIGMA2 *= args.scale_sigma2
 
     SIGMA3 = 0.5    # always use 0.5 deg as outer kernel
