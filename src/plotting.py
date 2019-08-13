@@ -1,10 +1,10 @@
 import matplotlib
 matplotlib.use('Agg')
 
-import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import scipy.stats as stats
+import matplotlib.pyplot as plt
 
 from param.param import *
 

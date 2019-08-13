@@ -7,6 +7,10 @@ from typing import List
 
 
 
+def print_sep_line():
+    print('------------------------------------------------------------ \n')
+
+
 def dist2(x: np.ndarray, y: np.ndarray, x0: float, y0: float) -> np.ndarray:
     """ Calculate the square of distance between a numpy array and (x0, y0).
 
