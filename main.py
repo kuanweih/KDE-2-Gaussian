@@ -12,10 +12,6 @@ np.seterr(divide='ignore', invalid='ignore')
 
 
 
-def print_sep_line():
-    print('------------------------------------------------------------ \n')
-
-
 def get_dir_name() -> str:
     """ Get the name of results directory """
     if DATABASE == 'gaia_dr2.gaia_source':
@@ -145,7 +141,7 @@ if __name__ == '__main__':
 
     plot_dir = "plots"
     peaks_dir = "peaks"
-    create_dir("plots")
+    create_dir(plot_dir)
     create_dir(peaks_dir)
 
     visual_dir = "{}/visual".format(plot_dir)
