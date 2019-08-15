@@ -85,6 +85,7 @@ def plot_gaia_stars_cmd_pm(patch: PatchMWSatellite):
     sns.scatterplot(x=pmra[is_inside], y=pmdec[is_inside],  ax=axes[2])
 
     fig.autofmt_xdate()
+    axes[0].invert_xaxis()
     axes[1].invert_yaxis()
     axes[0].set_title('stellar distribution')
     axes[1].set_title('color mag diagram (CMD)')
