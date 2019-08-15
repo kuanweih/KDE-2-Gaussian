@@ -15,8 +15,8 @@ WIDTH_FAC = 10    # width of image = width_fac * sigma1
 
 
 def multiprocessing_plot_hips_sky_image(
-        name_df: List, label_df: List, hips_df: List, ra_df: List,
-        dec_df: List, sigma1_df: List, path: str, res: int, id_: int):
+        name_df: List, label_df: List, hips_df: List, ra_df: List, dec_df: List,
+        sigma1_df: List, sig_p_df: List, path: str, res: int, id_: int):
     """ Re-arange the order of arguments such that the only iterable 'id_'
     is at the last one. With this arangement, we can use multiprocessing
     under the help of partial from the functools.
@@ -27,21 +27,23 @@ def multiprocessing_plot_hips_sky_image(
     : ra_df : list of average ra of pixels
     : dec_df : list of average dec of pixels
     : sigma1_df : list of sigma1 of images
+    : sig_p_df : list of sig_poisson of pixels
     : path : output dir path
     : res : resolution of the image (number of pixels for the image)
     : id_ : iterable of all the target clusters
     """
-    plot_hips_sky_image(ra_df[id_], dec_df[id_], sigma1_df[id_],
+    plot_hips_sky_image(ra_df[id_], dec_df[id_], sig_p_df[id_], sigma1_df[id_],
                         hips_df, path, name_df[id_], label_df[id_], res)
 
 
 
-def plot_hips_sky_image(ra: float, dec: float, sigma1: float, hips_surveys: List,
-                        outpath: str, name: str, label: int, res: int):
+def plot_hips_sky_image(ra: float, dec: float, sig_p: float, sigma1: float,
+        hips_surveys: List, outpath: str, name: str, label: int, res: int):
     """ Plot sky image using hips
 
     : ra : ra of the pixel
     : dec : dec of the pixel
+    : sig_p : sig_poisson of the pixel
     : sigma1 : sigma1 of the map
     : hips_surveys : list of surveys
     : outpath : output dir path
@@ -85,7 +87,7 @@ def plot_hips_sky_image(ra: float, dec: float, sigma1: float, hips_surveys: List
     sns.set(style="white", color_codes=True, font_scale=1)
     fig, axes = plt.subplots(1, 4, figsize=(15, 5))
 
-    _st1 = '{}-label{}-'.format(short_name, label)
+    _st1 = '{}-label{}-sigp%0.2f-'.format(short_name, label) % sig_p
     _st2 = '-width{}'.format(width)
     fig.suptitle('{}(%0.4f,%0.4f){}'.format(_st1, _st2) %(ra, dec), y=0.9)
 
