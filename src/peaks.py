@@ -61,6 +61,7 @@ def summarize_peaks_pixel_csv(path: str, outfile: str,
     x, y = np.load('{}/meshgrids.npy'.format(path))
     sig = np.load('{}/sig_{}.npy'.format(path, kernel))
 
+    x_patch, y_patch = np.mean(x), np.mean(y)    # for boundary
     mask = sig > s_above
     labeled_array, num_features = snlabel(mask, structure=np.ones((3, 3)))
 
@@ -87,13 +88,17 @@ def summarize_peaks_pixel_csv(path: str, outfile: str,
         y_peaks = np.array(y_peaks)
         sigs = np.array(sigs)
 
-    pixel_peaks_table = {}
+    mask = np.abs(x_peaks - x_patch) < 0.4    # hard code boundary
+    mask = (np.abs(y_peaks - y_patch) < 0.4) & mask
 
-    pixel_peaks_table["name"] = np.array([name.replace("peaks/pixels/", "")] * len(label_s))
-    pixel_peaks_table["label"] = label_s
-    pixel_peaks_table["ra"] = x_peaks
-    pixel_peaks_table["dec"] = y_peaks
-    pixel_peaks_table["sig_{}".format(kernel)] = sigs
+    _name = np.array([name.replace("peaks/pixels/", "")] * len(label_s))
+
+    pixel_peaks_table = {}
+    pixel_peaks_table["name"] = _name[mask]
+    pixel_peaks_table["label"] = label_s[mask]
+    pixel_peaks_table["ra"] = x_peaks[mask]
+    pixel_peaks_table["dec"] = y_peaks[mask]
+    pixel_peaks_table["sig_{}".format(kernel)] = sigs[mask]
 
     df = pd.DataFrame(data=pixel_peaks_table)
     df = df[["name", "label", "ra", "dec", "sig_{}".format(kernel)]]
