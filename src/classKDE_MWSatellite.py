@@ -220,7 +220,7 @@ class KDE_MWSatellite(object):
         # factors using for outer aperture
         f_in2out = 2.    # r_i = f_in2out * s1
         f_out2out = 0.68    # r_o = f_out2out * rh
-        rh_th = 0.1    # threshold of minimum half-light radius in deg
+        rh_th = 10. * self.sigma1    # threshold of min half-light radius in deg
 
         # inner aperture
         n_inner, area_inner = self.poisson_inner_number_count(self.sigma1)
