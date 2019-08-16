@@ -24,7 +24,7 @@ else:
 """ default (manual) target parameters """
 NAME = 'Fornax'    # name of the dwarf
 RA = 39.997      # ra of the center of a patch (in deg)
-DEC = -34.551    # dec of the center of a patch (in deg)
+DEC = -34.449    # dec of the center of a patch (in deg)
 WIDTH = 0.25     # map width when querying data (in deg)
 DISTANCE = 140000.    # distance in pc
 

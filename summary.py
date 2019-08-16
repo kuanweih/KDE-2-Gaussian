@@ -87,7 +87,7 @@ if __name__ == '__main__':
     path = "images"
     create_dir(path)
 
-    name_df, label_df, ra_df, dec_df, sigma1_df = [], [], [], [], []
+    name_df, label_df, ra_df, dec_df, sigma1_df, sig_p_df = [], [], [], [], [], []
     df = pd.read_csv("{}/all_pixels_peaks.csv".format(output_file))
 
     name_set = set(df['name'])
@@ -101,16 +101,18 @@ if __name__ == '__main__':
             df_name_label = df_name.loc[df_name['label'] == label]
             ra = np.mean(df_name_label['ra'])
             dec = np.mean(df_name_label['dec'])
+            sig_p = np.mean(df_name_label['sig_poisson'])
             name_list = name.split("-")
             if 'gaia' in name:
                 sigma1 = float('%0.4f' % float(name_list[5].split('s')[1]))
             else:
                 sigma1 = float('%0.4f' % float(name_list[3].split('s')[1]))
 
-            name_df.append(name)
-            label_df.append(label)
             ra_df.append(ra)
             dec_df.append(dec)
+            name_df.append(name)
+            label_df.append(label)
+            sig_p_df.append(sig_p)
             sigma1_df.append(sigma1)
 
     df = None    # free memory
@@ -121,7 +123,7 @@ if __name__ == '__main__':
 
     pool = multiprocessing.Pool(num_workers)
     func = partial(multiprocessing_plot_hips_sky_image, name_df, label_df,
-                   hips_surveys, ra_df, dec_df, sigma1_df, path, res_image)
+        hips_surveys, ra_df, dec_df, sigma1_df, sig_p_df, path, res_image)
     pool.map(func, iterable)
     pool.close()
     pool.join()
