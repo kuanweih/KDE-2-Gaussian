@@ -1,21 +1,9 @@
 import numpy as np
+
 from typing import Dict
+from src.param_preprocess import *
+from src.tools import get_dic_list_npy
 
-
-PATCH_DIST = 0.9
-N_PATCH_MAX = 4
-
-
-def get_dic_list(path: str, quantitys: str):
-    """ Select dict of a dwaft list based on keys as quantitys
-
-    : path : path of the dict npy file
-    : quantitys : target keys
-    : return : needed dict
-    """
-    dwarfs_dict = np.load(path).item()
-    dict_need = {q: dwarfs_dict[q] for q in quantitys}
-    return  dict_need
 
 
 def calc_r_200(m_200: float = 1e9) -> float:
@@ -80,24 +68,24 @@ def plot_rh_sigma(dict_joint: Dict):
     ax.set(xlabel="angular size [deg]")
     sns.despine(left=True, bottom=True)
 
-    plt.savefig("rh_sigma.png", bbox_inches='tight', dpi=200)
+    plt.savefig("dwarfs/rh_sigma.png", bbox_inches='tight', dpi=200)
 
 
 
 if __name__ == '__main__':
     """ Concatenate the McConnachie list and my list into a joint one """
-    path_mcconnachie = "McConnachie/dwarfs-McConnachie.npy"
-    path_more = "more/dwarfs-more.npy"
+    path_mcconnachie = "dwarfs/McConnachie/dwarfs-McConnachie.npy"
+    path_more = "dwarfs/more/dwarfs-more.npy"
 
     quantitys = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
 
-    dict1 = get_dic_list(path_mcconnachie, quantitys)
-    dict2 = get_dic_list(path_more, quantitys)
+    dict1 = get_dic_list_npy(path_mcconnachie, quantitys)
+    dict2 = get_dic_list_npy(path_more, quantitys)
 
     dict_joint = {q: np.concatenate((dict1[q], dict2[q])) for q in quantitys}
 
-    np.save("dwarfs-joint", dict_joint)
-    np.savetxt("dwarfs-names.txt", np.sort(dict_joint["GalaxyName"]), fmt="%s")
+    np.save("dwarfs/dwarfs-joint", dict_joint)
+    np.savetxt("dwarfs/dwarfs-names.txt", np.sort(dict_joint["GalaxyName"]), fmt="%s")
 
     # plotting half-light radius and simgas
     plot_rh_sigma(dict_joint)
@@ -148,15 +136,5 @@ if __name__ == '__main__':
 
     sorted_name = np.sort(dict_joint["GalaxyName"])
 
-    np.save("dwarfs-joint-split", dict_joint)
-    np.savetxt("dwarfs-names-split.txt", sorted_name, fmt="%s")
-
-
-    # n_patch = len(sorted_name)
-    # n_split_txt = int(np.ceil(n_patch / N_LINE_SPLIT))
-    #
-    # for i in range(n_split_txt):
-    #     id_i = i * N_LINE_SPLIT
-    #     id_f = (i + 1) * N_LINE_SPLIT
-    #     np.savetxt("dwarfs-names-split-%d.txt" %(i + 1),
-    #                sorted_name[id_i:id_f], fmt="%s")
+    np.save("dwarfs/dwarfs-joint-split", dict_joint)
+    np.savetxt("dwarfs/dwarfs-names-split.txt", sorted_name, fmt="%s")
