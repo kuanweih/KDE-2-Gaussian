@@ -9,12 +9,9 @@ WIDTH = 1    # width of a patch in deg
 
 """ parameters about candidates """
 # hips_image.py
-NSTAR_MIN = 10    # plotting image if the candidate contains more than 10 stars
+NSTAR_MIN = 3    # plotting image if the candidate contains more than 10 stars
 WIDTH_FAC = 10    # width of image = width_fac * sigma1
 valid_width = 2. * PATCH_DIST - WIDTH    # deal with the boundary
-
-# candidates.py
-OUTPUT_PATH = 'plots/candidates'
 
 
 # summary.py

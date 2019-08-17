@@ -12,7 +12,7 @@ DATABASE = 'gaia_dr2.gaia_source'
 
 if DATABASE == 'gaia_dr2.gaia_source':
     DATABASE_SHORT = 'gaia'
-    CATALOG_STR = """ ra, dec, parallax, pmra, pmdec,
+    CATALOG_STR = """ ra, dec, pmra, pmdec, bp_rp,
                       phot_g_mean_mag, astrometric_excess_noise """
 elif DATABASE == 'panstarrs_dr1.stackobjectthin':
     DATABASE_SHORT = 'panstarrs'
@@ -73,8 +73,6 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     parser = argparse.ArgumentParser(description='Set parameters for a specific dwarf')
     parser.add_argument('--name_dwarf', type=str, help='A dwarf name from McConnachie list')
     parser.add_argument('--gc_size_pc', type=int, help='Size of globular clusters: e.g. 1~10 pc')
-    parser.add_argument('--scale_sigma2', type=float, nargs='?', const=1,
-                        default=1., help='sigma2 = scale_sigma2 * sigma2')
     args = parser.parse_args()
 
     if IS_DWARF_SPLIT_LIST:
@@ -111,12 +109,8 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     GC_SIZE = args.gc_size_pc
     DISTANCE = float('%0.4f' %(dwarfs_dict["Distance_pc"][0]))
 
-    SIGMA1 = GC_SIZE / DISTANCE * 180. / np.pi
-    SIGMA1 = float('%0.4f' %(SIGMA1))
-
-    SIGMA2 = float('%0.4f' %(0.2 * R_HALFLIGHT * GC_SIZE / 10.))    # factor 0.2 is made up
-    SIGMA2 *= args.scale_sigma2
-
+    SIGMA1 = float('%0.4f' % (GC_SIZE / DISTANCE * 180. / np.pi))
+    SIGMA2 = float('%0.4f' %(0.68 * R_HALFLIGHT))
     SIGMA3 = 0.5    # always use 0.5 deg as outer kernel
     PIXEL_SIZE = 0.25 * SIGMA1
 
