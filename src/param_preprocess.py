@@ -1,0 +1,2 @@
+PATCH_DIST = 0.9
+N_PATCH_MAX = 4
