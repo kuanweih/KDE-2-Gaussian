@@ -1,8 +1,8 @@
 import numpy as np
 
 from typing import Dict
-from src.param_preprocess import *
 from src.tools import get_dic_list_npy
+from src.param_patch_candidate import PATCH_DIST, N_PATCH_MAX
 
 
 

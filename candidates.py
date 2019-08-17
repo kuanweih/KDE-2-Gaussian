@@ -6,12 +6,10 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from src.tools import *
-from param.wsdb import *
-from src.classPatchMWSatellite import *
-
-
-OUTPUT_PATH = 'plots/candidates'
+from wsdb import HOST, USER, PASSWORD
+from src.tools import create_dir, print_sep_line
+from src.classPatchMWSatellite import PatchMWSatellite
+from src.param_patch_candidate import OUTPUT_PATH
 
 
 

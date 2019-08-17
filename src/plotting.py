@@ -3,10 +3,10 @@ matplotlib.use('Agg')
 
 import numpy as np
 import seaborn as sns
-import scipy.stats as stats
 import matplotlib.pyplot as plt
 
-from param.param import *
+from scipy import stats
+from src.param import *
 
 
 _st1 = '{}  GC={}pc'.format(NAME, GC_SIZE)
