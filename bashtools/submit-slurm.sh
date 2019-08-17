@@ -5,14 +5,7 @@
 source  activate  mypython3
 
 
-# pre-processing dwarf list
-cd  dwarfs/more
-python  more_dwarfs.py
-cd  ../McConnachie
-python  convert_McConnachie.py
-cd  ..
-python  joint_list.py
-cd  ..
+bash  bashtools/preprocessing_dwarflist.sh
 
 
 # main search
