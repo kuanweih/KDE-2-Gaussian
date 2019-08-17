@@ -1,17 +1,15 @@
 import matplotlib
 matplotlib.use('Agg')
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
+from typing import List
 from astropy.coordinates import SkyCoord
 from hips import WCSGeometry, make_sky_image
-from typing import List
+from src.param_patch_candidate import NSTAR_MIN, WIDTH_FAC
 
-
-NSTAR_MIN = 10    # plotting image if the candidate contains more than 10 stars
-WIDTH_FAC = 10    # width of image = width_fac * sigma1
 
 
 def multiprocessing_plot_hips_sky_image(

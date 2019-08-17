@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from scipy.ndimage import label as snlabel
+from src.param_patch_candidate import valid_width
 
 
 
@@ -43,9 +44,8 @@ def summarize_peaks_star_csv(path: str, outfile: str, kernel: str, s_above=5):
 
 
 
-def summarize_peaks_pixel_csv(path: str, outfile: str,
-                              kernel: str, sat_ra: float, sat_dec: float,
-                              width: float, s_above=5):
+def summarize_peaks_pixel_csv(path: str, outfile: str, kernel: str,
+        sat_ra: float, sat_dec: float, width: float, s_above=5):
     """ Plotting star distribution (left panels) and density maps (right
     panels). (Others)
 
@@ -88,8 +88,8 @@ def summarize_peaks_pixel_csv(path: str, outfile: str,
         y_peaks = np.array(y_peaks)
         sigs = np.array(sigs)
 
-    mask = np.abs(x_peaks - x_patch) < 0.4    # hard code boundary
-    mask = (np.abs(y_peaks - y_patch) < 0.4) & mask
+    mask = (np.abs(x_peaks - x_patch) < 0.5 * valid_width)
+    mask = (np.abs(y_peaks - y_patch) < 0.5 * valid_width) & mask
 
     _name = np.array([name.replace("peaks/pixels/", "")] * len(label_s))
 
@@ -104,30 +104,3 @@ def summarize_peaks_pixel_csv(path: str, outfile: str,
     df = df[["name", "label", "ra", "dec", "sig_{}".format(kernel)]]
 
     df.to_csv("{}.csv".format(name), index=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    #

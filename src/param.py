@@ -102,7 +102,7 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     R_HALFLIGHT = dwarfs_dict["rh(arcmins)"][0] / 60.    # rh in deg
 
     if IS_DWARF_SPLIT_LIST:
-        WIDTH = 1
+        from src.param_patch_candidate import WIDTH
     elif IS_DWARF_LIST:
         WIDTH = float('%0.4f' %(8. * R_HALFLIGHT))
     else:

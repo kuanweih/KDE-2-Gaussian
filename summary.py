@@ -1,25 +1,13 @@
-import numpy as np
 import glob
+import numpy as np
 import pandas as pd
 import multiprocessing
 
 from functools import partial
 from src.tools import create_dir, df_concat
 from src.hips_image import multiprocessing_plot_hips_sky_image
+from src.param_patch_candidate import s_above, res_image, hips_surveys
 
-
-""" parameters """
-s_above = 5    # significance threshold
-
-hips_surveys = ['CDS/P/DES-DR1/g',
-                'CDS/P/DECaLS/DR5/color',
-                'CDS/P/DSS2/color',
-                'CDS/P/SDSS9/color',
-                'CDS/P/PanSTARRS/DR1/color-z-zg-g',
-                'CDS/P/2MASS/color',
-                ]
-
-res_image = 1000    # image resolution of hips
 
 num_workers = multiprocessing.cpu_count()
 # num_workers = int(0.5 * num_workers)
