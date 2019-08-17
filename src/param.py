@@ -12,7 +12,7 @@ DATABASE = 'gaia_dr2.gaia_source'
 
 if DATABASE == 'gaia_dr2.gaia_source':
     DATABASE_SHORT = 'gaia'
-    CATALOG_STR = """ ra, dec, parallax, pmra, pmdec,
+    CATALOG_STR = """ ra, dec, pmra, pmdec, bp_rp,
                       phot_g_mean_mag, astrometric_excess_noise """
 elif DATABASE == 'panstarrs_dr1.stackobjectthin':
     DATABASE_SHORT = 'panstarrs'
