@@ -1,13 +1,12 @@
-import numpy as np
 import time
+import numpy as np
 
-from param.param import *
-from src.classPatchMWSatellite import *
-from scipy.special import erfcinv
-from scipy.stats import poisson
 from typing import Tuple
-from scipy.signal import fftconvolve, gaussian
+from src.param import *
 from src.tools import dist2
+from scipy.stats import poisson
+from scipy.special import erfcinv
+from scipy.signal import fftconvolve, gaussian
 
 
 

@@ -7,6 +7,18 @@ from typing import List
 
 
 
+def get_dic_list_npy(path: str, quantitys: str):
+    """ Select a dict from a numpy array based on keys as quantitys
+
+    : path : path of the dict npy file
+    : quantitys : target keys
+    : return : needed dict
+    """
+    dwarfs_dict = np.load(path).item()
+    dict_need = {q: dwarfs_dict[q] for q in quantitys}
+    return  dict_need
+
+
 def print_sep_line():
     print('------------------------------------------------------------ \n')
 
