@@ -60,7 +60,7 @@ def execute_kde_routine(patch: PatchMWSatellite, kdepatch: KDE_MWSatellite):
     kdepatch.np_hist2d(patch.datas['ra'], patch.datas['dec'])
     kdepatch.is_inside_2d(RA_DWARF, DEC_DWARF, R_HALFLIGHT)    # TODO add a factor here
     kdepatch.compound_sig_gaussian()
-    kdepatch.compound_sig_poisson(R_HALFLIGHT)
+    kdepatch.compound_sig_poisson()
     patch.append_sig_to_data(kdepatch.x_mesh, kdepatch.y_mesh,
                              kdepatch.sig_gaussian, kdepatch.sig_poisson)
 
@@ -123,7 +123,7 @@ if __name__ == '__main__':
         apply_pm_cut_gaia(Patch, N_ERRORBAR)
 
     print('Creating a KDEPatch object and start the KDE calcuation: \n')
-    KDEPatch = KDE_MWSatellite(RA, DEC, WIDTH, PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3)
+    KDEPatch = KDE_MWSatellite(RA, DEC, WIDTH, PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3, R_HALFLIGHT)
     print(KDEPatch.__str__())
 
     execute_kde_routine(Patch, KDEPatch)

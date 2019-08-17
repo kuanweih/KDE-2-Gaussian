@@ -12,7 +12,7 @@ from scipy.signal import fftconvolve, gaussian
 
 class KDE_MWSatellite(object):
     def __init__(self, ra_center: float, dec_center: float, width: float,
-                 ps: float, sigma1: float, sigma2: float, sigma3: float):
+            ps: float, sigma1: float, sigma2: float, sigma3: float, rh: float):
         """ Kernel Density Estimation on a PatchMWSatellite object. This class
         contains 2 kernels: Gaussian and Poisson.
 
@@ -23,6 +23,7 @@ class KDE_MWSatellite(object):
         : sigma1 : target kernel size in deg: GCs
         : sigma2 : background kernel size inside the satellite in deg
         : sigma3 : background kernel size outside the satellite in deg
+        : rh : half-light radius in deg
         """
         self.ra_center = ra_center
         self.dec_center = dec_center
@@ -31,19 +32,21 @@ class KDE_MWSatellite(object):
         self.sigma1 = sigma1
         self.sigma2 = sigma2
         self.sigma3 = sigma3
+        self.rh = rh
 
         self.num_grid = round(self.width / self.pixel_size)
         self.x_mesh = self.grid_coord(self.ra_center)
         self.y_mesh = self.grid_coord(self.dec_center)
 
     def __str__(self):
-        str1 = "This is a KDE_MWSatellite object: \n"
-        str2 = "    pixel size = {}\n".format(self.pixel_size)
-        str3 = "    number of grids = {}\n".format(self.num_grid)
-        str4 = "    sigma1 = {} deg\n".format(self.sigma1)
-        str5 = "    sigma2 inside the satellite = {} deg\n".format(self.sigma2)
-        str6 = "    sigma2 outside the satellite = {} deg\n".format(self.sigma3)
-        return  "{}{}{}{}{}{}".format(str1, str2, str3, str4, str5, str6)
+        s1 = "This is a KDE_MWSatellite object: \n"
+        s2 = "    pixel size = %0.8f\n" % self.pixel_size
+        s3 = "    number of grids = %d\n" % self.num_grid
+        s4 = "    sigma1 = %0.8f deg\n" % self.sigma1
+        s5 = "    sigma2 inside the satellite = %0.8f deg\n" % self.sigma2
+        s6 = "    sigma2 outside the satellite = %0.8f deg\n" % self.sigma3
+        s7 = "    rh = %0.8f deg"    % self.rh
+        return  "{}{}{}{}{}{}{}".format(s1, s2, s3, s4, s5, s6, s7)
 
     def grid_coord(self, center: float) -> np.ndarray:
         """ Get grid coordinates according to the center position and the
@@ -208,17 +211,14 @@ class KDE_MWSatellite(object):
         """
         return  n_o * area_i / area_o
 
-    def compound_sig_poisson(self, rh: float):
+    def compound_sig_poisson(self):
         """ Compound the Poisson significance map: s12 inside (s23 > sigma_th)
         and s13 outside (s23 < sigma_th)
-
-        : rh : half-light radius in deg
         """
         t0 = time.time()
 
         # factors using for outer aperture
         f_in2out = 2.    # r_i = f_in2out * s1
-        f_out2out = 0.68    # r_o = f_out2out * rh
         rh_th = 10. * self.sigma1    # threshold of min half-light radius in deg
 
         # inner aperture
@@ -231,10 +231,10 @@ class KDE_MWSatellite(object):
         lambda_out = self.get_lambda_poisson(n_outer, area_outer, area_inner)
 
         # outer aperture inside the dwarf
-        if rh < rh_th:
+        if self.rh < rh_th:
             lambda_in = lambda_out
         else:
-            r_o = f_out2out * float(rh)
+            r_o = self.sigma2
             n_outer, area_outer = self.poisson_outer_expected_background(r_i, r_o)
             lambda_in = self.get_lambda_poisson(n_outer, area_outer, area_inner)
 
