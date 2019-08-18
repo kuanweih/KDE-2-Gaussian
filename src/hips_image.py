@@ -86,7 +86,7 @@ def plot_hips_sky_image(ra: float, dec: float, sig_p: float, sigma1: float,
     if n_star_in < NSTAR_MIN:
         _s1 = 'skipping image for %s ' % short_name
         _s2 = 'because there are only %d stars in the kernel' % n_star_in
-        print(st1 + _st2)
+        print(_st1 + _st2)
         return    # skip plotting image with fewer than NSTAR_MIN stars
 
     print('plotting image for %s' %short_name)
