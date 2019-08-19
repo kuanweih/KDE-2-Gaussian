@@ -1,17 +1,17 @@
 """ parameters about patches """
 # preprocess.py
-PATCH_DIST = 0.9
-N_PATCH_MAX = 4
+PATCH_DIST = 0.5
+N_PATCH_MAX = 8
 
-WIDTH = 1    # width of a patch in deg
+WIDTH = 1.5    # width of a patch in deg = PATCH_DIST + 2 * sigma3
 
 
 
 """ parameters about candidates """
 # hips_image.py
-NSTAR_MIN = 3    # plotting image if the candidate contains more than 10 stars
+NSTAR_MIN = 5    # threshold of min stars in inner aperture
 WIDTH_FAC = 10    # width of image = width_fac * sigma1
-valid_width = 2. * PATCH_DIST - WIDTH    # deal with the boundary
+valid_width = PATCH_DIST    # deal with the boundary
 
 
 # summary.py

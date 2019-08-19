@@ -90,6 +90,10 @@ if __name__ == '__main__':
             ra = np.mean(df_name_label['ra'])
             dec = np.mean(df_name_label['dec'])
             sig_p = np.mean(df_name_label['sig_poisson'])
+
+            if sig_p < s_above:
+                continue    # don't plot images with sig < s_above
+
             name_list = name.split("-")
             if 'gaia' in name:
                 sigma1 = float('%0.4f' % float(name_list[5].split('s')[1]))
