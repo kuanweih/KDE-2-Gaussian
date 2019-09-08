@@ -1,7 +1,8 @@
 import numpy as np
+import pandas as pd
 
 from typing import Dict
-from src.tools import get_dic_list_npy
+from src.tools import get_dic_list_npy, dist2
 from src.param_patch_candidate import PATCH_DIST, N_PATCH_MAX
 
 
@@ -71,6 +72,47 @@ def plot_rh_sigma(dict_joint: Dict):
     plt.savefig("dwarfs/rh_sigma.png", bbox_inches='tight', dpi=200)
 
 
+def savetxt_gaia_pm_nstar(dict_joint):
+
+    from wsdb import HOST, USER, PASSWORD
+    from src.classPatchMWSatellite import PatchMWSatellite
+
+    pmra, pmdec, nrh = [], [], []
+    for i, name in enumerate(dict_joint['GalaxyName']):
+        ra, dec = dict_joint['RA_deg'][i], dict_joint['Dec_deg'][i]
+        dist = dict_joint['Distance_pc'][i]
+        rh = dict_joint['rh(arcmins)'][i] / 60.
+        width = 2. * rh
+        database = 'gaia_dr2.gaia_source'
+        cat_str = """ ra, dec, pmra, pmdec,
+                      phot_g_mean_mag, astrometric_excess_noise """
+
+        Patch = PatchMWSatellite(name, ra, dec, dist, width, database, cat_str)
+        Patch.sql_get(HOST, USER, PASSWORD)
+        Patch.mask_cut("phot_g_mean_mag", 17, 22)
+        Patch.mask_g_mag_astro_noise_cut()
+
+        mask = dist2(Patch.datas['ra'], Patch.datas['dec'], ra, dec) <= rh**2
+        Patch.cut_datas(mask)
+
+        _nrh = len(Patch.datas['pmra'])
+        _pmra = np.nanmean(Patch.datas['pmra'])
+        _pmdec = np.nanmean(Patch.datas['pmdec'])
+
+        nrh.append(_nrh)
+        pmra.append(_pmra)
+        pmdec.append(_pmdec)
+
+    nrh, pmra, pmdec = np.array(nrh), np.array(pmra), np.array(pmdec)
+
+    dict_joint['Nstar_rh'] = nrh
+    dict_joint['pmra_rh'] = pmra
+    dict_joint['pmdec_rh'] = pmdec
+
+    df = pd.DataFrame(dict_joint)
+    df.to_csv('dwarfs/dwarfs_detail.csv')
+
+
 
 if __name__ == '__main__':
     """ Concatenate the McConnachie list and my list into a joint one """
@@ -87,9 +129,10 @@ if __name__ == '__main__':
     np.save("dwarfs/dwarfs-joint", dict_joint)
     np.savetxt("dwarfs/dwarfs-names.txt", np.sort(dict_joint["GalaxyName"]), fmt="%s")
 
-    # plotting half-light radius and simgas
+
     plot_rh_sigma(dict_joint)
 
+    savetxt_gaia_pm_nstar(dict_joint)
 
     """ Expend the joint list by splitting the original map """
     r_200 = calc_r_200()    # R_200 in pc
