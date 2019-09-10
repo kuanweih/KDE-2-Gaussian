@@ -77,12 +77,12 @@ def savetxt_gaia_pm_nstar(dict_joint):
     from wsdb import HOST, USER, PASSWORD
     from src.classPatchMWSatellite import PatchMWSatellite
 
-    pmra, pmdec, nrh = [], [], []
+    pmra, pmdec, nrh, nbg = [], [], [], []
     for i, name in enumerate(dict_joint['GalaxyName']):
         ra, dec = dict_joint['RA_deg'][i], dict_joint['Dec_deg'][i]
         dist = dict_joint['Distance_pc'][i]
         rh = dict_joint['rh(arcmins)'][i] / 60.
-        width = 2. * rh
+        width = 4. * rh
         database = 'gaia_dr2.gaia_source'
         cat_str = """ ra, dec, pmra, pmdec,
                       phot_g_mean_mag, astrometric_excess_noise """
@@ -92,9 +92,13 @@ def savetxt_gaia_pm_nstar(dict_joint):
         Patch.mask_cut("phot_g_mean_mag", 17, 22)
         Patch.mask_g_mag_astro_noise_cut()
 
-        mask = dist2(Patch.datas['ra'], Patch.datas['dec'], ra, dec) <= rh**2
-        Patch.cut_datas(mask)
+        mask2rh = dist2(
+            Patch.datas['ra'], Patch.datas['dec'], ra, dec) <= (2.*rh)**2
+        Patch.cut_datas(mask2rh)
+        _n2rh = len(Patch.datas['pmra'])
 
+        maskrh = dist2(Patch.datas['ra'], Patch.datas['dec'], ra, dec) <= rh**2
+        Patch.cut_datas(maskrh)
         _nrh = len(Patch.datas['pmra'])
         _pmra = np.nanmean(Patch.datas['pmra'])
         _pmdec = np.nanmean(Patch.datas['pmdec'])
@@ -103,11 +107,15 @@ def savetxt_gaia_pm_nstar(dict_joint):
         pmra.append(_pmra)
         pmdec.append(_pmdec)
 
-    nrh, pmra, pmdec = np.array(nrh), np.array(pmra), np.array(pmdec)
+        _den = (_n2rh - _nrh) / np.pi / 3. / rh**2
+        nbg.append(_den)    # Nbg / deg^2
 
-    dict_joint['Nstar_rh'] = nrh
-    dict_joint['pmra_rh'] = pmra
-    dict_joint['pmdec_rh'] = pmdec
+    dict_joint['Nstar_rh'] = np.array(nrh)
+    dict_joint['pmra_rh'] = np.array(pmra)
+    dict_joint['pmdec_rh'] = np.array(pmdec)
+    dict_joint['Nbg_per_deg2'] = np.array(nbg)
+    dict_joint['rh_deg'] = dict_joint['rh(arcmins)'] / 60.
+    dict_joint['Nstar_per_rhdeg3'] = dict_joint['Nstar_rh'] / dict_joint['rh_deg']**3
 
     df = pd.DataFrame(dict_joint)
     df.to_csv('dwarfs/dwarfs_detail.csv')
