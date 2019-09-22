@@ -58,7 +58,7 @@ def calc_pm_dwarf_gaia(dwarf: PatchMWSatellite) -> Tuple[float]:
 
 def execute_kde_routine(patch: PatchMWSatellite, kdepatch: KDE_MWSatellite):
     kdepatch.np_hist2d(patch.datas['ra'], patch.datas['dec'])
-    kdepatch.is_inside_2d(RA_DWARF, DEC_DWARF, R_HALFLIGHT)    # TODO add a factor here
+    kdepatch.add_masks_on_pixels(RA_DWARF, DEC_DWARF, R_HALFLIGHT)
     kdepatch.compound_sig_gaussian()
     kdepatch.compound_sig_poisson()
     patch.append_sig_to_data(kdepatch.x_mesh, kdepatch.y_mesh,
