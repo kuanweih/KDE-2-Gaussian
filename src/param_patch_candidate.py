@@ -1,7 +1,7 @@
 """ parameters about patches """
 # preprocess.py
 PATCH_DIST = 0.5
-N_PATCH_MAX = 8
+N_PATCH_MAX = 7
 
 WIDTH = 1.5    # width of a patch in deg = PATCH_DIST + 2 * sigma3
 
