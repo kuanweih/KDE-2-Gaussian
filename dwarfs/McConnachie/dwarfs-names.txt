@@ -42,8 +42,6 @@ IndusI?
 CanesVenatici(I)
 LeoII
 LeoI
-AndromedaXVI
 Phoenix
 Eridanus2
-NGC6822
 LeoT

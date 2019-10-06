@@ -99,7 +99,7 @@ if __name__ == '__main__':
     dwarfs["Distance_pc"] = np.array(list(map(lambda x: dist_modulus_to_dist(x[0], x[1], x[2]), dwarfs["(m-M)o"])))
     dwarfs["rh(arcmins)"] = dwarfs["rh(arcmins)"][:, 0]
 
-    mask = dwarfs["Distance_pc"] < 500000    # skip dwarfs too far
+    mask = dwarfs["Distance_pc"] < 450000    # skip dwarfs outside of MW
     mask = mask & (dwarfs["rh(arcmins)"] < 90)    # skip dwarfs with rh = 99.99
 
     np.savetxt("dwarfs-names.txt", dwarfs["GalaxyName"][mask], fmt="%s")
