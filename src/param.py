@@ -44,7 +44,7 @@ R_HALFLIGHT = 0.28    # half light radius in deg
 if DATABASE == 'gaia_dr2.gaia_source':
     # g-band cut
     G_MAG_MIN = 17
-    G_MAG_MAX = 22    # fainter cut at G=22 for Gaia DR2
+    G_MAG_MAX = 21    # fainter cut at G=21 for Gaia DR2
 
     # pm cut based on pm_error
     IS_PM_ERROR_CUT = False

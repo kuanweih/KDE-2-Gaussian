@@ -39,9 +39,11 @@ AndXXXI
 LGS3
 AndromedaVI
 AndromedaXXII
+AndromedaXVI
 AndromedaXXVIII
 AndXXXIII
 IC1613
+NGC6822
 Cetus
 PegasusdIrr
 WLM
