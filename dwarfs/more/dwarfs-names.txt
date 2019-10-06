@@ -1,9 +1,9 @@
-CraterII
-AntliaII
-CarinaII
-CarinaIII
-CetusIII
-AquariusII
+Crater2
+Antlia2
+Carina2
+Carina3
+Cetus3
+Aquarius2
 VirgoI
 HydraI
-BootesIII
+Bootes3
