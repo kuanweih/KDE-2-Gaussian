@@ -89,7 +89,7 @@ def savetxt_gaia_pm_nstar(dict_joint):
 
         Patch = PatchMWSatellite(name, ra, dec, dist, width, database, cat_str)
         Patch.sql_get(HOST, USER, PASSWORD)
-        Patch.mask_cut("phot_g_mean_mag", 17, 22)
+        Patch.mask_cut("phot_g_mean_mag", 17, 21)
         Patch.mask_g_mag_astro_noise_cut()
 
         mask2rh = dist2(
