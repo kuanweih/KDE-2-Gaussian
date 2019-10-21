@@ -110,7 +110,7 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     DISTANCE = float('%0.4f' %(dwarfs_dict["Distance_pc"][0]))
 
     SIGMA1 = float('%0.4f' % (GC_SIZE / DISTANCE * 180. / np.pi))
-    SIGMA2 = float('%0.4f' %(0.68 * R_HALFLIGHT))
+    SIGMA2 = float('%0.4f' %(0.5 * R_HALFLIGHT))
     SIGMA3 = 0.5    # always use 0.5 deg as outer kernel
     PIXEL_SIZE = 0.25 * SIGMA1
 
