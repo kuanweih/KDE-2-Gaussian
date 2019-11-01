@@ -4,9 +4,7 @@
 # use py3 on coma (don't need this if already using py3)
 source  activate  mypython3
 
-
-bash  bashtools/preprocessing_dwarflist.sh
-
+python  preprocess.py
 
 # main search
 gc_size_pcs="10"
