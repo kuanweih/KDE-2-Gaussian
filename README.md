@@ -26,5 +26,5 @@ Before starting density estimation, one shall first set up:
     (if using the joint or joint-split dwarf list: names can be find in the txt files in `dwarfs/`)
 5. Summarize searching result with `python  -W  ignore  summary.py`
 6. If running step 4 and 5 on a cluster, slurm job scripts are provided:
-    - `bash  bashtools/slurm-slurm.sh`
+    - `bash  bashtools/slurm-slurm.sh`    # make sure the right input txt
     - `sbatch  bashtools/slurm-summary.sh`    # make sure all the KDE searches are done and then run this command
