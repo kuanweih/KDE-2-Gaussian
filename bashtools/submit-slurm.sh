@@ -4,16 +4,14 @@
 # use py3 on coma (don't need this if already using py3)
 source  activate  mypython3
 
-
-bash  bashtools/preprocessing_dwarflist.sh
-
+python  preprocess.py
 
 # main search
 gc_size_pcs="10"
 # gc_size_pcs="5  10"
 
-# input="dwarfs/dwarfs-names.txt"
-input="dwarfs/dwarfs-names-split.txt"
+# input="dwarfs/dwarfs-names-split.txt"
+input="dwarfs/dwarfs-names-split-pm.txt"
 
 
 while IFS= read -r name_dwarf;  do
