@@ -87,6 +87,22 @@ class PatchMWSatellite(object):
         self.cut_datas(mask)
         print("    %d sources left \n"  %self.n_source())
 
+    def mask_pm_error(self, pmra0: float, pmdec0: float, n_error: int):
+        """ Hard code the pm cut: dist(pm, pm_dwarf) < n_error * pm_error
+
+        : pmra0 : pmra of the dwarf
+        : pmdec0 : pmdec of the dwarf
+        : n_error : select sources withing n_error errorbar
+        """
+        print("Applying proper motion cut with %d" % n_error)
+        pmdist = dist2(self.datas['pmra'], self.datas['pmdec'], pmra0, pmdec0)
+        pmdist = np.sqrt(pmdist)
+        pmerror = dist2(self.datas['pmra_error'], self.datas['pmdec_error'], 0, 0)
+        pmerror = np.sqrt(pmerror)
+        mask = pmdist <= n_error * pmerror
+        self.cut_datas(mask)
+        print("    %d sources left \n"  %self.n_source())
+
     def mask_panstarrs_stargalaxy_sep(self):
         """ Hard code the star galaxy separation """
         print("Applying star galaxy separation: (rpsfmag - rkronmag) < 0.05")

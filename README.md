@@ -14,7 +14,7 @@ Before starting density estimation, one shall first set up:
 # How to use it:
 0. Clean the work directory: `bash bashtools/clean.sh`
 1. Preprocess a dwarf list (optional): <br>
-   `bash  bashtools/preprocessing_dwarflist.sh`
+   `python  preprocess.py`
 2. Get access to the database and enter information in `wsdb.py`
 3. Set up parameters in `src/param.py`, especially the following:
     - `IS_DWARF_LIST = False`    # use joint list
@@ -26,5 +26,5 @@ Before starting density estimation, one shall first set up:
     (if using the joint or joint-split dwarf list: names can be find in the txt files in `dwarfs/`)
 5. Summarize searching result with `python  -W  ignore  summary.py`
 6. If running step 4 and 5 on a cluster, slurm job scripts are provided:
-    - `bash  bashtools/slurm-slurm.sh`
+    - `bash  bashtools/slurm-slurm.sh`    # make sure the right input txt
     - `sbatch  bashtools/slurm-summary.sh`    # make sure all the KDE searches are done and then run this command

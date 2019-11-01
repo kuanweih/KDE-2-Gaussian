@@ -12,8 +12,8 @@ DATABASE = 'gaia_dr2.gaia_source'
 
 if DATABASE == 'gaia_dr2.gaia_source':
     DATABASE_SHORT = 'gaia'
-    CATALOG_STR = """ ra, dec, pmra, pmdec, bp_rp,
-                      phot_g_mean_mag, astrometric_excess_noise """
+    CATALOG_STR = """ ra, dec, pmra, pmdec, pmra_error, pmdec_error,
+                      bp_rp, phot_g_mean_mag, astrometric_excess_noise """
 elif DATABASE == 'panstarrs_dr1.stackobjectthin':
     DATABASE_SHORT = 'panstarrs'
     CATALOG_STR = 'ra, dec, rpsfmag, rkronmag'
@@ -47,9 +47,9 @@ if DATABASE == 'gaia_dr2.gaia_source':
     G_MAG_MAX = 21    # fainter cut at G=21 for Gaia DR2
 
     # pm cut based on pm_error
-    IS_PM_ERROR_CUT = False
+    IS_PM_ERROR_CUT = True
     if IS_PM_ERROR_CUT:
-        N_ERRORBAR = 5
+        N_ERRORBAR = 3
 
 
 """ panstarrs cuts """
@@ -77,6 +77,8 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
 
     if IS_DWARF_SPLIT_LIST:
         path_dwarfs = "dwarfs/dwarfs-joint-split.npy"
+        if IS_PM_ERROR_CUT:
+            path_dwarfs = "dwarfs/dwarfs-joint-split-pm.npy"
     elif IS_DWARF_LIST:
         path_dwarfs = "dwarfs/dwarfs-joint.npy"
     else:
@@ -98,6 +100,10 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     RA_DWARF = dwarfs_dict["RA_dwarf_deg"][0]      # ra of the dwarf (in deg)
     DEC_DWARF = dwarfs_dict["Dec_dwarf_deg"][0]    # dec of the dwarf (in deg)
     R_HALFLIGHT = dwarfs_dict["rh(arcmins)"][0] / 60.    # rh in deg
+
+    if IS_PM_ERROR_CUT:
+        PMRA_DWARF = dwarfs_dict["pmra_dwarf"][0]
+        PMDEC_DWARF = dwarfs_dict["pmdec_dwarf"][0]
 
     if IS_DWARF_SPLIT_LIST:
         from src.param_patch_candidate import WIDTH
