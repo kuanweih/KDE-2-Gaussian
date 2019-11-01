@@ -35,25 +35,25 @@ def gaia_patch_gmag_cut_astro_noise_cut(patch: PatchMWSatellite):
     patch.mask_g_mag_astro_noise_cut()    # astrometric_excess_noise cut
 
 
-def calc_pm_dwarf_gaia(dwarf: PatchMWSatellite) -> Tuple[float]:
-    """ Calculate the proper motions of a dwarf.
-
-    : dwarf : PatchMWSatellite of the dwarf with a size of rh
-    : return : mean and std of pmra and pmdec
-    """
-    dwarf.sql_get(HOST, USER, PASSWORD)    # query data
-    gaia_patch_gmag_cut_astro_noise_cut(dwarf)
-
-    pmra_mean = np.nanmean(dwarf.datas['pmra'])
-    pmra_std = np.nanstd(dwarf.datas['pmra'])
-    pmdec_mean = np.nanmean(dwarf.datas['pmdec'])
-    pmdec_std = np.nanstd(dwarf.datas['pmdec'])
-
-    print('The proper motions of the dwarf are:')
-    print('    pmra: mean = %0.4f, std = %0.4f' %(pmra_mean, pmra_std))
-    print('    pmdec: mean = %0.4f, std = %0.4f \n' %(pmdec_mean, pmdec_std))
-
-    return  pmra_mean, pmra_std, pmdec_mean, pmdec_std
+# def calc_pm_dwarf_gaia(dwarf: PatchMWSatellite) -> Tuple[float]:
+#     """ Calculate the proper motions of a dwarf.
+#
+#     : dwarf : PatchMWSatellite of the dwarf with a size of rh
+#     : return : mean and std of pmra and pmdec
+#     """
+#     dwarf.sql_get(HOST, USER, PASSWORD)    # query data
+#     gaia_patch_gmag_cut_astro_noise_cut(dwarf)
+#
+#     pmra_mean = np.nanmean(dwarf.datas['pmra'])
+#     pmra_std = np.nanstd(dwarf.datas['pmra'])
+#     pmdec_mean = np.nanmean(dwarf.datas['pmdec'])
+#     pmdec_std = np.nanstd(dwarf.datas['pmdec'])
+#
+#     print('The proper motions of the dwarf are:')
+#     print('    pmra: mean = %0.4f, std = %0.4f' %(pmra_mean, pmra_std))
+#     print('    pmdec: mean = %0.4f, std = %0.4f \n' %(pmdec_mean, pmdec_std))
+#
+#     return  pmra_mean, pmra_std, pmdec_mean, pmdec_std
 
 
 def execute_kde_routine(patch: PatchMWSatellite, kdepatch: KDE_MWSatellite):
@@ -65,35 +65,35 @@ def execute_kde_routine(patch: PatchMWSatellite, kdepatch: KDE_MWSatellite):
                              kdepatch.sig_gaussian, kdepatch.sig_poisson)
 
 
-def apply_pm_cut_gaia(patch: PatchMWSatellite, n_error: float):
-    """ Create a patch object for the dwarf so as to get pm limits.
-    Then use the limits to cut the data.
-
-    : patch : patch object
-    : n_error : N_ERRORBAR
-    """
-    _str1 = 'Creating a Dwarf object within'
-    _str2 = 'for proper motion selection: \n'
-    print('{} rh = %0.4f deg {}'.format(_str1, _str2) % R_HALFLIGHT)
-    # hard coding of the size for pm selection.
-    Dwarf = PatchMWSatellite(NAME, RA_DWARF, DEC_DWARF,
-                             DISTANCE, R_HALFLIGHT, DATABASE, CATALOG_STR)
-    print(Dwarf.__str__())
-    pmra_mean, pmra_std, pmdec_mean, pmdec_std = calc_pm_dwarf_gaia(Dwarf)
-
-    del Dwarf    # free the memory though it might not be necessary
-    print('Removed the Dwarf object since it is no longer needed. \n')
-    print_sep_line()
-    print('Selecting proper motion within %d sigma: \n' % n_error)
-
-    pmramax = pmra_mean + n_error * pmra_std
-    pmramin = pmra_mean - n_error * pmra_std
-    pmdecmax = pmdec_mean + n_error * pmdec_std
-    pmdecmin = pmdec_mean - n_error * pmdec_std
-
-    patch.mask_cut("pmra", pmramin, pmramax)
-    patch.mask_cut("pmdec", pmdecmin, pmdecmax)
-    print_sep_line()
+# def apply_pm_cut_gaia(patch: PatchMWSatellite, n_error: float):
+#     """ Create a patch object for the dwarf so as to get pm limits.
+#     Then use the limits to cut the data.
+#
+#     : patch : patch object
+#     : n_error : N_ERRORBAR
+#     """
+#     _str1 = 'Creating a Dwarf object within'
+#     _str2 = 'for proper motion selection: \n'
+#     print('{} rh = %0.4f deg {}'.format(_str1, _str2) % R_HALFLIGHT)
+#     # hard coding of the size for pm selection.
+#     Dwarf = PatchMWSatellite(NAME, RA_DWARF, DEC_DWARF,
+#                              DISTANCE, R_HALFLIGHT, DATABASE, CATALOG_STR)
+#     print(Dwarf.__str__())
+#     pmra_mean, pmra_std, pmdec_mean, pmdec_std = calc_pm_dwarf_gaia(Dwarf)
+#
+#     del Dwarf    # free the memory though it might not be necessary
+#     print('Removed the Dwarf object since it is no longer needed. \n')
+#     print_sep_line()
+#     print('Selecting proper motion within %d sigma: \n' % n_error)
+#
+#     pmramax = pmra_mean + n_error * pmra_std
+#     pmramin = pmra_mean - n_error * pmra_std
+#     pmdecmax = pmdec_mean + n_error * pmdec_std
+#     pmdecmin = pmdec_mean - n_error * pmdec_std
+#
+#     patch.mask_cut("pmra", pmramin, pmramax)
+#     patch.mask_cut("pmdec", pmdecmin, pmdecmax)
+#     print_sep_line()
 
 
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     print_sep_line()
 
     if IS_PM_ERROR_CUT:
-        apply_pm_cut_gaia(Patch, N_ERRORBAR)
+        Patch.mask_pm_error(PMRA_DWARF, PMDEC_DWARF, N_ERRORBAR)
 
     print('Creating a KDEPatch object and start the KDE calcuation: \n')
     KDEPatch = KDE_MWSatellite(RA, DEC, WIDTH, PIXEL_SIZE, SIGMA1, SIGMA2, SIGMA3, R_HALFLIGHT)
