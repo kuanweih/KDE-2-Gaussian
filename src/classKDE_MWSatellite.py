@@ -259,12 +259,13 @@ class KDE_MWSatellite(object):
         print("Took %0.4fs to calculate Poisson sig." % (time.time() - t0))
         print('Added sig_poisson to the KDE_MWSatellite object. \n')
 
-    #     self.bg_estimate = lambda_in * self.is_inside_dwarf + \
-    #         lambda_out * (~self.is_inside_dwarf)
-    #     self.bg_estimate /= area_inner
-    #
-    # def true_bg_parser(self, true_bg: np.ndarray):
-    #     """ Parse true_bg in to be used as self.hist2d
-    #     : true_bg : the true or analytic bg
-    #     """
-    #     self.hist2d = true_bg
+        if IS_OUTPUT_BG:
+            self.bg_estimate = lambda_in * self.is_inside_dwarf
+            self.bg_estimate += lambda_out * (~self.is_inside_dwarf)
+            # self.bg_estimate /= area_inner
+
+    def true_bg_parser(self, true_bg: np.ndarray):
+        """ Parse true_bg in to be used as self.hist2d (Only for the sanity check).
+        : true_bg : the true or analytic bg
+        """
+        self.hist2d = true_bg

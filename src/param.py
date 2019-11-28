@@ -22,6 +22,8 @@ else:
 
 
 """ default (manual) target parameters """
+IS_OUTPUT_BG = False    # ouput bg estimation
+
 NAME = 'Fornax'    # name of the dwarf
 RA = 39.997      # ra of the center of a patch (in deg)
 DEC = -34.449    # dec of the center of a patch (in deg)
@@ -47,7 +49,7 @@ if DATABASE == 'gaia_dr2.gaia_source':
     G_MAG_MAX = 21    # fainter cut at G=21 for Gaia DR2
 
     # pm cut based on pm_error
-    IS_PM_ERROR_CUT = True
+    IS_PM_ERROR_CUT = False
     if IS_PM_ERROR_CUT:
         N_ERRORBAR = 3
 
@@ -56,13 +58,6 @@ if DATABASE == 'gaia_dr2.gaia_source':
 if DATABASE == 'panstarrs_dr1.stackobjectthin':
     # pm cut based on pm_error
     IS_PM_ERROR_CUT = False
-
-
-""" output file name """
-FILE_STAR = 'queried-data'    # output data file
-FILE_SIG_GAUSSIAN = 'sig_gaussian'    # output significance file
-FILE_SIG_POISSON = 'sig_poisson'    # output significance file
-FILE_MESH = 'meshgrids'    # output mesh grids
 
 
 """ parse arguments from the joint-split dwarf list or the joint dwarf list """
@@ -81,6 +76,8 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
             path_dwarfs = "dwarfs/dwarfs-joint-split-pm.npy"
     elif IS_DWARF_LIST:
         path_dwarfs = "dwarfs/dwarfs-joint.npy"
+        if IS_PM_ERROR_CUT:
+            path_dwarfs = "dwarfs/dwarfs-joint-pm.npy"
     else:
         raise ValueError('Wrong list boolean')
 
@@ -108,7 +105,7 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     if IS_DWARF_SPLIT_LIST:
         from src.param_patch_candidate import WIDTH
     elif IS_DWARF_LIST:
-        WIDTH = float('%0.4f' %(8. * R_HALFLIGHT))
+        WIDTH = float('%0.4f' %(2. * R_HALFLIGHT))
     else:
         raise ValueError('Wrong list boolean')
 
@@ -119,6 +116,16 @@ if IS_DWARF_SPLIT_LIST or IS_DWARF_LIST:
     SIGMA2 = float('%0.4f' %(0.5 * R_HALFLIGHT))
     SIGMA3 = 0.5    # always use 0.5 deg as outer kernel
     PIXEL_SIZE = 0.25 * SIGMA1
+
+
+""" output file name """
+FILE_STAR = 'queried-data'    # output data file
+FILE_SIG_GAUSSIAN = 'sig_gaussian'    # output significance file
+FILE_SIG_POISSON = 'sig_poisson'    # output significance file
+FILE_MESH = 'meshgrids'    # output mesh grids
+
+if IS_OUTPUT_BG:
+    FILE_BG_EST = 'bg_estimate'
 
 
 if __name__ == '__main__':

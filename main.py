@@ -82,6 +82,11 @@ if __name__ == '__main__':
     np.save("{}/{}".format(dir_name, FILE_SIG_POISSON), KDEPatch.sig_poisson)
     _meshs = np.array([KDEPatch.x_mesh, KDEPatch.y_mesh])
     np.save("{}/{}".format(dir_name, FILE_MESH), _meshs)
+
+    if IS_OUTPUT_BG:
+        np.save("{}/{}".format(dir_name, FILE_BG_EST), KDEPatch.bg_estimate)
+
+
     print('Done =) \n')
     print('Finished KDE calculation. \n')
     print_sep_line()
