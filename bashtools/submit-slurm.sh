@@ -10,6 +10,8 @@ python  preprocess.py
 gc_size_pcs="10"
 # gc_size_pcs="5  10"
 
+# input="dwarfs/dwarfs-names.txt"
+
 # input="dwarfs/dwarfs-names-split.txt"
 input="dwarfs/dwarfs-names-split-pm.txt"
 

@@ -30,8 +30,8 @@ def calc_width(r_200: float, dist: float, factor: int = 1) -> float:
 
 
 
-def expand_joint_dict(df: pd.DataFrame, is_pm: bool = False):
-    """ Expand joint list to splitted one.
+def expand_joint_dict_split(df: pd.DataFrame, is_pm: bool = False):
+    """ Expand joint list to a splitted one.
 
     : df : DataFrame of csv file for the dwarfs
     : is_pm : specify if it is the original csv or the one with proper motions
@@ -111,6 +111,37 @@ def expand_joint_dict(df: pd.DataFrame, is_pm: bool = False):
 
 
 
+def expand_joint_dict(df: pd.DataFrame, is_pm: bool = False):
+    """ Expand joint list to a splitted one.
+
+    : df : DataFrame of csv file for the dwarfs
+    : is_pm : specify if it is the original csv or the one with proper motions
+    """
+    df['RA_dwarf_deg'], df['Dec_dwarf_deg'] = df['RA_deg'], df['Dec_deg']
+
+    quantitys = ["GalaxyName", "RA_deg", "Dec_deg", "Distance_pc", "rh(arcmins)"]
+    quantitys.append("RA_dwarf_deg")
+    quantitys.append("Dec_dwarf_deg")
+    if is_pm:
+        quantitys.append('pmra')
+        quantitys.append('pmdec')
+
+    dict = {q: df[q].values for q in quantitys}
+    if is_pm:
+        dict['pmra_dwarf'] = dict.pop('pmra')
+        dict['pmdec_dwarf'] = dict.pop('pmdec')
+
+    sorted_name = np.sort(dict["GalaxyName"])
+
+    if is_pm:
+        np.save("dwarfs/dwarfs-joint-pm", dict)
+        np.savetxt("dwarfs/dwarfs-names-pm.txt", sorted_name, fmt="%s")
+    else:
+        np.save("dwarfs/dwarfs-joint", dict)
+        np.savetxt("dwarfs/dwarfs-names.txt", sorted_name, fmt="%s")
+
+
+
 if __name__ == '__main__':
 
     df_ori = pd.read_csv('dwarfs/ori-dwarfs.csv').drop(['Unnamed: 0'], axis=1)
@@ -118,3 +149,6 @@ if __name__ == '__main__':
 
     expand_joint_dict(df_ori)
     expand_joint_dict(df_ori_pm, is_pm=True)
+
+    expand_joint_dict_split(df_ori)
+    expand_joint_dict_split(df_ori_pm, is_pm=True)
